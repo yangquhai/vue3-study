@@ -16,6 +16,9 @@ const instance = axios.create({
 
 instance.interceptors.request.use(
     (config) => {
+        document.cookie = 'anywell_ajax_token=2023072812212943983'
+        document.cookie = ".ASPXANONYMOUS=aGkrNR1hIwiIlB8eA64nrqbfwjRyD09R7OpQ9PP1dH5ksIO8NpE91V-RMplOi7gGe1p3mH_aXIbKSI9UpxU27jfCK51R05p4Dm1D3fDrVJpUe"
+        document.cookie = "ASP.NET_SessionId=p5mezybsvczsx3ajulyvqbqz"
         return config
     },
     (error) => {

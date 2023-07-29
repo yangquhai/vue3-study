@@ -1,9 +1,9 @@
 <template>
+    <searchTab :placeholder="placeholder" @search="search"></searchTab>
     <div>
-        123123132
+        index
     </div>
     <calendar></calendar>
-    <search></search>
     <superFilter></superFilter>
     <userInfo></userInfo>
 </template>
@@ -12,6 +12,11 @@
 import request from '_api'
 import {ref} from 'vue'
 
+const placeholder = ref('12313123')
+
+const search = (value)=> {
+    console.log(value,'12312312')
+}
 
 const getData = async()=> {
         let formData = new FormData()
@@ -30,16 +35,6 @@ const getData = async()=> {
     } catch (err) {
         console.log(err)
     }
-        // let formData = new FormData()
-        // formData.append('Ttablename','bxd_main')
-        // formData.append('Turl','bxd.aspx')
-        // formData.append('Tformnamecn','4366')
-        // formData.append('Tsystem_lcmc','报销单')
-        // formData.append('TisFirst','1')
-        // let data = await api.getDropData(formData)
-        // tabListData = data.colums
-        // placeholders.value = tabListData.search.text
-        // console.log(tabListData)
 }
 getData()
 </script>
