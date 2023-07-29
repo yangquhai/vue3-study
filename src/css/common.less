@@ -1,0 +1,303 @@
+@import url('./reset.less');
+
+// 毛玻璃效果
+.blur-effect() {
+    &::before {
+        content: "";
+        z-index: -1;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--van-white-color-p60);
+        backdrop-filter: blur(15px);
+    }
+}
+
+// 常规容器
+.card {
+    position: relative;
+    margin: var(--van-padding-sm);
+    background-color: var(--van-white);
+    border-radius: var(--van-radius-lg);
+    overflow: hidden;
+    word-break: break-all;
+
+    .card-header,
+    .card-content-inner,
+    .card-footer {
+        padding: var(--van-padding-sm);
+    }
+}
+
+.page-content {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+}
+
+// 返回顶部
+.van-back-top {
+    // opacity: var(--van-active-opacity);
+    overflow: hidden;
+    background-color: transparent;
+    .blur-effect();
+
+    .van-back-top__icon {
+        color: var(--van-gray-6);
+    }
+}
+
+
+// tabbar毛玻璃效果
+.van-tabbar {
+    background: none;
+
+    .van-tabbar-item--active {
+        background: none;
+    }
+
+    .blur-effect();
+}
+
+// 单元格
+.van-cell-group {
+    // .van-cell__title {
+    //     color: var(--van-text-color-2);
+    // }
+
+    .van-cell {
+        padding: var(--van-cell-vertical-padding) var(--van-padding-sm);
+    }
+}
+
+// 单元格 - 无边框
+.van-cell-group.van-cell-group-1 {
+    padding: calc(var(--van-cell-vertical-padding) / 2) 0;
+
+    .van-cell__title {
+        flex: initial;
+        width: 25%;
+        color: var(--van-text-color-2);
+    }
+
+    .van-cell__value {
+        color: var(--van-text-color);
+        text-align: left;
+    }
+
+    .van-cell {
+        padding: calc(var(--van-cell-vertical-padding) / 2) var(--van-padding-sm);
+
+        &::after {
+            border: none;
+        }
+    }
+}
+
+// 步骤条
+.van-steps--horizontal {
+    position: fixed;
+    top: 0;
+    z-index: 2;
+    box-sizing: border-box;
+    width: 100vw;
+
+    .van-step {
+
+        &:first-child {
+            .van-step__circle-container i {
+                margin-left: 0.5rem;
+            }
+        }
+
+        &:last-child {
+            .van-step__circle-container i {
+                margin-right: 0.5rem;
+            }
+        }
+    }
+}
+
+// 自适应矩形图片
+.square-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+
+    .square-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+
+        .van-image {
+            width: 100%;
+            height: 100%;
+        }
+    }
+}
+
+// 横屏模式
+.landscape-mode {
+    &.van-dialog {
+        transform: rotate(90deg);
+        top: calc(50% - calc(50vw - var(--van-padding-md) * 2) / 2);
+    }
+}
+
+// 辅助函数: 生成 margin padding 类
+.generate-spacing(@type; @t; @value) {
+    .m-@{value} {
+        margin: @value * 1px !important;
+    }
+
+    .m-@{t}-@{value} {
+        margin-@{type}: @value * 1px !important;
+    }
+
+    .p-@{value} {
+        padding: @value * 1px !important;
+    }
+
+    .p-@{t}-@{value} {
+        padding-@{type}: @value * 1px !important;
+    }
+}
+
+// 辅助函数: 生成递归循环
+.loop-spacing(@index, @base) when (@index <=8) {
+    .generate-spacing(top; t; @base * @index);
+    .generate-spacing(right; r; @base * @index);
+    .generate-spacing(bottom; b; @base * @index);
+    .generate-spacing(left; l; @base * @index);
+    .loop-spacing(@index + 1, @base);
+}
+
+.loop-spacing(0, @basePixel);
+
+.txt-primary {
+    color: var(--van-primary-color); // 字体主色
+}
+
+.txt-default {
+    color: var(--van-text-color); // 字体默认色
+}
+
+// 字体常规色
+.txt-red {
+    color: var(--van-red);
+}
+
+.txt-blue {
+    color: var(--van-blue);
+}
+
+.txt-green {
+    color: var(--van-green);
+}
+
+.txt-orange {
+    color: var(--van-orange);
+}
+
+.txt-gray {
+    color: var(--van-text-color-2);
+}
+
+// 字体自定义颜色
+.txt-c-1 {
+    color: var(--text-color-1);
+}
+
+// 字体自定义粗体和大小
+.txt-bold {
+    font-weight: var(--van-font-bold);
+}
+
+.txt-xs {
+    font-size: var(--van-font-size-xs) !important;
+}
+
+.txt-sm {
+    font-size: var(--van-font-size-sm) !important;
+}
+
+.txt-md {
+    font-size: var(--van-font-size-md) !important;
+}
+
+.txt-lg {
+    font-size: var(--van-font-size-lg) !important;
+}
+
+// 内联元素对齐
+.txt-c {
+    text-align: center;
+}
+.txt-l {
+    text-align: left;
+}
+.txt-r {
+    text-align: right;
+}
+
+// 背景色
+.bg-gray {
+    background-color: var(--van-background);
+}
+.bg-blue-p5 {
+    background-color: var(--van-blue-color-p5);
+}
+.bg-none {
+    background: none;
+    background-color: none;
+}
+
+// flex元素对齐
+.flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.flex-t {
+    align-items: baseline;
+}
+
+.flex-r {
+    justify-content: end;
+}
+
+.flex-b {
+    align-items: end;
+}
+
+.flex-l {
+    justify-content: start;
+}
+
+.flex-c {
+    justify-content: center;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+

@@ -1,0 +1,51 @@
+@basePixel: 4;
+@themeColor: #ff6600;
+@greenColor: #07c160;
+@whiteColor: #ffffff;
+@grayColor: #f7f8fa;
+@blueColor: #1989fa;
+
+:root:root {
+    --van-orange: @themeColor;
+    --van-primary-color: var(--van-orange);
+    --van-primary-color-p15: fade(@themeColor, 15%);
+    --van-primary-color-p60: fade(@themeColor, 60%);
+    --van-green-color-p15: fade(@greenColor, 15%);
+    --van-white-color-p60: fade(@whiteColor, 60%);
+    --van-gray-color-p60: fade(@grayColor, 60%);
+    --van-orange-color-p60: fade(@themeColor, 10%);
+    --text-color-1: #34495e;
+    --van-blue-color-p5: fade(@blueColor, 5%);
+    --van-back-top-background: var(--van-orange);
+    --van-nav-bar-icon-color: var(--van-black);
+}
+
+::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    height: 100%;
+    color: var(--van-text-color);
+    font-size: var(--van-font-size-md) !important;
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    color: var(--van-primary-color);
+}
+
+.van-theme-light {
+    background-color: var(--van-gray-2);
+}
