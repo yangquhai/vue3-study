@@ -4,7 +4,7 @@
         index
     </div>
     <calendar></calendar>
-    <superFilter></superFilter>
+    <superFilter :tabListDatas="tabListData" @sift="sift"></superFilter>
     <userInfo></userInfo>
 </template>
 
@@ -13,6 +13,7 @@ import request from '_api'
 import {ref} from 'vue'
 
 const placeholder = ref('12313123')
+const tabListData = ref('')
 
 const search = (value)=> {
     console.log(value,'12312312')
@@ -27,16 +28,16 @@ const getData = async()=> {
         formData.append('TisFirst','1')
     try {
         const res = await request.getUserInfo(formData)
-        // const res = await request.uploadCheckInATakePhotosImgs(formData)
-        const resImg = res.data
-        console.log(resImg)
-
-        
+        tabListData.value = res.data
+        // const res = await request.uploadCheckInATakePhotosImgs(formData)    
     } catch (err) {
         console.log(err)
     }
 }
-getData()
+const sift =()=>{
+    console.log(333)
+}
+// getData()
 </script>
 
 <style lang="scss" scoped>

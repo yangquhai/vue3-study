@@ -2,7 +2,7 @@
   <div>
     <div class="calendar">
         <div class="calelist" style="display:flex">
-            <van-cell title="从" :value="date" @click="showDate" />
+            <van-cell title="从" :value="date1" @click="value1 = true" />
             <van-calendar v-model:show="value1" :show-confirm="false" @confirm="onConfirm" :min-date="minDate" :max-date="maxDate" />
             <van-cell title="至" class="van-cell2" :value="date2" @click="value2 = true" />
             <van-calendar v-model:show="value2" :show-confirm="false" @confirm="onConfirm2" :min-date="minDate" :max-date="maxDate" />
@@ -13,7 +13,7 @@
 
 <script setup>
 import {ref} from 'vue'
-const date = ref('请选择日期')
+const date1 = ref('请选择日期')
 const date2 = ref('请选择日期')
 const value1 = ref(false)
 const value2 = ref(false)
@@ -21,19 +21,15 @@ const minDate = ref(new Date(2020, 0, 1))
 const maxDate = ref(new Date(2025, 0, 31))
 const onConfirm = (date)=> {
        value1.value = false;
-       date.value = this.getSimpleDate(date);
-       console.log(date.value)
+       date1.value = getSimpleDate(date);
+       console.log(date1.value)
 }
 const onConfirm2=(date)=> {
       value2.value = false;
       date2.value = getSimpleDate(date);
       console.log(date2.value)
 }
-const showDate = ()=> {
-  value1.value = true
-  console.log(value1.value)
-}
-const getSimpleDate=(date)=> {
+const getSimpleDate = (date)=> {
         var y = date.getFullYear();
         var m = date.getMonth() + 1;
         m = m < 10 ? ('0' + m) : m;
