@@ -1,3 +1,4 @@
+<!-- 用于头部框的搜索框制作 -->
 <template>
     <div>
       <form action="/">
@@ -14,7 +15,8 @@
 
 <script setup>
 import {ref} from 'vue'
-    const value = ref('1312312')
+    const value = ref('')
+    // const flag = ref(['1','2','3'])
     const props =defineProps({
       placeholder:String
     })

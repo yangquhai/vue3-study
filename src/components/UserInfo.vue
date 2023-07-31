@@ -1,3 +1,4 @@
+<!-- 用于card信息的渲染 -->
 <template>
     <div>
        userInfo
