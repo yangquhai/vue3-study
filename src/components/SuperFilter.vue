@@ -11,9 +11,9 @@
                             <div>{{ value[index].luoji }}</div>
                             <van-icon name="arrow-down" />
                         </div>
-                        <van-popup v-model="showPopoverSelect[index]" round position="bottom" :style="{ height: '30%' }">
-                            <van-picker :columns="item.condition" @confirm="onConfirm" @cancel="onCancel" value-key="luoji"
-                                show-toolbar item-height="1rem" :default-index="0" />
+                        <van-popup v-model:show="showPopoverSelect[index]" round position="bottom" :style="{ height: '40%' }">
+                            <van-picker :columns="item.condition" @confirm="onConfirm" @cancel="onCancel" 
+                            :columns-field-names="customFieldName" show-toolbar item-height="1rem" :default-index="0" />
                         </van-popup>
                         <van-field v-model="item.values[0].value" :placeholder="'请输入' + item.text" right-icon="search" />
                     </div>
@@ -27,12 +27,12 @@
                     <div>{{ item.text }}</div>
                     <div class="options">
                         <div class="buttons" @click="showTextPopovers(index)">
-                            <div class="luoji">{{ value1[index].luoji }}</div>
+                            <div class="luoji">{{ value1[index] }}</div>
                             <van-icon name="arrow-down" />
                         </div>
-                        <van-popup v-model="showPopoverText[index]" round position="bottom" :style="{ height: '30%' }">
+                        <van-popup v-model:show="showPopoverText[index]" round position="bottom" :style="{ height: '40%' }">
                             <van-picker :columns="item.condition" @confirm="onConfirmText" @cancel="onCancelText"
-                                value-key="luoji" show-toolbar item-height="1rem" :default-index="0" />
+                            :columns-field-names="customFieldName" show-toolbar item-height="1rem" :default-index="0" />
                         </van-popup>
                         <van-field v-model="item.values[0]" :placeholder="'请输入' + item.text" clearable />
                     </div>
@@ -81,9 +81,13 @@ const showPopoverSelect = ref([])
 const showPopoverText = ref([])
 // 用户点击的condition索引
 const showPopoverSelectFlag = ref([])
-// const showPopoverTextFlag = ref([])
+const showPopoverTextFlag = ref([])
 const value = ref([])
 const value1 = ref([])
+const customFieldName = {
+      text: 'luoji',
+      value: 'id',
+    };
 const props = defineProps({
     tabListData: Object
 })
@@ -98,7 +102,7 @@ const selectList = computed(() => {
             for (let j = 0; j < props.tabListData.searchCondition[i].condition.length; j++) {
                 if (props.tabListData.searchCondition[i].condition[j].select)
                     // console.log(i)
-                    value.value.push({ luoji: props.tabListData.searchCondition[i].condition[j].luoji })
+                    value.value.push(props.tabListData.searchCondition[i].condition[j])
                 // this.value1[valueIndex].luoji = this.tabListData.searchCondition[i].condition[j].luoji
             }
         }
@@ -117,13 +121,13 @@ const textList = computed(() => {
             for (let j = 0; j < props.tabListData.searchCondition[i].condition.length; j++) {
                 if (props.tabListData.searchCondition[i].condition[j].select)
                     // console.log(i)
-                    value1.value.push({ luoji: props.tabListData.searchCondition[i].condition[j].luoji })
+                    value1.value.push(props.tabListData.searchCondition[i].condition[j].luoji)
                 // this.value1[valueIndex].luoji = this.tabListData.searchCondition[i].condition[j].luoji
             }
             // this.showPopoverText.push(false)
         }
     }
-    // console.log(this.value1)
+    console.log(textList)
     return textList
 })
 const onSelect = (action) => {
@@ -168,11 +172,12 @@ const showTextPopovers = (index) => {
     showPopoverText.value[index] = true
     showPopoverTextFlag.value = index
 }
-const onConfirmText = (value, index) => {
+const onConfirmText = ({ selectedOptions } ) => {
     // Toast(`当前值：${value}, 当前索引：${index}`);
-    console.log(index, value, showPopoverTextFlag.value)
-    value1.value[showPopoverTextFlag.value] = value
+    console.log(selectedOptions[0], showPopoverTextFlag.value)
+    value1.value[showPopoverTextFlag.value] = selectedOptions[0].luoji
     // this.$set(this.value1,index,value)
+    console.log(value1.value[showPopoverTextFlag.value])
     showPopoverText.value[showPopoverTextFlag.value] = false
 }
 const onCancelText = () => {

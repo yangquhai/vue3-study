@@ -93,4 +93,5 @@ const getSimpleDate = (date) => {
     // background-color: white;
   }
 
-}</style>
+}
+</style>

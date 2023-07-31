@@ -289,13 +289,13 @@ const XGRQ = computed(() => {
     if (userDataList2.value != undefined && fieldName.value != undefined)
         for (let i = 0; i < userDataList2.value.length; i++) {
             for (let j = 0; j < fieldName.value.length; j++) {
-                if (fieldName.value[j].type == '字段1' && fieldName.value[j].fieldname == 'DGY') {
+                if (fieldName.value[j].type == '字段1' && fieldName.value[j].fieldname == 'XGRQ') {
                     if (fieldName.value[j].lb == '数据:日期框') {
                         let arr = userDataList2.value[i][fieldName.value[j].fieldname].split('T')
-                        LXDH.push(arr[0])
+                        KHMC.push(arr[0])
                     }
                     else if (fieldName.value[j].lb == '数据:时间框') {
-                        LXDH.push(userDataList2.value[i][fieldName.value[j].fieldname])
+                        KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname])
                     }
                 }
             }
@@ -655,7 +655,7 @@ const checked = (name, money) => {
 
     .style1 {
         // border: solid 1px red;
-        margin-top: 9px;
+        // margin-top: 9px;
         display: flex;
         justify-content: flex-end;
         margin-left: 12px;

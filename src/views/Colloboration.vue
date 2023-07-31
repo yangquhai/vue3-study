@@ -36,7 +36,7 @@
             <van-calendar v-model:show="value2" :show-confirm="false" @confirm="onConfirm2" :min-date="minDate"
               :max-date="maxDate" />
           </div>
-          <van-button round  size="small" @click="close">确认</van-button>
+          <van-button round size="small" @click="close">确认</van-button>
         </div>
       </div>
     </transition>
@@ -207,6 +207,8 @@ const actions2 = reactive([{ name: '转收款' }, { name: '转订单' }, { name:
 const minDate = ref(new Date(2020, 0, 1))
 const maxDate = ref(new Date(2025, 0, 31))
 const baseUrl = ref('http://dx.anywellchat.com:8888/ANYWELL_hylingls/')
+// 总金额
+const totalMoney = ref('')
 
 // 获取页面数据
 const getData = async () => {
@@ -223,7 +225,10 @@ const getData = async () => {
     tabList.value[0] = tabListData.value.dateType.defaultValue
     placeholder.value = tabListData.value.search.text
     procedureList.value = tabListData.value.lcmxmc
-    console.log(tabListData.value)
+    totalMoney.value = userInfoDataList.value.sum[0].value
+    if (totalMoney.value > 10000)
+    totalMoney.value = (totalMoney.value / 10000).toFixed(0).toString() + '万'
+    // console.log(userInfoDataList.value.sum[0].value)
   } catch (err) {
     console.log(err)
   }
@@ -231,28 +236,28 @@ const getData = async () => {
 getData()
 
 // 计算总金额
-const totalMoney = computed(() => {
-  let sum = 0
-  // console.log(this.chooseList.length)
-  if (chooseList.value.length) {
-    for (let i = 0; i < chooseList.value.length; i++) {
-      // sum = this.dataList[i].money+this.dataList[i+1].money
-      // console.log(this.chooseList[i].money)
-      sum = sum + chooseList[i].value.money
-    }
-  }
-  else {
-    for (let i = 0; i < dataList.value.length; i++) {
-      // sum = this.dataList[i].money+this.dataList[i+1].money
-      // console.log(this.dataList[i].money)
-      sum = sum + dataList[i].value.money
-    }
-  }
-  // console.log(sum)
-  if (sum > 10000)
-    sum = (sum / 10000).toFixed(0).toString() + '万'
-  return sum
-})
+// const totalMoney = computed(() => {
+//   let sum = 0
+//   // console.log(this.chooseList.length)
+//   if (chooseList.value.length) {
+//     for (let i = 0; i < chooseList.value.length; i++) {
+//       // sum = this.dataList[i].money+this.dataList[i+1].money
+//       // console.log(this.chooseList[i].money)
+//       sum = sum + chooseList[i].value.money
+//     }
+//   }
+//   else {
+//     for (let i = 0; i < dataList.value.length; i++) {
+//       // sum = this.dataList[i].money+this.dataList[i+1].money
+//       // console.log(this.dataList[i].money)
+//       sum = sum + dataList[i].value.money
+//     }
+//   }
+//   // console.log(sum)
+//   if (sum > 10000)
+//     sum = (sum / 10000).toFixed(0).toString() + '万'
+//   return sum
+// })
 // 计算排序数组
 const sortList = computed(() => {
   let sortList = tabListData.value.orderType.orderType
@@ -283,7 +288,8 @@ const dateList = computed(() => {
       // console.log(dateList[index].values,index)
       for (let j = 0; j < dateList[index].values.length; j++) {
         if (dateList[index].values[j].select)
-          dateLastClick.value[index] = 1
+          // dateLastClick.value[index] = 1
+          console.log(111)
       }
     }
   }
@@ -507,30 +513,31 @@ const chooseProcedureTags = (index, value) => {
 }
 // 日期单选
 const chooseDataTag = (index, index2, value) => {
-  console.log(value, dateLastClick.value[index], index2)
+  // console.log(value)
+  // console.log(dateLastClick.value[index])
   if (value.value == '自定义') {
     // 说明有初始值
     if (dateLastClick.value[index] != null)
       dateList.value[index].values[dateLastClick.value[index]].select = false
-    dateList.value[index].values[index2].select = true
-    calendarFlag2.value = true
+      dateList.value[index].values[index2].select = true
+      calendarFlag2.value = true
   }
   // 当点击值为非自定义时
   else {
     calendarFlag2.value = false
+     // 点击到相同的框
     if (dateList.value[index].values[index2].select) {
       // console.log(this.usertTagList[index].values[index2].select)
       dateList.value[index].values[index2].select = false
     }
     else {
-      if (dateLastClick.value[index] != null) {
+      if (dateLastClick.value[index] != null)
         dateList.value[index].values[dateLastClick.value[index]].select = false
         dateList.value[index].values[index2].select = true
-      }
     }
   }
   dateLastClick.value[index] = index2
-  console.log(dateLastClick.value[index])
+  // console.log(dateLastClick.value[index])
 }
 
 const onSelect = () => {
@@ -756,13 +763,13 @@ const sift = () => {
       // border: solid 1px red;
       width: 100%;
       // margin-left: 85px;
-      margin-top: 0px;
+      margin-top: -25px;
       position: fixed;
       display: flex;
       z-index: 2;
       justify-content: flex-end;
       background-color: rgba(255, 255, 255, 1);
-      padding-bottom: 4px;
+      padding-bottom: 8px;
 
       .van-button {
         width: 83px;
