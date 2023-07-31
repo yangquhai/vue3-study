@@ -11,9 +11,10 @@
                             <div>{{ value[index].luoji }}</div>
                             <van-icon name="arrow-down" />
                         </div>
-                        <van-popup v-model:show="showPopoverSelect[index]" round position="bottom" :style="{ height: '40%' }">
-                            <van-picker :columns="item.condition" @confirm="onConfirm" @cancel="onCancel" 
-                            :columns-field-names="customFieldName" show-toolbar item-height="1rem" :default-index="0" />
+                        <van-popup v-model:show="showPopoverSelect[index]" round position="bottom"
+                            :style="{ height: '40%' }">
+                            <van-picker :columns="item.condition" @confirm="onConfirm" @cancel="onCancel"
+                                :columns-field-names="customFieldName" show-toolbar item-height="1rem" :default-index="0" />
                         </van-popup>
                         <van-field v-model="item.values[0].value" :placeholder="'请输入' + item.text" right-icon="search" />
                     </div>
@@ -32,7 +33,7 @@
                         </div>
                         <van-popup v-model:show="showPopoverText[index]" round position="bottom" :style="{ height: '40%' }">
                             <van-picker :columns="item.condition" @confirm="onConfirmText" @cancel="onCancelText"
-                            :columns-field-names="customFieldName" show-toolbar item-height="1rem" :default-index="0" />
+                                :columns-field-names="customFieldName" show-toolbar item-height="1rem" :default-index="0" />
                         </van-popup>
                         <van-field v-model="item.values[0]" :placeholder="'请输入' + item.text" clearable />
                     </div>
@@ -85,9 +86,9 @@ const showPopoverTextFlag = ref([])
 const value = ref([])
 const value1 = ref([])
 const customFieldName = {
-      text: 'luoji',
-      value: 'id',
-    };
+    text: 'luoji',
+    value: 'id',
+};
 const props = defineProps({
     tabListData: Object
 })
@@ -172,7 +173,7 @@ const showTextPopovers = (index) => {
     showPopoverText.value[index] = true
     showPopoverTextFlag.value = index
 }
-const onConfirmText = ({ selectedOptions } ) => {
+const onConfirmText = ({ selectedOptions }) => {
     // Toast(`当前值：${value}, 当前索引：${index}`);
     console.log(selectedOptions[0], showPopoverTextFlag.value)
     value1.value[showPopoverTextFlag.value] = selectedOptions[0].luoji

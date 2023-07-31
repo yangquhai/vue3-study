@@ -2,123 +2,124 @@
 <template>
     <div class="userinfo">
         <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
-        <div v-if="userDataList.length != 0">
-            <div v-for="(item, index) in userDataList" :key="index" class="userinfoDataList">
-                <div class="top">
-                    <div class="checked">
-                        <div class="checkBorder"
-                            :style="{ 'border': (chooseList.includes(item.name) ? 'none' : 'solid 1px rgba(226, 226, 226, 1)') }"
-                            @click="checked(item.name, item.money)">
-                            <van-icon v-show="chooseList.includes(item.name)" name="success" />
-                        </div>
-                    </div>
-                    <div class="name">
-                        {{ KHMC[index] }}
-                    </div>
-                    <div class="options">
-                        {{ SYSTEM_LCMXMC[index] }}
-                        <van-icon style="font-weight:bold;" name="arrow" />
-                    </div>
-                </div>
-                <van-divider />
-                <div class="center">
-                    <div class="address">
-                        <img src="../assets/address.svg" alt="">
-                        <div class="addressed">{{ SHDD[index] }}</div>
-                    </div>
-                    <div style="display:flex;" class="centerList">
-                        <div class="taglist">
-                            <div class="buyOptions">
-                                <van-tag color="#fff2e9" text-color="#fd9148" size="large" v-if="tagBM[index]">{{
-                                    tagBM[index] }}</van-tag>
-                                <!-- <van-tag color="rgba(234,84,85,0.1)" text-color="#ea5455" size="large"  v-if="item.money=='4500'">{{item2}}</van-tag>
-              <van-tag color="rgba(115,103,240,0.1)" text-color="#7367f0" size="large"  v-if="item.money=='2300'">{{item2}}</van-tag> -->
-                            </div>
-                            <div class="buyOptions">
-                                <van-tag color="#fff2e9" text-color="#fd9148" size="large" v-if="XSQD[index]">{{ XSQD[index]
-                                }}</van-tag>
-                                <!-- <van-tag color="rgba(234,84,85,0.1)" text-color="#ea5455" size="large"  v-if="item.money=='4500'">{{item2}}</van-tag>
-              <van-tag color="rgba(115,103,240,0.1)" text-color="#7367f0" size="large"  v-if="item.money=='2300'">{{item2}}</van-tag> -->
+            <div v-if="userDataList.length != 0">
+                <div v-for="(item, index) in userDataList" :key="index" class="userinfoDataList">
+                    <div class="top">
+                        <div class="checked">
+                            <div class="checkBorder"
+                                :style="{ 'border': (chooseList.includes(item.name) ? 'none' : 'solid 1px rgba(226, 226, 226, 1)') }"
+                                @click="checked(item.name, item.money)">
+                                <van-icon v-show="chooseList.includes(item.name)" name="success" />
                             </div>
                         </div>
-                        <div class="phone" @click="callOut(item.phone)">
-                            <img src="../assets/phone.svg" alt="">
-                            <div>{{ LXDH[index] }}</div>
+                        <div class="name">
+                            {{ KHMC[index] }}
+                        </div>
+                        <div class="options">
+                            {{ SYSTEM_LCMXMC[index] }}
+                            <van-icon style="font-weight:bold;" name="arrow" />
                         </div>
                     </div>
-                </div>
-                <div class="content">
-                    <div style="display:flex">
-                        <div class="title" v-if="YWY[index]">
-                            <div class="titleDetails">业务员</div>
+                    <van-divider />
+                    <div class="center">
+                        <div class="address">
+                            <img src="../assets/address.svg" alt="">
+                            <div class="addressed">{{ SHDD[index] }}</div>
                         </div>
-                        <div class="title" v-if="DGY[index]">
-                            <div class="titleDetails">导购员</div>
-                        </div>
-                        <div class="title" v-if="XGRQ[index]">
-                            <div class="titleDetails">修改日期</div>
+                        <div style="display:flex;" class="centerList">
+                            <div class="taglist">
+                                <div class="buyOptions">
+                                    <van-tag color="#fff2e9" text-color="#fd9148" size="large" v-if="tagBM[index]">{{
+                                        tagBM[index] }}</van-tag>
+                                    <!-- <van-tag color="rgba(234,84,85,0.1)" text-color="#ea5455" size="large"  v-if="item.money=='4500'">{{item2}}</van-tag>
+              <van-tag color="rgba(115,103,240,0.1)" text-color="#7367f0" size="large"  v-if="item.money=='2300'">{{item2}}</van-tag> -->
+                                </div>
+                                <div class="buyOptions">
+                                    <van-tag color="#fff2e9" text-color="#fd9148" size="large" v-if="XSQD[index]">{{
+                                        XSQD[index]
+                                    }}</van-tag>
+                                    <!-- <van-tag color="rgba(234,84,85,0.1)" text-color="#ea5455" size="large"  v-if="item.money=='4500'">{{item2}}</van-tag>
+              <van-tag color="rgba(115,103,240,0.1)" text-color="#7367f0" size="large"  v-if="item.money=='2300'">{{item2}}</van-tag> -->
+                                </div>
+                            </div>
+                            <div class="phone" @click="callOut(item.phone)">
+                                <img src="../assets/phone.svg" alt="">
+                                <div>{{ LXDH[index] }}</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="contentData">
-                        <div class="datas" v-if="YWY[index]">{{ YWY[index] }}</div>
-                        <div class="datas" v-if="DGY[index]">{{ DGY[index] }}</div>
-                        <div class="datas" v-if="XGRQ[index]">{{ XGRQ[index] }}</div>
+                    <div class="content">
+                        <div style="display:flex">
+                            <div class="title" v-if="YWY[index]">
+                                <div class="titleDetails">业务员</div>
+                            </div>
+                            <div class="title" v-if="DGY[index]">
+                                <div class="titleDetails">导购员</div>
+                            </div>
+                            <div class="title" v-if="XGRQ[index]">
+                                <div class="titleDetails">修改日期</div>
+                            </div>
+                        </div>
+                        <div class="contentData">
+                            <div class="datas" v-if="YWY[index]">{{ YWY[index] }}</div>
+                            <div class="datas" v-if="DGY[index]">{{ DGY[index] }}</div>
+                            <div class="datas" v-if="XGRQ[index]">{{ XGRQ[index] }}</div>
+                        </div>
                     </div>
-                </div>
-                <div class="bottoms" v-if="BZ[index]">
-                    <div class="tips">
-                        <span> <span style="font-weight:bold;">最后跟进内容:</span> <span>{{ BZ[index] }}</span> </span>
+                    <div class="bottoms" v-if="BZ[index]">
+                        <div class="tips">
+                            <span> <span style="font-weight:bold;">最后跟进内容:</span> <span>{{ BZ[index] }}</span> </span>
+                        </div>
                     </div>
-                </div>
-                <div class="border" v-if="!BZ[index]"></div>
-                <div class="style1" v-if="item.button.length == 3">
-                    <span class="stylemoney">销售金额</span>
-                    <span>￥</span>
-                    <span class="moneyDetails">
-                        {{ ZJE[index] }}
-                    </span>
-                </div>
-                <div class="style3" v-if="item.button.length == 0">
-                    <span class="titleMoney">销售金额</span>
-                    <span class="points" style="color: #111;">￥</span>
-                    <span class="prices">
-                        <span class="moneyDetails3">
+                    <div class="border" v-if="!BZ[index]"></div>
+                    <div class="style1" v-if="item.button.length == 3">
+                        <span class="stylemoney">销售金额</span>
+                        <span>￥</span>
+                        <span class="moneyDetails">
                             {{ ZJE[index] }}
                         </span>
-                    </span>
-                </div>
-                <div class="getDetails" v-if="item.keep">
-                    <div class="money">
-                        <div class="style2" v-if="item.button.length != 3 && item.button.length != 0">
-                            <div class="titleMoney">销售金额</div>
-                            <div>
-                                <span class="points" style="color: #111;">￥</span>
+                    </div>
+                    <div class="style3" v-if="item.button.length == 0">
+                        <span class="titleMoney">销售金额</span>
+                        <span class="points" style="color: #111;">￥</span>
+                        <span class="prices">
+                            <span class="moneyDetails3">
+                                {{ ZJE[index] }}
+                            </span>
+                        </span>
+                    </div>
+                    <div class="getDetails" v-if="item.keep">
+                        <div class="money">
+                            <div class="style2" v-if="item.button.length != 3 && item.button.length != 0">
+                                <div class="titleMoney">销售金额</div>
+                                <div>
+                                    <span class="points" style="color: #111;">￥</span>
+                                </div>
+                                <div class="moneyList">
+                                    <span class="moneyDetails">
+                                        {{ ZJE[index] }}
+                                    </span>
+                                </div>
                             </div>
-                            <div class="moneyList">
-                                <span class="moneyDetails">
-                                    {{ ZJE[index] }}
-                                </span>
-                            </div>
+
                         </div>
 
-                    </div>
-
-                    <div class="bottonList">
-                        <div v-for="(item2, index2) in item.button" :key="index2">
-                            <button class="userDetails borders" @click="goDetails"
-                                v-if="item2 == '转测量' && item.button.length != 4">{{ item2 }}</button>
-                            <button class="userDetails borders" @click="goDetails"
-                                v-if="item2 == '转收款' && item.button.length != 4">{{ item2 }}</button>
-                            <div v-else>
-                                <button class="userDetails borders" @click="transferOrder" v-if="item2 == '转单'">{{ item2
-                                }}</button>
+                        <div class="bottonList">
+                            <div v-for="(item2, index2) in item.button" :key="index2">
+                                <button class="userDetails borders" @click="goDetails"
+                                    v-if="item2 == '转测量' && item.button.length != 4">{{ item2 }}</button>
+                                <button class="userDetails borders" @click="goDetails"
+                                    v-if="item2 == '转收款' && item.button.length != 4">{{ item2 }}</button>
+                                <div v-else>
+                                    <button class="userDetails borders" @click="transferOrder" v-if="item2 == '转单'">{{ item2
+                                    }}</button>
+                                </div>
+                                <button class="userDetails order" @click="goDetails" v-if="item2 == '客户详情'">客户详情</button>
                             </div>
-                            <button class="userDetails order" @click="goDetails" v-if="item2 == '客户详情'">客户详情</button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
         </van-pull-refresh>
         <van-dialog v-model="show" show-cancel-button confirmButtonText="拨打电话" confirmButtonColor='#1890ff'
             cancelButtonText="复制" @confirm="callPhone()">

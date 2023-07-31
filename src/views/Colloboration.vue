@@ -227,7 +227,7 @@ const getData = async () => {
     procedureList.value = tabListData.value.lcmxmc
     totalMoney.value = userInfoDataList.value.sum[0].value
     if (totalMoney.value > 10000)
-    totalMoney.value = (totalMoney.value / 10000).toFixed(0).toString() + '万'
+      totalMoney.value = (totalMoney.value / 10000).toFixed(0).toString() + '万'
     // console.log(userInfoDataList.value.sum[0].value)
   } catch (err) {
     console.log(err)
@@ -519,13 +519,13 @@ const chooseDataTag = (index, index2, value) => {
     // 说明有初始值
     if (dateLastClick.value[index] != null)
       dateList.value[index].values[dateLastClick.value[index]].select = false
-      dateList.value[index].values[index2].select = true
-      calendarFlag2.value = true
+    dateList.value[index].values[index2].select = true
+    calendarFlag2.value = true
   }
   // 当点击值为非自定义时
   else {
     calendarFlag2.value = false
-     // 点击到相同的框
+    // 点击到相同的框
     if (dateList.value[index].values[index2].select) {
       // console.log(this.usertTagList[index].values[index2].select)
       dateList.value[index].values[index2].select = false
@@ -533,7 +533,7 @@ const chooseDataTag = (index, index2, value) => {
     else {
       if (dateLastClick.value[index] != null)
         dateList.value[index].values[dateLastClick.value[index]].select = false
-        dateList.value[index].values[index2].select = true
+      dateList.value[index].values[index2].select = true
     }
   }
   dateLastClick.value[index] = index2
