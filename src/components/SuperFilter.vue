@@ -1,6 +1,6 @@
 <!-- 用于筛选界面俩种type对应的值，包含text与select字段 -->
 <template>
-    <div class="page-content">
+    <div class="page-content2">
         <div class="card">
             <!-- 渲染type为select的数据 -->
             <div v-if="selectList.length != 0" class="card-content">
@@ -21,7 +21,7 @@
                 </div>
             </div>
 
-          <!-- 渲染type为text的数据 -->
+            <!-- 渲染type为text的数据 -->
             <div v-if="textList.length != 0" class="card-content">
                 <div v-for="(item, index) in textList" :key="item.fieldname">
                     <div>{{ item.text }}</div>
@@ -87,7 +87,7 @@ const value1 = ref([])
 const props = defineProps({
     tabListData: Object
 })
-console.log(props.tabListData)
+// console.log(props.tabListData)
 // 用于筛选出type为select的数据，形成新的数组渲染
 const selectList = computed(() => {
     let selectList = []
@@ -188,7 +188,7 @@ const onCancelText = () => {
     // overflow:scroll; 
     // width:1200px; 
     // border: solid 1px red;
-    margin-bottom: 40px;
+    // margin-bottom: 40px;
     // max-height:200px;
     margin-left: 15px;
     margin-top: 9px;
@@ -259,6 +259,7 @@ const onCancelText = () => {
             margin-left: 16px;
         }
     }
+
     .card-footer {
         // border: solid 1px red;
         width: 90%;

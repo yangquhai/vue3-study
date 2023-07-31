@@ -36,7 +36,7 @@
             <van-calendar v-model:show="value2" :show-confirm="false" @confirm="onConfirm2" :min-date="minDate"
               :max-date="maxDate" />
           </div>
-          <van-button round type="info" size="small" @click="close">确认</van-button>
+          <van-button round  size="small" @click="close">确认</van-button>
         </div>
       </div>
     </transition>
@@ -145,18 +145,8 @@
         <button class="button3" @click="edit">批量操作</button>
         <button class="button2" @click="goAddData" v-if="tabListData.newUrl">新增</button>
       </div>
-      <van-action-sheet v-model="editFlag" :actions="actions" @select="onSelect" cancel-text="取消" />
-      <!-- <van-popup v-model="editFlag" position="bottom" :style="{ height: '22%' }" :safe-area-inset-bottom="true">
-          <div v-for="item in list" :key="item" class="approve">
-               <van-cell :title="item" />
-          </div> 
-        </van-popup> -->
-      <van-action-sheet v-model="orderFlag" :actions="actions2" @select="onSelect" cancel-text="取消" />
-      <!-- <van-popup v-model="orderFlag" position="bottom" :style="{ height: '26%' }" :safe-area-inset-bottom="true">
-            <div v-for="item in list2" :key="item" class="approve1">
-                <van-cell :title="item" />
-            </div> 
-        </van-popup> -->
+      <van-action-sheet v-model:show="editFlag" :actions="actions" @select="onSelect" cancel-text="取消" />
+      <van-action-sheet v-model:show="orderFlag" :actions="actions2" @select="onSelect" cancel-text="取消" />
     </div>
     <userInfo class="userInfo" ref="info" @checked="checked" @transferOrder="transferOrder"
       :userInfoDataList="userInfoDataList"></userInfo>
@@ -165,8 +155,7 @@
 
 <script setup>
 import request from '_api'
-import { computed } from 'vue';
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 const tabList = ref(['当月', '排序', '筛选'])
 const dataList = ref([])
 // 用户选中的数组
@@ -279,7 +268,7 @@ const usertTagList = computed(() => {
       usertTagList.push(tabListData.value.searchCondition[i])
     // console.log(usertTagList)
   }
-  console.log(usertTagList)
+  // console.log(usertTagList)
   return usertTagList
 })
 // 计算日期模块数组
@@ -291,12 +280,15 @@ const dateList = computed(() => {
       index = index + 1
       dateList.push(tabListData.value.searchCondition[i])
       // 判断是否有初始选择框为true的情况
-      for (let j = 0; j < dateList.values.length; j++) {
-        if (dateList.values[j].select)
+      // console.log(dateList[index].values,index)
+      for (let j = 0; j < dateList[index].values.length; j++) {
+        if (dateList[index].values[j].select)
           dateLastClick.value[index] = 1
       }
     }
   }
+  // console.log(dateList)
+  return dateList
 })
 
 
@@ -325,6 +317,14 @@ const close = () => {
   selectFlag.value = false
   flag.value = false
   move()
+}
+// 点击跳转新增页面
+const goAddData = () => {
+  let url = baseUrl.value + tabListData.value.newUrl
+  console.log(url)
+  // window.open = (this.baseUrl + this.tabListData.newUrl,"blank")
+  // window.location.href = ('http://www.baidu.com')
+  window.location.href = (baseUrl.value + tabListData.value.newUrl)
 }
 
 // 点击出现下拉框
@@ -444,7 +444,7 @@ const getSimpleDate = (date) => {
   minute = minute < 10 ? ('0' + minute) : minute;
   var s = date.getSeconds();
   s = s < 10 ? '0' + s : s;
-  return y + '-' + m + '-' + d ;
+  return y + '-' + m + '-' + d;
 }
 
 // 选择排序字段
@@ -488,13 +488,13 @@ const down = (index, value, type) => {
 
 // 判断多选列表
 const chooseUserTag = (index, index2, value) => {
-  // console.log(this.usertTagList[index].values[index2])
+  console.log(usertTagList.value[index].values[index2].select)
   if (usertTagList.value[index].values[index2].select) {
     // console.log(this.usertTagList[index].values[index2].select)
     usertTagList.value[index].values[index2].select = false
   }
   else {
-    this.usertTagList.value[index].values[index2].select = true
+    usertTagList.value[index].values[index2].select = true
   }
   console.log(value)
 }
@@ -505,15 +505,17 @@ const chooseProcedureTags = (index, value) => {
     procedureList.value[index].select = true
   console.log(value)
 }
+// 日期单选
 const chooseDataTag = (index, index2, value) => {
-  console.log(index, dateLastClick.value[index])
+  console.log(value, dateLastClick.value[index], index2)
   if (value.value == '自定义') {
     // 说明有初始值
     if (dateLastClick.value[index] != null)
-      dateList.value[index].values[this.dateLastClick[index]].select = false
+      dateList.value[index].values[dateLastClick.value[index]].select = false
     dateList.value[index].values[index2].select = true
     calendarFlag2.value = true
   }
+  // 当点击值为非自定义时
   else {
     calendarFlag2.value = false
     if (dateList.value[index].values[index2].select) {
@@ -521,12 +523,14 @@ const chooseDataTag = (index, index2, value) => {
       dateList.value[index].values[index2].select = false
     }
     else {
-      if (dateLastClick.value[index] != null)
-        dateList.value[index].values[this.dateLastClick[index]].select = false
-      dateList.value[index].values[index2].select = true
+      if (dateLastClick.value[index] != null) {
+        dateList.value[index].values[dateLastClick.value[index]].select = false
+        dateList.value[index].values[index2].select = true
+      }
     }
   }
   dateLastClick.value[index] = index2
+  console.log(dateLastClick.value[index])
 }
 
 const onSelect = () => {
@@ -540,10 +544,15 @@ const checked = (val) => {
   chooseList.value = val
 }
 const transferOrder = () => {
+  console.log('zhaundan++++++++')
   orderFlag.value = true
 }
+const edit = () => {
+  editFlag.value = true
+  console.log('edit')
+}
 // 保存筛选框的值
-const keep =()=> {
+const keep = () => {
   console.log('keep')
 }
 
@@ -697,9 +706,6 @@ const sift = () => {
       }
 
       .van-button {
-        // position: absolute;
-        // border: solid 1px red;
-        // margin-top: 5px;
         margin-left: 260px;
         margin-bottom: 5px;
         width: 83px;
@@ -708,7 +714,10 @@ const sift = () => {
         line-height: 150%;
         font-size: 13px;
         border-radius: 16px;
-        // background-color: white;
+        background-color: rgba(24, 144, 255, 1);
+        color: rgba(255, 255, 255, 1);
+        border: none;
+        // background-color: red;
       }
 
       :deep(.el-input__inner) {
@@ -859,6 +868,7 @@ const sift = () => {
     // position: absolute;
     padding-top: 95px;
     // margin-right: 0px;
+    // border: solid 1px red;
   }
 
   .checkbox {
@@ -972,4 +982,5 @@ const sift = () => {
     }
 
   }
-}</style>
+}
+</style>
