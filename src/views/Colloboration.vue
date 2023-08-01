@@ -1,7 +1,7 @@
 <!-- 协同列表首页,入口文件 -->
 <template>
-  <div class="content">
-    <div class="mask" style="z-index:-1;background-color:rgb(239, 242, 245);"></div>
+  <div class="page-content">
+    <!-- <div class="mask" style="z-index:-1;background-color:rgb(239, 242, 245);"></div> -->
     <van-overlay z-index='100' :show="flag" @click="close" />
     <div style=" position: fixed;z-index:1000;width:100%;">
       <searchTab @search="search" :placeholder="placeholder"></searchTab>
@@ -551,7 +551,7 @@ const sift = () => {
 </script>
 
 <style lang="less" scoped>
-.content {
+.page-content {
     overflow-y: scroll;
     overflow-x: hidden;
     height: 100vh;
