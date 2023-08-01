@@ -1,10 +1,8 @@
 <!-- 用于头部框的搜索框制作 -->
 <template>
-  <div>
     <form action="/">
       <van-search v-model="value" show-action :placeholder="placeholder" @search="onSearch" @cancel="onCancel" />
     </form>
-  </div>
 </template>
 
 <script setup>

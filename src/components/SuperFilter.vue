@@ -1,11 +1,10 @@
 <!-- 用于筛选界面俩种type对应的值，包含text与select字段 -->
 <template>
-    <div class="page-content2">
         <div class="card">
             <!-- 渲染type为select的数据 -->
             <div v-if="selectList.length != 0" class="card-content">
                 <div v-for="(item, index) in selectList" :key="item.fieldname">
-                    <div>{{ item.text }}</div>
+                    <div class="title">{{ item.text }}</div>
                     <div class="options">
                         <div class="buttons" @click="showSelectPopovers(index)">
                             <div>{{ value[index].luoji }}</div>
@@ -25,7 +24,7 @@
             <!-- 渲染type为text的数据 -->
             <div v-if="textList.length != 0" class="card-content">
                 <div v-for="(item, index) in textList" :key="item.fieldname">
-                    <div>{{ item.text }}</div>
+                    <div class="title">{{ item.text }}</div>
                     <div class="options">
                         <div class="buttons" @click="showTextPopovers(index)">
                             <div class="luoji">{{ value1[index] }}</div>
@@ -71,7 +70,6 @@
                 <van-button round type="success" size="small" @click="sift">筛选</van-button>
             </div> -->
         </div>
-    </div>
 </template>
  
 <script setup>
@@ -222,7 +220,9 @@ const onCancelText = () => {
         margin-left: 8px;
         flex-wrap: wrap
     }
-
+    .title {
+        font-size: 12px;
+     }
     .options {
         display: flex;
         // align-items: center;
@@ -252,12 +252,6 @@ const onCancelText = () => {
                 color: rgba(153, 153, 153, 1);
                 ;
             }
-        }
-
-        .title {
-            // border: solid 1px red;
-            display: flex;
-            align-items: center;
         }
 
         .van-cell {

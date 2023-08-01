@@ -235,29 +235,6 @@ const getData = async () => {
 }
 getData()
 
-// 计算总金额
-// const totalMoney = computed(() => {
-//   let sum = 0
-//   // console.log(this.chooseList.length)
-//   if (chooseList.value.length) {
-//     for (let i = 0; i < chooseList.value.length; i++) {
-//       // sum = this.dataList[i].money+this.dataList[i+1].money
-//       // console.log(this.chooseList[i].money)
-//       sum = sum + chooseList[i].value.money
-//     }
-//   }
-//   else {
-//     for (let i = 0; i < dataList.value.length; i++) {
-//       // sum = this.dataList[i].money+this.dataList[i+1].money
-//       // console.log(this.dataList[i].money)
-//       sum = sum + dataList[i].value.money
-//     }
-//   }
-//   // console.log(sum)
-//   if (sum > 10000)
-//     sum = (sum / 10000).toFixed(0).toString() + '万'
-//   return sum
-// })
 // 计算排序数组
 const sortList = computed(() => {
   let sortList = tabListData.value.orderType.orderType
@@ -575,6 +552,9 @@ const sift = () => {
 
 <style lang="less" scoped>
 .content {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 100vh;
   .v-enter-active {
     animation: testanimation 0.3s;
   }
@@ -763,17 +743,17 @@ const sift = () => {
       // border: solid 1px red;
       width: 100%;
       // margin-left: 85px;
-      margin-top: -25px;
-      position: fixed;
+      // margin-top: -25px;
+      // position: fixed;
       display: flex;
       z-index: 2;
       justify-content: flex-end;
-      background-color: rgba(255, 255, 255, 1);
+      // background-color: rgba(255, 255, 255, 1);
       padding-bottom: 8px;
 
       .van-button {
         width: 83px;
-        height: 31px;
+        // height: 31px;
         border: none;
         background-color: rgba(24, 144, 255, 1);
         color: rgba(255, 255, 255, 1);
@@ -869,13 +849,7 @@ const sift = () => {
   }
 
   .userInfo {
-    width: 356px;
-    margin-left: 8.5px;
-    // margin-top: 100px;
-    // position: absolute;
-    padding-top: 95px;
-    // margin-right: 0px;
-    // border: solid 1px red;
+    padding-top: 80px;
   }
 
   .checkbox {

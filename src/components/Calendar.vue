@@ -1,8 +1,7 @@
 <!-- 日历插件的制作 -->
 <template>
-  <div>
-    <div class="calendar">
-      <div class="calelist" style="display:flex">
+    <div class="card">
+      <div class="tablist" style="display:flex">
         <van-cell title="从" :value="date1" @click="value1 = true" />
         <van-calendar v-model:show="value1" :show-confirm="false" @confirm="onConfirm" :min-date="minDate"
           :max-date="maxDate" />
@@ -11,7 +10,6 @@
           :max-date="maxDate" />
       </div>
     </div>
-  </div>
 </template>
 
 <script setup>
@@ -49,7 +47,7 @@ const getSimpleDate = (date) => {
 </script>
 
 <style lang="less" scoped>
-.calendar {
+.card {
   margin-left: 15px;
   margin-top: 18px;
 
