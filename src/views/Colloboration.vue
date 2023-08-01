@@ -21,8 +21,8 @@
         <div class="sort" v-for="(item, index) in monthList" :key="index" @click="chooseMonth(index, item)"
           :style="{ 'color': (index != chooseMonthIndex ? 'rgba(50, 50, 51, 1)' : '#1890ff') }">
           <div class="sortItem">
-            <img src="../assets/选中.svg" alt="" v-if="index == chooseMonthIndex">
             <div>{{ item }}</div>
+            <img src="../assets/选中.svg" alt="" v-if="index == chooseMonthIndex">
           </div>
         </div>
         <div class="calendar" v-if="calendarFlag">
@@ -30,8 +30,6 @@
             <van-cell title="从" :value="date1" @click.stop="value1 = true" />
             <van-calendar v-model:show="value1" :show-confirm="false" @confirm="onConfirm" :min-date="minDate"
               :max-date="maxDate" />
-
-
             <van-cell title="至" class="van-cell2" :value="date2" @click.stop="value2 = true" />
             <van-calendar v-model:show="value2" :show-confirm="false" @confirm="onConfirm2" :min-date="minDate"
               :max-date="maxDate" />
@@ -45,21 +43,21 @@
         <div class="sort" v-for="(item, index) in sortList" :key="index" @click="choosesort(index, item)"
           :style="{ 'color': (index != chooseDateIndex ? 'rgba(50, 50, 51, 1)' : 'rgba(25, 137, 250, 1)') }">
           <div class="sortItem">
-            {{ item.text }}
-          </div>
-          <div class="imgList">
-            <!-- <img class="img1" src="../assets/down.png" alt="" @click="up(index)" v-if="index!=chooseDateIndex">
-              <img class="img2" src="../assets/up.png" alt="" @click="down(index)" v-if="index!=chooseDateIndex">
-              <img src="../assets/black-down.svg" alt="" v-if="index==chooseDateIndex&&index==chooseDateIndex">
-              <img src="../assets/up.svg" alt="" v-if="index==chooseDateIndex&&index==chooseDateIndex"> -->
-            <img class="img1" src="../assets/down.png" alt="" @click="down(index, item.order, 0)"
-              v-if="item.order != 'desc'">
-            <img class="img1" src="../assets/chooseDown.png" alt="" @click="down(index, item.order, 1)"
-              v-if="item.order == 'desc'">
-            <img class="img2" src="../assets/up.png" alt="" @click="up(index, item.order, 0)"
-              v-if="item.order != 'descd'">
-            <img class="img1" src="../assets/chooseDown.png" alt="" @click="up(index, item.order, 1)"
-              v-if="item.order == 'descd'">
+              <div>{{ item.text }}</div> 
+              <div class="imgList">
+              <!-- <img class="img1" src="../assets/down.png" alt="" @click="up(index)" v-if="index!=chooseDateIndex">
+                <img class="img2" src="../assets/up.png" alt="" @click="down(index)" v-if="index!=chooseDateIndex">
+                <img src="../assets/black-down.svg" alt="" v-if="index==chooseDateIndex&&index==chooseDateIndex">
+                <img src="../assets/up.svg" alt="" v-if="index==chooseDateIndex&&index==chooseDateIndex"> -->
+              <img class="img1" src="../assets/down.png" alt="" @click="down(index, item.order, 0)"
+                v-if="item.order != 'desc'">
+              <img class="img1" src="../assets/chooseDown.png" alt="" @click="down(index, item.order, 1)"
+                v-if="item.order == 'desc'">
+              <img class="img2" src="../assets/up.png" alt="" @click="up(index, item.order, 0)"
+                v-if="item.order != 'descd'">
+              <img class="img1" src="../assets/chooseDown.png" alt="" @click="up(index, item.order, 1)"
+                v-if="item.order == 'descd'">
+             </div>
           </div>
         </div>
       </div>
@@ -589,7 +587,7 @@ const sift = () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: -4px;
+    // margin-top: -4px;
 
     img {
       width: 21px;
@@ -603,7 +601,7 @@ const sift = () => {
       justify-content: center;
       width: 125px;
       height: 31px;
-      top: 114px;
+      // top: 114px;
       background-color: rgba(255, 255, 255, 1);
       color: rgba(80, 80, 80, 1);
       font-size: 12px;
@@ -621,51 +619,42 @@ const sift = () => {
     padding-top: 4px;
     background-color: rgba(255, 255, 255, 1);
     max-height: 70%;
-
     // border: solid 1px red;
     // border: none;
     // margin-top: -1px;
     .sort {
-      color: rgba(80, 80, 80, 1);
-      // background-color: rgba(255, 255, 255, 1);
-      // background-color: red;
       height: 34px;
       display: flex;
       align-items: center;
-
       // justify-content: center;
       .imgList {
-        margin-left: 316px;
-        // border: solid 1px red;
-        position: absolute;
-
+        // margin-left: 316px;
+        display: flex;
+        margin-left: auto;
         img {
-          // border: solid 1px red;
-          // position: absolute;
           width: 14px;
           height: 14px;
         }
       }
-
       .sortItem {
         width: 90%;
         font-size: 12px;
         padding-bottom: 8px;
         border-bottom: 1px solid rgba(242, 243, 245, 1);
         margin-left: 16px;
-
+        // border: solid 1px red;
+        display: flex;
         img {
           width: 14px;
           height: 14px;
-          position: absolute;
-          margin-left: 321px;
+          margin-left: auto;
         }
       }
     }
 
     .calendar {
       margin-left: 15px;
-      margin-top: 4px;
+      // margin-top: 4px;
 
       // display: flex;
       // border: solid 1px red;
@@ -674,7 +663,7 @@ const sift = () => {
         // border: solid 1px red;
         text-align: left;
         // width: 10px;
-        margin-left: -30px;
+        // margin-left: -30px;
       }
 
       .van-cell {
@@ -698,38 +687,15 @@ const sift = () => {
         width: 83px;
         height: 31px;
         // color: rgb(102, 102, 102);
-        line-height: 150%;
+        // line-height: 150%;
         font-size: 13px;
         border-radius: 16px;
         background-color: rgba(24, 144, 255, 1);
         color: rgba(255, 255, 255, 1);
         border: none;
+        // border: solid 1px red;
         // background-color: red;
       }
-
-      :deep(.el-input__inner) {
-        border: none;
-        font-size: 12px;
-        // border: solid 1px red;
-        // width: 80px;
-        // height: 28px;
-
-        padding: 0px;
-        margin-left: 35px;
-      }
-
-      :deep(.el-input) {
-        width: 80px;
-        // border: solid 1px red;
-      }
-
-      :deep(.el-input__icon) {
-        display: none;
-      }
-
-      // /deep/ .el-input__inner {
-      //   border: none;
-      // }
     }
 
     .sort:nth-last-child(1) {
@@ -787,12 +753,6 @@ const sift = () => {
       height: 60vh;
       background-color: rgba(255, 255, 255, 1);
 
-      .muliselect {
-        overflow: scroll;
-        // width:1200px; 
-        // max-height:100px;
-      }
-
       .title {
         padding-top: 8px;
         margin-left: 15px;
@@ -804,7 +764,7 @@ const sift = () => {
       .checkboxPre {
         // border: solid 1px red;
         display: flex;
-        margin-left: 8px;
+        margin-left: 15px;
         flex-wrap: wrap
       }
 
@@ -813,7 +773,7 @@ const sift = () => {
         // border: solid 0.5px rgba(242, 243, 245, 1);
         // background-color: rgba(242, 243, 245, 1);
         width: 90%;
-        margin-left: 16px;
+        margin-left: 15px;
         margin-top: 7px;
         margin-bottom: 1px;
       }
@@ -822,7 +782,7 @@ const sift = () => {
         // border: solid 1px red;
         height: 20px;
         margin-top: 5px;
-        margin-left: 6px;
+        margin-right: 6px;
         font-size: 12px;
         margin-bottom: 10px;
 
@@ -927,41 +887,6 @@ const sift = () => {
     z-index: 50;
     background-color: white;
     height: 50px;
-
-    .approve {
-      height: 46px;
-
-      // display:flex;
-      // justify-content: center;
-      // align-items: center;
-      // border: solid 1px red;
-      // border: solid 1px red;
-      // height: 33%;
-      .van-cell {
-        height: 46px;
-        border-bottom: solid 1px rgba(245, 245, 245, 1);
-        text-align: center;
-        padding-left: 0px;
-      }
-    }
-
-    .approve1 {
-      height: 46px;
-
-      // display:flex;
-      // justify-content: center;
-      // align-items: center;
-      // border: solid 1px red;
-      // border: solid 1px red;
-      // height: 24%;
-      .van-cell {
-        height: 46px;
-        border-bottom: solid 1px rgba(245, 245, 245, 1);
-        text-align: center;
-        padding-left: 0px;
-      }
-    }
-
   }
 }
 </style>
