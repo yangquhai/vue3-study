@@ -76,8 +76,11 @@ export function recordPhoneCall(params) {
 /***-获取卡片信息以及下拉框数据-***/
 
 export function getUserInfo(params) {
-    return request.post(APIFiles.colloborationList, '/data/list_bill_wap.aspx?Tmethod=getlistbill.gz.initial', params, contentType.FormData)
+    // 打包上传
+    // return request.post(APIFiles.colloborationList, 'getlistbill.gz.initial',params, contentType.FormData)
+    // mock上传
     // return request.post(APIFiles.colloborationList, 'listbill.gz.initial', params, contentType.FormData)
+    return request.post(APIFiles.colloborationList, '/data/list_bill_wap.aspx?Tmethod=getlistbill.gz.initial', params, contentType.FormData)
 }
 
 export default {

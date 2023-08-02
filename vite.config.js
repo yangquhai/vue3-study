@@ -6,10 +6,10 @@ import postCssPxToRem from 'postcss-pxtorem'
 import autoprefixer from 'autoprefixer'
 import copy from 'rollup-plugin-copy'
 import { resolve } from 'path'
-import browserslist from 'browserslist'
-import legacy from '@vitejs/plugin-legacy'
+// import browserslist from 'browserslist'
+// import legacy from '@vitejs/plugin-legacy'
 
-const browserslistConfig = browserslist.loadConfig({ path: '.' })
+// const browserslistConfig = browserslist.loadConfig({ path: '.' })
 
 import Unocss from 'unocss/vite'
 import { presetUno, presetAttributify, presetIcons } from 'unocss'
@@ -44,9 +44,9 @@ export default defineConfig(({ mode }) => {
         },
         plugins: [
             vue(),
-            legacy({
-                targets: browserslistConfig,
-              }),
+            // legacy({
+            //     targets: browserslistConfig,
+            //   }),
             Components({
                 resolvers: [VantResolver()],
             }),
