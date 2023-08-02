@@ -12,7 +12,7 @@
                             <van-icon v-show="chooseList.includes(item.name)" name="success" />
                         </div>
                         <div class="name m-l-8">
-                          {{ KHMC[index] }}
+                            {{ KHMC[index] }}
                         </div>
                     </div>
 
@@ -28,19 +28,12 @@
                             <img class="m-r-4" src="../assets/address.svg" alt="">
                             <small class="addressed">{{ SHDD[index] }}</small>
                         </div>
-
                         <div class="centerList flex  m-t-8 ">
 
                             <div class="taglist flex flex-l">
-                                <div class="buyOptions m-r-4 m-b-4" v-for="(item) in tagBM[index]">
-                                    <van-tag color="#fff2e9" text-color="#fd9148" size="large" v-if="tagBM[index]">
-                                      <!-- {{ tagBM[index] }} -->
-                                        {{ item }} 
-                                    </van-tag>
-                                </div>
-                                <div class="buyOptions m-r-4  m-b-4" v-for="(item) in XSQD[index]">
-                                    <van-tag color="rgba(234,84,85,0.1)" text-color="#ea5455" size="large" v-if="XSQD[index]">
-                                    <!-- {{ XSQD[index] }} -->
+                                <div class="buyOptions m-r-4 m-b-4" v-for="(item) in BQ[index]">
+                                    <van-tag color="#fff2e9" text-color="#fd9148" size="large" v-if="BQ[index]">
+                                        <!-- {{ tagBM[index] }} -->
                                         {{ item }}
                                     </van-tag>
                                 </div>
@@ -55,18 +48,18 @@
                     </div>
                     <small class="card-content2">
                         <div class="van-row m-t-12 m-r-12 m-l-12">
-                            <div class="title van-col van-col--8 flex flex-col flex-l" v-if="YWY[index]">
-                                <div class="titleDetails">业务员</div>
-                                <div class="datas m-t-4 m-b-12" v-if="YWY[index]">{{ YWY[index] }}</div>
+                            <div class="title van-col van-col--8 flex flex-col flex-l" v-for="(item) in ZDY[index]">
+                                <div class="titleDetails">{{ item.title }}</div>
+                                <div class="datas m-t-4 m-b-12" v-if="ZDY[index]">{{ item.value }}</div>
                             </div>
-                            <div class="title van-col van-col--8 flex flex-col flex-l" v-if="DGY[index]">
+                            <!-- <div class="title van-col van-col--8 flex flex-col flex-l" v-if="DGY[index]">
                                 <div class="titleDetails">导购员</div>
                                 <div class="datas m-t-4 m-b-12" v-if="DGY[index]">{{ DGY[index] }}</div>
                             </div>
                             <div class="title van-col van-col--8 flex flex-col flex-l" v-if="XGRQ[index]">
                                 <div class="titleDetails">修改日期</div>
                                 <div class="datas m-t-4 m-b-12" v-if="XGRQ[index]">{{ XGRQ[index] }}</div>
-                            </div>
+                            </div> -->
                         </div>
                     </small>
                     <div class="card-content3 m-t-0 m-l-12 m-r-12" v-if="BZ[index]">
@@ -124,7 +117,7 @@
         </van-dialog>
 
         <div class="nomore">
-            {{ZDY}}
+            <van-divider :style="{ color: '#969799', borderColor: '#969799', padding: '0 16px' }">没有更多了..</van-divider>
         </div>
     </div>
 </template>
@@ -215,54 +208,51 @@ const SHDD = computed(() => {
     // console.log(KHMC)
     return KHMC
 })
-const tagBM = computed(() => {
-    let KHMC = []
-    if (userDataList2.value != undefined && fieldName.value != undefined){
-        for (let i = 0; i < userDataList2.value.length; i++) {
-            for (let j = 0; j < fieldName.value.length; j++) {
-                if (fieldName.value[j].type == '标签' && fieldName.value[j].fieldname == 'BM') {
-                    // userDataList2.value[i][fieldName.value[j].fieldname].split(',')
-                    console.log(userDataList2.value[i][fieldName.value[j].fieldname].split(','))
-                    // KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname])
-                    KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname].split(','))
-                }
-            }
-        }
-        // console.log(KHMC)
-    }
-    return KHMC
-})
-const XSQD = computed(() => {
-    let KHMC = []
-    if (userDataList2.value != undefined && fieldName.value != undefined)
-        for (let i = 0; i < userDataList2.value.length; i++) {
-            for (let j = 0; j < fieldName.value.length; j++) {
-                if (fieldName.value[j].type == '标签' && fieldName.value[j].fieldname == 'XSQD') {
-                    // KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname])
-                    KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname].split(','))
-                }
-            }
-        }
-    // console.log(KHMC)
-    return KHMC
-})
 
-const ZDY = computed(()=>{
+// 字段一筛选
+const ZDY = computed(() => {
     let KHMC = []
     let sum = 0
-    if (userDataList2.value != undefined && fieldName.value != undefined)
-    for (let i = 0; i < userDataList2.value.length; i++) {
+    let size = 0
+    if (userDataList2.value != undefined && fieldName.value != undefined) {
+        for (let i = 0; i < userDataList2.value.length; i++) {
             for (let j = 0; j < fieldName.value.length; j++) {
                 if (fieldName.value[j].type == '字段1') {
+                    sum++
+                    KHMC.push({value:userDataList2.value[i][fieldName.value[j].fieldname],title:fieldName.value[j].text})
+                }
+            }
+            size = sum
+            sum = 0
+        }
+        // console.log(KHMC.length)
+        // sliceArr(KHMC,size)
+        console.log(sliceArr(KHMC,size))
+    }
+    return sliceArr(KHMC,size)
+})
+
+// 标签筛选
+const BQ = computed(() => {
+    let KHMC = []
+    let sum = 0
+    let size = 0
+    if (userDataList2.value != undefined && fieldName.value != undefined) {
+        for (let i = 0; i < userDataList2.value.length; i++) {
+            for (let j = 0; j < fieldName.value.length; j++) {
+                if (fieldName.value[j].type == '标签') {
                     sum++
                     KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname])
                 }
             }
-            console.log(sum)
+            size = sum
             sum = 0
-       }
-    console.log(KHMC)
-    return KHMC
+        }
+        // console.log(KHMC.length)
+        // sliceArr(KHMC,size)
+        console.log(sliceArr(KHMC,size))
+    }
+    return sliceArr(KHMC,size)
 })
 
 
@@ -356,6 +346,17 @@ const onRefresh = () => {
     console.log(fieldName.value, userDataList2.value.length)
 }
 
+// 将数组拆分
+const sliceArr = (array, size) => {
+    let result = [];
+    for (let x = 0; x < Math.ceil(array.length / size); x++) {
+        let start = x * size;
+        let end = start + size;
+        result.push(array.slice(start, end));
+    }
+    return result;
+}
+
 // 调起手机拨打电话操作
 const callPhone = () => {
     window.location.href = 'tel://' + callPhoneNum.value
@@ -401,6 +402,7 @@ const checked = (name, money) => {
     &::-webkit-scrollbar {
         display: none;
     }
+
     .card {
         border-radius: var(--van-radius-md);
     }
@@ -452,17 +454,21 @@ const checked = (name, money) => {
                 width: 14px;
                 height: 14px;
             }
+
             .addressed {
                 color: #666666;
             }
         }
+
         .centerList {
             position: relative;
         }
+
         .taglist {
             flex-wrap: wrap;
             width: 225px;
         }
+
         .phone {
             color: #657786;
             display: flex;
@@ -470,13 +476,16 @@ const checked = (name, money) => {
             position: absolute;
             right: 0;
             top: 0;
+
             img {
                 width: 14px;
                 height: 14px;
             }
         }
+
         .buyOptions {
             color: rgb(96, 178, 255);
+
             :deep(.van-tag--large) {
                 font-size: 12px;
                 padding: 2px 5px 2px 5px;
@@ -484,11 +493,13 @@ const checked = (name, money) => {
             }
         }
     }
+
     .card-content2 {
         .title {
             .titleDetails {
                 color: #999999;
             }
+
             .datas {
                 color: #333333;
             }
@@ -499,6 +510,7 @@ const checked = (name, money) => {
         border: solid 1px rgb(247, 248, 250);
         background-color: rgb(247, 248, 250);
         border-radius: 2px;
+
         span {
             color: #666666;
         }
@@ -514,6 +526,7 @@ const checked = (name, money) => {
         justify-content: flex-end;
         align-items: flex-end;
         align-items: baseline;
+
         // height: 24px;
         // line-height: 24px;
         .titleMoney {
@@ -532,6 +545,7 @@ const checked = (name, money) => {
         display: flex;
         align-items: flex-end;
         align-items: baseline;
+
         // border: solid 1px red;
         // height: 24px;
         // line-height: 24px;
@@ -551,6 +565,7 @@ const checked = (name, money) => {
         align-items: flex-end;
         justify-content: flex-end;
         align-items: baseline;
+
         // height: 24px;
         // line-height: 24px;
         .titleMoney {
@@ -607,8 +622,6 @@ const checked = (name, money) => {
     }
 
     .nomore {
-        height: 40px;
-        text-align: center;
-        margin-bottom: 10px;
+        height: 80px;
     }
 }</style>
