@@ -139,6 +139,7 @@ const userDataList2 = computed(() => {
     let userDataList2 = props.userInfoDataList.data
     return userDataList2
 })
+// 客户名称筛选
 const KHMC = computed(() => {
     let KHMC = []
     if (userDataList2.value != undefined && fieldName.value != undefined)
@@ -152,6 +153,9 @@ const KHMC = computed(() => {
     // console.log(KHMC)
     return KHMC
 })
+
+// 状态筛选
+
 const SYSTEM_LCMXMC = computed(() => {
     let KHMC = []
     if (userDataList2.value != undefined && fieldName.value != undefined)
@@ -165,6 +169,8 @@ const SYSTEM_LCMXMC = computed(() => {
     // console.log(KHMC)
     return KHMC
 })
+
+// 备注筛选
 const BZ = computed(() => {
     let KHMC = []
     if (userDataList2.value != undefined && fieldName.value != undefined)
@@ -178,6 +184,8 @@ const BZ = computed(() => {
     // console.log(KHMC)
     return KHMC
 })
+
+// 联系电话筛选
 const LXDH = computed(() => {
     let KHMC = []
     // console.log(111)
@@ -195,6 +203,8 @@ const LXDH = computed(() => {
     // console.log(KHMC)
     return KHMC
 })
+
+// 销售地址筛选
 const SHDD = computed(() => {
     let KHMC = []
     if (userDataList2.value != undefined && fieldName.value != undefined)
@@ -255,52 +265,7 @@ const BQ = computed(() => {
     return sliceArr(KHMC,size)
 })
 
-
-const YWY = computed(() => {
-    let KHMC = []
-    if (userDataList2.value != undefined && fieldName.value != undefined)
-        for (let i = 0; i < userDataList2.value.length; i++) {
-            for (let j = 0; j < fieldName.value.length; j++) {
-                if (fieldName.value[j].type == '字段1' && fieldName.value[j].fieldname == 'YWY') {
-                    KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname])
-                }
-            }
-        }
-    // console.log(KHMC)
-    return KHMC
-})
-const DGY = computed(() => {
-    let KHMC = []
-    if (userDataList2.value != undefined && fieldName.value != undefined)
-        for (let i = 0; i < userDataList2.value.length; i++) {
-            for (let j = 0; j < fieldName.value.length; j++) {
-                if (fieldName.value[j].type == '字段1' && fieldName.value[j].fieldname == 'DGY') {
-                    KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname])
-                }
-            }
-        }
-    // console.log(KHMC)
-    return KHMC
-})
-const XGRQ = computed(() => {
-    let KHMC = []
-    if (userDataList2.value != undefined && fieldName.value != undefined)
-        for (let i = 0; i < userDataList2.value.length; i++) {
-            for (let j = 0; j < fieldName.value.length; j++) {
-                if (fieldName.value[j].type == '字段1' && fieldName.value[j].fieldname == 'XGRQ') {
-                    if (fieldName.value[j].lb == '数据:日期框') {
-                        let arr = userDataList2.value[i][fieldName.value[j].fieldname].split('T')
-                        KHMC.push(arr[0])
-                    }
-                    else if (fieldName.value[j].lb == '数据:时间框') {
-                        KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname])
-                    }
-                }
-            }
-        }
-    // console.log(KHMC)
-    return KHMC
-})
+// 总金额筛选
 const ZJE = computed(() => {
     let LXDH = []
     if (userDataList2.value != undefined && fieldName.value != undefined)
