@@ -3,7 +3,7 @@
   <div class="page-content">
     <!-- <div class="mask" style="z-index:-1;background-color:rgb(239, 242, 245);"></div> -->
     <van-overlay z-index='100' :show="flag" @click="close" />
-    <div style=" position: fixed;z-index:1000;width:100%;">
+    <div style=" position: fixed;z-index:999;width:100%;">
       <searchTab @search="search" :placeholder="placeholder"></searchTab>
       <div class="dropdown">
         <div v-for="(item, index) in tabList" :key="index" class="dropdownList" @click="dropdown(index)"
@@ -658,23 +658,13 @@ const sift = () => {
     }
   }
 
-  .mask {
-    width: 100%;
-    height: 100%;
-    opacity: 0.9;
-    background-color: rgba(0, 0, 0, 0.7);
-    // border: solid 1px red;
-    position: fixed;
-    z-index: 999;
-  }
-
   .dropdown {
-    // border: solid 1px red;
     height: 31px;
     display: flex;
     align-items: center;
     justify-content: center;
-    // margin-top: -4px;
+    margin-top: -1px;
+    background-color: rgba(255, 255, 255, 1);
 
     img {
       width: 21px;
@@ -700,7 +690,7 @@ const sift = () => {
 
   .month {
     position: fixed;
-    z-index: 999;
+    z-index: 888;
     width: 100%;
     top: 80px;
     padding-top: 4px;

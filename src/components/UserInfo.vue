@@ -237,7 +237,7 @@ const ZDY = computed(() => {
         }
         // console.log(KHMC.length)
         // sliceArr(KHMC,size)
-        console.log(sliceArr(KHMC,size))
+        // console.log(sliceArr(KHMC,size))
     }
     return sliceArr(KHMC,size)
 })
@@ -260,7 +260,7 @@ const BQ = computed(() => {
         }
         // console.log(KHMC.length)
         // sliceArr(KHMC,size)
-        console.log(sliceArr(KHMC,size))
+        // console.log(sliceArr(KHMC,size))
     }
     return sliceArr(KHMC,size)
 })

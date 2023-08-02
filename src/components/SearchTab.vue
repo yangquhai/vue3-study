@@ -1,7 +1,7 @@
 <!-- 用于头部框的搜索框制作 -->
 <template>
     <form action="/">
-      <van-search v-model="value" show-action :placeholder="placeholder" @search="onSearch" @cancel="onCancel" />
+      <van-search v-model="value"  shape="round" :placeholder="placeholder" @search="onSearch" />
     </form>
 </template>
 
