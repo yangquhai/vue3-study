@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@unocss/preset-icons": "^0.51.13",
+    "@vitejs/plugin-legacy": "^4.1.1",
     "@vitejs/plugin-vue": "^4.1.0",
     "babel-eslint": "^10.1.0",
     "eslint": "^8.40.0",

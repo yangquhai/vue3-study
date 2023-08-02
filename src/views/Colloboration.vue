@@ -119,7 +119,7 @@
               </div>
             </div>
           </div>
-          <van-divider></van-divider>
+          <van-divider v-if="usertTagList.length"></van-divider>
           <superFilter :tabListData="tabListData" @sift="sift"></superFilter>
         </div>
         <div class="userOptions2">
@@ -207,19 +207,49 @@ const maxDate = ref(new Date(2025, 0, 31))
 const baseUrl = ref('http://dx.anywellchat.com:8888/ANYWELL_hylingls/')
 // 总金额
 const totalMoney = ref('')
+const toFormData = ref({
+  dateType: {
+		value: {
+					dateFrom: "",
+					dateTo: ""
+				},
+				defaultValue: "",
+				fieldname: ""
+	},
+	searchKeys: "",
+	searchCondition: [],
+	lcmxmc: [],
+	orderType: {
+			orderType_sql: "",
+			orderType: 
+				{
+					filedname: "",
+					order: "",
+					text: ""
+				}
+		},
+	page : {
+		pagesize : 10,
+		pageindex : 1
+		}
+  })
+// const filterFormData = new FormData()
 
-// 获取页面数据
-const getData = async () => {
+// 获取页面数据,第一次进入页面时TisFirst为1，否则都为0
+const getData = async (TisFirst,filter) => {
   let formData = new FormData()
-  formData.append('Ttablename', 'bxd_main')
-  formData.append('Turl', 'bxd.aspx')
-  formData.append('Tformnamecn', '4366')
-  formData.append('Tsystem_lcmc', '报销单')
-  formData.append('TisFirst', '1')
+  formData.append('Tformnamecn', '1665')
+  formData.append('Turl', 'YXKHGZB.ASPX')
+  formData.append('Ttablename', 'YXKHGZB')
+  formData.append('Tsystem_lcmc', '意向客户跟踪表')
+  formData.append('TisFirst', TisFirst)
+  if(filter)
+  formData.append('filter',filter)
   try {
     const res = await request.getUserInfo(formData)
     tabListData.value = res.colums
     userInfoDataList.value = res.data
+    if(tabListData.value.dateType.defaultValue)
     tabList.value[0] = tabListData.value.dateType.defaultValue
     placeholder.value = tabListData.value.search.text
     procedureList.value = tabListData.value.lcmxmc
@@ -227,11 +257,60 @@ const getData = async () => {
     if (totalMoney.value > 10000)
       totalMoney.value = (totalMoney.value / 10000).toFixed(0).toString() + '万'
     // console.log(userInfoDataList.value.sum[0].value)
+
+    // toFormData值的初始化,toForm的值需要传给后端
+    // 日期初始值
+    toFormData.value.dateType = tabListData.value.dateType
+    // 选中的流程值
+    // console.log(tabListData.value.lcmxmc)
+    for(let i=0;i<tabListData.value.lcmxmc.length;i++){
+        if(tabListData.value.lcmxmc[i].select)
+        toFormData.value.lcmxmc.push({value:tabListData.value.lcmxmc[i].value,ID:tabListData.value.lcmxmc[i].ID})
+    }
+    // 高级筛选五种自定义选择
+    for(let i=0;i<tabListData.value.searchCondition.length;i++){
+      // console.log(tabListData.value.searchCondition[i].fieldname)
+      // 为日期的时候values是对象,否则为数组
+      if(tabListData.value.searchCondition[i].type!='datetime')
+      toFormData.value.searchCondition.push({type:tabListData.value.searchCondition[i].type,fieldname:tabListData.value.searchCondition[i].fieldname,values:[]})
+      else
+      toFormData.value.searchCondition.push({type:tabListData.value.searchCondition[i].type,fieldname:tabListData.value.searchCondition[i].fieldname,values:{}})
+      // 将值为muliselect入参
+      if(tabListData.value.searchCondition[i].type=='muliselect'){
+        for(let j=0; j < tabListData.value.searchCondition[i].values.length ;j++){
+          if(tabListData.value.searchCondition[i].values[j].select){
+            toFormData.value.searchCondition[i].values.push({item:tabListData.value.searchCondition[i].values[j].item})
+          }
+        }
+      }
+      // 将值为dateTime入参
+      if(tabListData.value.searchCondition[i].type=='datetime'){
+        // console.log(tabListData.value.searchCondition[i])
+        for(let j=0; j < tabListData.value.searchCondition[i].values.length ;j++){
+          if(tabListData.value.searchCondition[i].values[j].value=='自定义'){
+            // console.log(tabListData.value.searchCondition[i].values[j].dateFrom)
+            toFormData.value.searchCondition[i].values.dateFrom = tabListData.value.searchCondition[i].values[j].dateFrom
+            toFormData.value.searchCondition[i].values.dateTo = tabListData.value.searchCondition[i].values[j].dateTo
+          }
+        }
+      }
+      // 将值为text入参
+      // if(tabListData.value.searchCondition[i].type=='text'){
+      //   for(let j=0; j < tabListData.value.searchCondition[i].condition.length ;j++){
+      //     console.log(222)
+      //     // if(tabListData.value.searchCondition[i].values[j].select){
+      //     //   toFormData.value.searchCondition[i].values.push({item:tabListData.value.searchCondition[i].values[j].item})
+      //     // }
+      //   }
+      // }
+    }
+    console.log(toFormData.value,tabListData.value)
+    // console.log(toFormData.value,tabListData.value)
   } catch (err) {
     console.log(err)
   }
 }
-getData()
+getData(1)
 
 // 计算排序数组
 const sortList = computed(() => {
@@ -381,7 +460,8 @@ const dropdown = (index) => {
 // 选择月份
 const chooseMonth = (index, value) => {
   console.log(chooseIndex.value)
-  console.log(index, value)
+  console.log(index, toFormData.value)
+
   // this.chooseIndex为0选择第一个
   chooseMonthIndex.value = index
   if (chooseIndex.value == 0) {
@@ -518,15 +598,22 @@ const chooseDataTag = (index, index2, value) => {
 const onSelect = () => {
   console.log(333)
 }
+// 点击搜索数据
 const search = (value) => {
-  console.log(value)
+  let formData = new FormData()
+  // let data = {}
+  console.log(value,toFormData.value)
+  toFormData.value.searchKeys = value
+  formData.append('filter',JSON.stringify(toFormData.value))
+  console.log(formData.get('filter'))
+  // getData(0,formData.get('filter'))
 }
 const checked = (val) => {
   console.log(val)
   chooseList.value = val
 }
 const transferOrder = () => {
-  console.log('zhaundan++++++++')
+  // console.log('zhaundan++++++++')
   orderFlag.value = true
 }
 const edit = () => {
@@ -644,10 +731,11 @@ const sift = () => {
         margin-left: 16px;
         // border: solid 1px red;
         display: flex;
+        justify-content: space-between;
         img {
           width: 14px;
           height: 14px;
-          margin-left: auto;
+          // margin-left: auto;
         }
       }
     }
@@ -663,7 +751,7 @@ const sift = () => {
         // border: solid 1px red;
         text-align: left;
         // width: 10px;
-        // margin-left: -30px;
+        margin-left: -30px;
       }
 
       .van-cell {

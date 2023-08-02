@@ -14,7 +14,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['search'])
 const onSearch = () => {
-  console.log(props.placeholder)
+  // console.log(props.placeholder)
   emit('search', value.value)
 }
 const onCancel = () => {

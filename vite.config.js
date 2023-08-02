@@ -6,6 +6,10 @@ import postCssPxToRem from 'postcss-pxtorem'
 import autoprefixer from 'autoprefixer'
 import copy from 'rollup-plugin-copy'
 import { resolve } from 'path'
+import browserslist from 'browserslist'
+import legacy from '@vitejs/plugin-legacy'
+
+const browserslistConfig = browserslist.loadConfig({ path: '.' })
 
 import Unocss from 'unocss/vite'
 import { presetUno, presetAttributify, presetIcons } from 'unocss'
@@ -31,15 +35,18 @@ export default defineConfig(({ mode }) => {
             cors:true,//开发模式
             host:"0.0.0.0",
             proxy:{
-              '^/api/*':{ /* 转发/api  */
+              '^/api/*':{
                 target: 'http://dx.anywellchat.com:8888/ANYWELL_hylingls',
                 changeOrigin: true,//允许跨域
-                rewrite: (path) => path.replace(/^\/api/, "")//路径重新
+                rewrite: (path) => path.replace(/^\/api/, "")
               }
             },
         },
         plugins: [
             vue(),
+            legacy({
+                targets: browserslistConfig,
+              }),
             Components({
                 resolvers: [VantResolver()],
             }),

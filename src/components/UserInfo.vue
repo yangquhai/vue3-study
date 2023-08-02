@@ -5,16 +5,17 @@
         <div v-if="userDataList.length != 0">
             <div v-for="(item, index) in userDataList" :key="index" class="card">
                 <div class="card-header flex">
-                    <div class="checked">
+                    <div class="checked flex">
                         <div class="checkBorder"
                             :style="{ 'border': (chooseList.includes(item.name) ? 'solid 1px #ffffff' : 'solid 1px rgba(226, 226, 226, 1)') }"
                             @click="checked(item.name, item.money)">
                             <van-icon v-show="chooseList.includes(item.name)" name="success" />
                         </div>
+                        <div class="name m-l-8">
+                          {{ KHMC[index] }}
+                        </div>
                     </div>
-                    <div class="name m-l-8">
-                        {{ KHMC[index] }}
-                    </div>
+
                     <small class="options">
                         {{ SYSTEM_LCMXMC[index] }}
                         <van-icon name="arrow" />
@@ -27,23 +28,30 @@
                             <img class="m-r-4" src="../assets/address.svg" alt="">
                             <small class="addressed">{{ SHDD[index] }}</small>
                         </div>
-                        <div class="centerList flex flex-l m-t-8 ">
+
+                        <div class="centerList flex  m-t-8 ">
+
                             <div class="taglist flex flex-l">
-                                <div class="buyOptions m-r-4">
-                                    <van-tag color="#fff2e9" text-color="#fd9148" size="large" v-if="tagBM[index]">{{
-                                        tagBM[index] }}</van-tag>
+                                <div class="buyOptions m-r-4 m-b-4" v-for="(item) in tagBM[index]">
+                                    <van-tag color="#fff2e9" text-color="#fd9148" size="large" v-if="tagBM[index]">
+                                      <!-- {{ tagBM[index] }} -->
+                                        {{ item }} 
+                                    </van-tag>
                                 </div>
-                                <div class="buyOptions">
-                                    <van-tag color="#fff2e9" text-color="#fd9148" size="large" v-if="XSQD[index]">{{
-                                        XSQD[index]
-                                    }}</van-tag>
+                                <div class="buyOptions m-r-4  m-b-4" v-for="(item) in XSQD[index]">
+                                    <van-tag color="rgba(234,84,85,0.1)" text-color="#ea5455" size="large" v-if="XSQD[index]">
+                                    <!-- {{ XSQD[index] }} -->
+                                        {{ item }}
+                                    </van-tag>
                                 </div>
                             </div>
-                            <div class="phone flex flex-l" @click="callOut(LXDH[index])">
+
+                            <div class="phone" @click="callOut(LXDH[index])">
                                 <img src="../assets/phone.svg" alt="">
                                 <small>{{ LXDH[index] }}</small>
                             </div>
                         </div>
+
                     </div>
                     <small class="card-content2">
                         <div class="van-row m-t-12 m-r-12 m-l-12">
@@ -116,8 +124,7 @@
         </van-dialog>
 
         <div class="nomore">
-            <i class="van-badge__wrapper van-icon van-icon-cross van-uploader__preview-delete-icon"></i>
-            <!-- <img src="https://api.iconify.design/flat-color-icons:next.svg?color=%23888888" alt=""> -->
+            {{ZDY}}
         </div>
     </div>
 </template>
@@ -180,6 +187,7 @@ const BZ = computed(() => {
 })
 const LXDH = computed(() => {
     let KHMC = []
+    // console.log(111)
     if (userDataList2.value != undefined && fieldName.value != undefined)
         for (let i = 0; i < userDataList2.value.length; i++) {
             for (let j = 0; j < fieldName.value.length; j++) {
@@ -209,15 +217,19 @@ const SHDD = computed(() => {
 })
 const tagBM = computed(() => {
     let KHMC = []
-    if (userDataList2.value != undefined && fieldName.value != undefined)
+    if (userDataList2.value != undefined && fieldName.value != undefined){
         for (let i = 0; i < userDataList2.value.length; i++) {
             for (let j = 0; j < fieldName.value.length; j++) {
                 if (fieldName.value[j].type == '标签' && fieldName.value[j].fieldname == 'BM') {
-                    KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname])
+                    // userDataList2.value[i][fieldName.value[j].fieldname].split(',')
+                    console.log(userDataList2.value[i][fieldName.value[j].fieldname].split(','))
+                    // KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname])
+                    KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname].split(','))
                 }
             }
         }
-    // console.log(KHMC)
+        // console.log(KHMC)
+    }
     return KHMC
 })
 const XSQD = computed(() => {
@@ -226,13 +238,34 @@ const XSQD = computed(() => {
         for (let i = 0; i < userDataList2.value.length; i++) {
             for (let j = 0; j < fieldName.value.length; j++) {
                 if (fieldName.value[j].type == '标签' && fieldName.value[j].fieldname == 'XSQD') {
-                    KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname])
+                    // KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname])
+                    KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname].split(','))
                 }
             }
         }
     // console.log(KHMC)
     return KHMC
 })
+
+const ZDY = computed(()=>{
+    let KHMC = []
+    let sum = 0
+    if (userDataList2.value != undefined && fieldName.value != undefined)
+    for (let i = 0; i < userDataList2.value.length; i++) {
+            for (let j = 0; j < fieldName.value.length; j++) {
+                if (fieldName.value[j].type == '字段1') {
+                    sum++
+                    KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname])
+                }
+            }
+            console.log(sum)
+            sum = 0
+       }
+    console.log(KHMC)
+    return KHMC
+})
+
+
 const YWY = computed(() => {
     let KHMC = []
     if (userDataList2.value != undefined && fieldName.value != undefined)
@@ -368,6 +401,9 @@ const checked = (name, money) => {
     &::-webkit-scrollbar {
         display: none;
     }
+    .card {
+        border-radius: var(--van-radius-md);
+    }
 
     .checked {
         .checkBorder {
@@ -403,7 +439,6 @@ const checked = (name, money) => {
 
     .options {
         font-size: 14px;
-        margin-left: auto;
         color: rgba(24, 144, 255, 1);
     }
 
@@ -421,9 +456,20 @@ const checked = (name, money) => {
                 color: #666666;
             }
         }
+        .centerList {
+            position: relative;
+        }
+        .taglist {
+            flex-wrap: wrap;
+            width: 225px;
+        }
         .phone {
             color: #657786;
-            margin-left: auto;
+            display: flex;
+            justify-content: flex-end;
+            position: absolute;
+            right: 0;
+            top: 0;
             img {
                 width: 14px;
                 height: 14px;
@@ -467,7 +513,9 @@ const checked = (name, money) => {
         display: flex;
         justify-content: flex-end;
         align-items: flex-end;
-
+        align-items: baseline;
+        // height: 24px;
+        // line-height: 24px;
         .titleMoney {
             color: rgba(102, 102, 102, 1);
         }
@@ -483,7 +531,10 @@ const checked = (name, money) => {
         width: 100%;
         display: flex;
         align-items: flex-end;
-
+        align-items: baseline;
+        // border: solid 1px red;
+        // height: 24px;
+        // line-height: 24px;
         .titleMoney {
             color: rgba(102, 102, 102, 1);
         }
@@ -499,7 +550,9 @@ const checked = (name, money) => {
         display: flex;
         align-items: flex-end;
         justify-content: flex-end;
-
+        align-items: baseline;
+        // height: 24px;
+        // line-height: 24px;
         .titleMoney {
             color: rgba(102, 102, 102, 1);
         }

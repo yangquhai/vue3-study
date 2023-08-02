@@ -77,6 +77,7 @@ export function recordPhoneCall(params) {
 
 export function getUserInfo(params) {
     return request.post(APIFiles.colloborationList, '/data/list_bill_wap.aspx?Tmethod=getlistbill.gz.initial', params, contentType.FormData)
+    // return request.post(APIFiles.colloborationList, 'listbill.gz.initial', params, contentType.FormData)
 }
 
 export default {

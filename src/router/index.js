@@ -88,11 +88,16 @@ const routes = [
     },
     {
         path: '/colloboration/',
+        // ?Ttablename=bxd_main&Turl=bxd.aspx&Tformnamecn=Tformnamecn&Tsystem_lcmc=4366&Tsystem_lcmc=/
         name: 'Colloboration',
         component: Colloboration,
         meta: {
-            title: '协同列表'
-        }
+            title:`报销单列表`
+        },
+        // beforeEnter: (to, from, next) => {
+        //     document.title = to.params.Ttablename  // 根据页面状态设置标题
+        //     next()
+        // }
     },
 ]
 
