@@ -5,7 +5,7 @@
             <!-- <div v-if="userDataList2"> -->
                 <div v-for="(item, index) in userDataList2" class="card">
 
-                    <div v-if="isLoad" class="skeleton" style="height: 279px; ">
+                    <div v-if="isLoad" class="skeleton" style="height: 313px; ">
                         <van-skeleton>
                             <template #template>
                                 <div :style="{ display: 'flex', width: '100%', height: '100%' }">
@@ -431,15 +431,15 @@ const checked = (name) => {
 
         .skeleton {
             .paragraphTitle {
-                height: 30px;
-            }
-
-            .paragraphaddress {
                 height: 40px;
             }
 
+            .paragraphaddress {
+                height: 50px;
+            }
+
             .paragraphBZ {
-                height: 60px;
+                height: 50px;
             }
         }
     }
