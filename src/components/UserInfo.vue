@@ -4,120 +4,145 @@
         <!-- <van-pull-refresh v-model="isLoading" @refresh="onRefresh"> -->
         <div v-if="userDataList.length != 0">
             <div v-for="(item, index) in userDataList" :key="index" class="card">
-                <div class="card-header flex">
-                    <div class="checked flex">
-                        <div class="checkBorder"
-                            :style="{ 'border': (chooseList.includes(item.name) ? 'solid 1px #ffffff' : 'solid 1px rgba(226, 226, 226, 1)') }"
-                            @click="checked(item.name, item.money)">
-                            <van-icon v-show="chooseList.includes(item.name)" name="success" />
+
+                <div v-if="isLoad" class="skeleton" style="height: 270px; ">
+                    <van-skeleton>
+                        <template #template>
+                            <div :style="{ display: 'flex', width: '100%' ,height: '100%' }">
+                                <div :style="{ flex: 1,marginTop: '20px' }">
+                                    <van-skeleton-paragraph class="paragraphTitle"  row-width="100%" style="background-color: #f2f3f5" />
+                                    <van-skeleton-paragraph style="background-color: #f2f3f5" />
+                                    <van-skeleton-paragraph style="background-color: #f2f3f5"/>
+                                    <van-skeleton-paragraph class="paragraphaddress" style="background-color: #f2f3f5"/>
+                                    <van-skeleton-paragraph class="paragraphaddress" style="background-color: #f2f3f5"/>
+                                    <van-skeleton-paragraph class="paragraphaddress" style="background-color: #f2f3f5"/>
+                                </div>
+                            </div>
+                        </template>
+                    </van-skeleton>
+                  </div>
+
+                <div v-else>
+                    <div class="card-header flex">
+                        <div class="checked flex">
+                            <div class="checkBorder"
+                                :style="{ 'border': (chooseList.includes(item.name) ? 'solid 1px #ffffff' : 'solid 1px rgba(226, 226, 226, 1)') }"
+                                @click="checked(item.name, item.money)">
+                                <van-icon v-show="chooseList.includes(item.name)" name="success" />
+                            </div>
+                            <div class="name m-l-8">
+                                {{ KHMC[index] }}
+                            </div>
                         </div>
-                        <div class="name m-l-8">
-                            {{ KHMC[index] }}
-                        </div>
+
+                        <small class="options">
+                            {{ SYSTEM_LCMXMC[index] }}
+                            <van-icon name="arrow" />
+                        </small>
                     </div>
 
-                    <small class="options">
-                        {{ SYSTEM_LCMXMC[index] }}
-                        <van-icon name="arrow" />
-                    </small>
-                </div>
-                <van-divider />
-                <div class="card-content">
-                    <div class="card-content1 m-t-8 p-l-12 p-r-12">
-                        <div class="address flex flex-l">
-                            <img class="m-r-4" src="../assets/address.svg" alt="">
-                            <small class="addressed">{{ SHDD[index] }}</small>
-                        </div>
-                        <div class="centerList flex  m-t-8 ">
 
-                            <div class="taglist flex flex-l">
-                                <div class="buyOptions m-r-4 m-b-4" v-for="(item) in BQ[index]">
-                                    <van-tag color="#fff2e9" text-color="#fd9148" size="large" v-if="BQ[index]">
-                                        <!-- {{ tagBM[index] }} -->
-                                        {{ item }}
-                                    </van-tag>
+                    <van-divider />
+                    <div class="card-content">
+                        <div class="card-content1 m-t-8 p-l-12 p-r-12">
+                            <div class="address flex flex-l">
+                                <i class="van-badge__wrapper van-icon van-icon-location m-r-4 txt-gray"
+                                    style="font-size: 14px;"></i>
+                                <small class="addressed">{{ SHDD[index] }}</small>
+                            </div>
+                            <div class="centerList flex  m-t-8 ">
+
+                                <div class="taglist flex flex-l">
+                                    <div class="buyOptions m-r-4 m-b-4" v-for="(item) in BQ[index]">
+                                        <div v-for="(item2) in item">
+                                            <van-tag color="#fff2e9" text-color="#fd9148" size="large" v-if="BQ[index]">
+                                                <!-- {{ tagBM[index] }} -->
+                                                {{ item2 }}
+                                            </van-tag>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="phone" @click="callOut(LXDH[index])">
+                                    <!-- <img src="../assets/phone.svg" alt=""> -->
+                                    <van-icon name="phone" class="txt-gray" />
+                                    <small>{{ LXDH[index] }}</small>
                                 </div>
                             </div>
 
-                            <div class="phone" @click="callOut(LXDH[index])">
-                                <img src="../assets/phone.svg" alt="">
-                                <small>{{ LXDH[index] }}</small>
-                            </div>
                         </div>
 
-                    </div>
-                    <small class="card-content2">
-                        <div class="van-row m-t-12 m-r-12 m-l-12">
-                            <div class="title van-col van-col--8 flex flex-col flex-l" v-for="(item) in ZDY[index]">
-                                <div class="titleDetails">{{ item.title }}</div>
-                                <div class="datas m-t-4 m-b-12" v-if="ZDY[index]">{{ item.value }}</div>
+                        <small class="card-content2">
+                            <div class="van-row m-t-12 m-r-12 m-l-12">
+                                <div class="title van-col van-col--8 flex flex-col flex-l" v-for="(item) in ZDY[index]">
+                                    <div class="titleDetails" v-if="item.value">{{ item.title }}</div>
+                                    <div class="datas m-t-4 m-b-12" v-if="item.value">{{ item.value }}</div>
+                                </div>
                             </div>
-                            <!-- <div class="title van-col van-col--8 flex flex-col flex-l" v-if="DGY[index]">
-                                <div class="titleDetails">导购员</div>
-                                <div class="datas m-t-4 m-b-12" v-if="DGY[index]">{{ DGY[index] }}</div>
-                            </div>
-                            <div class="title van-col van-col--8 flex flex-col flex-l" v-if="XGRQ[index]">
-                                <div class="titleDetails">修改日期</div>
-                                <div class="datas m-t-4 m-b-12" v-if="XGRQ[index]">{{ XGRQ[index] }}</div>
-                            </div> -->
-                        </div>
-                    </small>
-                    <div class="card-content3 m-t-0 m-l-12 m-r-12" v-if="BZ[index]">
-                        <div class="tips m-8">
-                            <span> <small style="font-weight:bold;">最后跟进内容:</small> <small>{{ BZ[index] }}</small> </span>
-                        </div>
-                    </div>
-                    <div class="border m-l-12 m-r-12" v-if="!BZ[index]"></div>
-                </div>
-                <div class="card-footer">
-                    <div class="style1 m-b-12" v-if="item.button.length == 3">
-                        <small class="titleMoney">销售金额</small>
-                        <small>￥</small>
-                        <span class="moneyDetails">{{ ZJE[index] }}</span>
-                    </div>
-                    <div class="style3" v-if="item.button.length == 0">
-                        <small class="titleMoney">销售金额</small>
-                        <small>￥</small>
-                        <span class="moneyDetails3">{{ ZJE[index] }}</span>
-                    </div>
+                        </small>
 
-                    <div class="getDetails" v-if="item.keep">
-                        <div class="style2" v-if="item.button.length != 3 && item.button.length != 0">
+                        <div class="card-content3 m-t-0 m-l-12 m-r-12" v-if="BZ[index]">
+                            <div class="tips m-8">
+                                <span> <small style="font-weight:bold;">最后跟进内容:</small> <small>{{ BZ[index] }}</small>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="border m-l-12 m-r-12" v-if="!BZ[index]"></div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="style1 m-b-12" v-if="item.button.length == 3">
                             <small class="titleMoney">销售金额</small>
                             <small>￥</small>
                             <span class="moneyDetails">{{ ZJE[index] }}</span>
                         </div>
-
-                        <div class="bottonList flex">
-                            <div v-for="(item2, index2) in item.button" :key="index2">
-                                <button class="userDetails borders m-l-8" @click="goDetails"
-                                    v-if="item2 == '转测量' && item.button.length != 4">{{ item2 }}</button>
-                                <button class="userDetails borders m-l-8" @click="goDetails"
-                                    v-if="item2 == '转收款' && item.button.length != 4">{{ item2 }}</button>
-                                <div v-else>
-                                    <button class="userDetails borders m-l-8" @click="transferOrder" v-if="item2 == '转单'">{{
-                                        item2
-                                    }}</button>
-                                </div>
-                                <button class="userDetails order m-l-8" @click="goDetails"
-                                    v-if="item2 == '客户详情'">客户详情</button>
-                            </div>
+                        <div class="style3" v-if="item.button.length == 0">
+                            <small class="titleMoney">销售金额</small>
+                            <small>￥</small>
+                            <span class="moneyDetails3">{{ ZJE[index] }}</span>
                         </div>
 
+                        <div class="getDetails" v-if="item.keep">
+                            <div class="style2" v-if="item.button.length != 3 && item.button.length != 0">
+                                <small class="titleMoney">销售金额</small>
+                                <small>￥</small>
+                                <span class="moneyDetails">{{ ZJE[index] }}</span>
+                            </div>
+
+                            <div class="bottonList flex">
+                                <div v-for="(item2, index2) in item.button" :key="index2">
+                                    <button class="userDetails borders m-l-8" @click="goDetails"
+                                        v-if="item2 == '转测量' && item.button.length != 4">{{ item2 }}</button>
+                                    <button class="userDetails borders m-l-8" @click="goDetails"
+                                        v-if="item2 == '转收款' && item.button.length != 4">{{ item2 }}</button>
+                                    <div v-else>
+                                        <button class="userDetails borders m-l-8" @click="transferOrder"
+                                            v-if="item2 == '转单'">{{
+                                                item2
+                                            }}</button>
+                                    </div>
+                                    <button class="userDetails order m-l-8" @click="goDetails"
+                                        v-if="item2 == '客户详情'">客户详情</button>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
+
             </div>
         </div>
         <!-- </van-pull-refresh> -->
         <!-- 用于唤起弹窗，拨打电话 -->
         <van-dialog v-model:show="show" show-cancel-button confirmButtonText="拨打电话" confirmButtonColor='#1890ff'
             cancelButtonText="复制" @confirm="callPhone()">
-            <p class="callPhone">{{ callPhoneNum }}</p>
+            <!-- <p class="callPhone">{{ callPhoneNum }}</p> -->
+            <p class="callPhone">18173135078</p>
             <p class="phoneTips">为了保护数据的安全性，本次的操作被系统记录。</p>
         </van-dialog>
 
         <div class="nomore">
-            <van-divider :style="{ color: '#969799', borderColor: '#969799', padding: '0 16px' }">没有更多了..</van-divider>
+            <!-- {{ KHBM }} -->
+            没有更多了
         </div>
     </div>
 </template>
@@ -126,7 +151,8 @@
 import { ref, reactive, computed } from 'vue'
 
 const props = defineProps({
-    userInfoDataList: Object
+    userInfoDataList: Object,
+    isLoad: Boolean
 })
 
 
@@ -229,7 +255,13 @@ const ZDY = computed(() => {
             for (let j = 0; j < fieldName.value.length; j++) {
                 if (fieldName.value[j].type == '字段1') {
                     sum++
-                    KHMC.push({value:userDataList2.value[i][fieldName.value[j].fieldname],title:fieldName.value[j].text})
+                    if (fieldName.value[j].lb != '数据:日期框') {
+                        // console.log(fieldName.value[j].lb)
+                        KHMC.push({ value: userDataList2.value[i][fieldName.value[j].fieldname], title: fieldName.value[j].text })
+                    }
+                    else {
+                        console.log(3333)
+                    }
                 }
             }
             size = sum
@@ -237,14 +269,15 @@ const ZDY = computed(() => {
         }
         // console.log(KHMC.length)
         // sliceArr(KHMC,size)
-        // console.log(sliceArr(KHMC,size))
+        console.log(sliceArr(KHMC, size))
     }
-    return sliceArr(KHMC,size)
+    return sliceArr(KHMC, size)
 })
 
 // 标签筛选
 const BQ = computed(() => {
     let KHMC = []
+    let KHMC2 = []
     let sum = 0
     let size = 0
     if (userDataList2.value != undefined && fieldName.value != undefined) {
@@ -260,9 +293,17 @@ const BQ = computed(() => {
         }
         // console.log(KHMC.length)
         // sliceArr(KHMC,size)
-        // console.log(sliceArr(KHMC,size))
+        for (let i = 0; i < sliceArr(KHMC, size).length; i++) {
+            // console.log(sliceArr(KHMC,size)[i])
+            for (let j = 0; j < sliceArr(KHMC, size)[i].length; j++) {
+                // console.log(sliceArr(KHMC,size)[i][j].split(','))
+                KHMC2.push(sliceArr(KHMC, size)[i][j].split(','))
+            }
+        }
+        // console.log(KHMC2)
+        // console.log(sliceArr(KHMC2,size))
     }
-    return sliceArr(KHMC,size)
+    return sliceArr(KHMC2, size)
 })
 
 // 总金额筛选
@@ -284,6 +325,21 @@ const ZJE = computed(() => {
         }
     // console.log(LXDH)
     return LXDH
+})
+
+// 客户详情按钮筛选
+const KHBM = computed(() => {
+    let KHMC = []
+    if (userDataList2.value != undefined && fieldName.value != undefined)
+        for (let i = 0; i < userDataList2.value.length; i++) {
+            for (let j = 0; j < fieldName.value.length; j++) {
+                if (fieldName.value[j].type == '客户详情按钮') {
+                    KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname])
+                }
+            }
+        }
+    console.log(KHMC)
+    return KHMC
 })
 
 const userDataList = reactive([
@@ -370,6 +426,14 @@ const checked = (name, money) => {
 
     .card {
         border-radius: var(--van-radius-md);
+        .skeleton {
+            .paragraphTitle {
+              height: 30px;
+          }
+          .paragraphaddress {
+            height: 40px;
+          }
+        }
     }
 
     .checked {
@@ -441,6 +505,7 @@ const checked = (name, money) => {
             position: absolute;
             right: 0;
             top: 0;
+            align-items: center;
 
             img {
                 width: 14px;
@@ -450,6 +515,9 @@ const checked = (name, money) => {
 
         .buyOptions {
             color: rgb(96, 178, 255);
+            // border: solid 1px red;
+            display: flex;
+            flex-wrap: wrap;
 
             :deep(.van-tag--large) {
                 font-size: 12px;
@@ -587,6 +655,10 @@ const checked = (name, money) => {
     }
 
     .nomore {
-        height: 80px;
+        color: var(--van-gray-6);
+        text-align: center;
+        font-size: var(--van-list-text-font-size);
+        height: 90px;
+        line-height: 20px;
     }
 }</style>

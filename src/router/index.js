@@ -6,9 +6,9 @@ import ImplementationDetails from '../views/ImplementationDetails.vue'
 import ImplementationProcess from '../views/ImplementationProcess.vue'
 import PerformanceReportingList from '../views/PerformanceReportingList.vue'
 import CheckInAndTakePhotos from '../views/CheckInAndTakePhotos.vue'
-import Colloboration from '../views/Colloboration.vue'
+import WapList from '../views/WapList.vue'
 
-const title = '亿建通协同'
+const title = '意向客户跟踪列表'
 const routes = [
     {
         path: '/:tszid/',
@@ -87,12 +87,12 @@ const routes = [
         }),
     },
     {
-        path: '/colloboration/',
+        path: '/wap-list/Ttablename=bxd_main/Turl=bxd.aspx/Tformnamecn=Tformnamecn/Tsystem_lcmc=4366/',
         // ?Ttablename=bxd_main&Turl=bxd.aspx&Tformnamecn=Tformnamecn&Tsystem_lcmc=4366&Tsystem_lcmc=/
-        name: 'Colloboration',
-        component: Colloboration,
+        name: 'WapList',
+        component: WapList,
         meta: {
-            title:`报销单列表`
+            title:`意向客户跟踪列表`
         },
         // beforeEnter: (to, from, next) => {
         //     document.title = to.params.Ttablename  // 根据页面状态设置标题

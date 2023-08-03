@@ -78,8 +78,6 @@ export function recordPhoneCall(params) {
 export function getUserInfo(params) {
     // 打包上传
     // return request.post(APIFiles.colloborationList, 'getlistbill.gz.initial',params, contentType.FormData)
-    // mock上传
-    // return request.post(APIFiles.colloborationList, 'listbill.gz.initial', params, contentType.FormData)
     return request.post(APIFiles.colloborationList, '/data/list_bill_wap.aspx?Tmethod=getlistbill.gz.initial', params, contentType.FormData)
 }
 

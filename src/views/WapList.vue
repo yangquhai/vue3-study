@@ -9,10 +9,8 @@
         <div v-for="(item, index) in tabList" :key="index" class="dropdownList" @click="dropdown(index)"
           :style="{ 'color': (index != chooseIndex ? 'rgba(50, 50, 51, 1)' : '#1890ff') }">
           <div>{{ item }}</div>
-          <img src="../assets/single.svg" alt="" style="" v-if="index == chooseIndex">
-          <img src="../assets/nosingle.svg" alt="" style="" v-if="index != chooseIndex">
-          <!-- <i class="el-icon-caret-bottom" v-if="index!=chooseIndex"></i>
-             <i class="el-icon-caret-top" v-if="index==chooseIndex"></i> -->
+          <img src="https://api.iconify.design/ic:baseline-arrow-drop-down.svg?color=%23888888" alt="" style="" v-if="index != chooseIndex">
+          <img src="https://api.iconify.design/ic:baseline-arrow-drop-up.svg?color=%231989fa" alt="" style="" v-if="index == chooseIndex"> 
         </div>
       </div>
     </div>
@@ -22,7 +20,8 @@
           :style="{ 'color': (index != chooseMonthIndex ? 'rgba(50, 50, 51, 1)' : '#1890ff') }">
           <div class="sortItem">
             <div>{{ item }}</div>
-            <img src="../assets/选中.svg" alt="" v-if="index == chooseMonthIndex">
+            <!-- <img src="../assets/选中.svg" alt="" v-if="index == chooseMonthIndex"> -->
+            <van-icon name="success" v-if="index == chooseMonthIndex" />
           </div>
         </div>
         <div class="calendar" v-if="calendarFlag">
@@ -34,7 +33,7 @@
             <van-calendar v-model:show="value2" :show-confirm="false" @confirm="onConfirm2" :min-date="minDate"
               :max-date="maxDate" />
           </div>
-          <van-button round size="small" @click="close">确认</van-button>
+          <van-button round size="small" type="primary" @click="close">确认</van-button>
         </div>
       </div>
     </transition>
@@ -123,9 +122,12 @@
           <superFilter :tabListData="tabListData" @sift="sift"></superFilter>
         </div>
         <div class="userOptions2">
-          <van-button class="button" round type="success" size="small">重置</van-button>
+          <!-- <van-button class="button" round type="success" size="small">重置</van-button>
           <van-button class="button1" round type="success" size="small" @click="keep">保存</van-button>
-          <van-button class="button3" round type="success" size="small" @click="sift">筛选</van-button>
+          <van-button class="button3" round type="success" size="small" @click="sift">筛选</van-button> -->
+          <van-button  class="button" type="primary" size="small">重置</van-button>
+          <van-button  type="primary" class="button1" size="small" @click="keep">保存</van-button>
+          <van-button  class="button3" type="primary" size="small" @click="sift">筛选</van-button>
         </div>
       </div>
     </transition>
@@ -134,9 +136,9 @@
       </div>
       <div class="total">
         <div class="number">
-          共{{ dataList.length }}条,已选{{ chooseList.length }}条
+          共{{ count }}条,已选{{ chooseList.length }}条
         </div>
-        <div class="number">销售金额共{{ totalMoney }}</div>
+        <div class="number">{{totalMoneyTitle}}共{{ totalMoney }}</div>
       </div>
       <div class="userOptions">
         <button class="button1" @click="del">删除</button>
@@ -146,7 +148,7 @@
       <van-action-sheet v-model:show="editFlag" :actions="actions" @select="onSelect" cancel-text="取消" />
       <van-action-sheet v-model:show="orderFlag" :actions="actions2" @select="onSelect" cancel-text="取消" />
     </div>
-    <userInfo class="userInfo" ref="info" @checked="checked" @transferOrder="transferOrder"
+    <userInfo class="userInfo" ref="info" @checked="checked" @transferOrder="transferOrder" :isLoad="isLoading"
       :userInfoDataList="userInfoDataList"></userInfo>
   </div>
 </template>
@@ -155,7 +157,7 @@
 import request from '_api'
 import { ref, reactive, computed } from 'vue'
 const tabList = ref(['当月', '排序', '筛选'])
-const dataList = ref([])
+const isLoading = ref(true)
 // 用户选中的数组
 const chooseList = ref([])
 // 用户选择框
@@ -207,6 +209,8 @@ const maxDate = ref(new Date(2025, 0, 31))
 const baseUrl = ref('http://dx.anywellchat.com:8888/ANYWELL_hylingls/')
 // 总金额
 const totalMoney = ref('')
+const totalMoneyTitle = ref('')
+const count = ref('')
 const toFormData = ref({
   dateType: {
 		value: {
@@ -247,13 +251,16 @@ const getData = async (TisFirst,filter) => {
   formData.append('filter',filter)
   try {
     const res = await request.getUserInfo(formData)
+    isLoading.value = false 
     tabListData.value = res.colums
     userInfoDataList.value = res.data
     if(tabListData.value.dateType.defaultValue)
     tabList.value[0] = tabListData.value.dateType.defaultValue
     placeholder.value = tabListData.value.search.text
     procedureList.value = tabListData.value.lcmxmc
-    totalMoney.value = userInfoDataList.value.sum[0].value
+    totalMoney.value = userInfoDataList.value.sum.value
+    totalMoneyTitle.value = userInfoDataList.value.sum.text
+    count.value = userInfoDataList.value.sum.count
     if (totalMoney.value > 10000)
       totalMoney.value = (totalMoney.value / 10000).toFixed(0).toString() + '万'
     // console.log(userInfoDataList.value.sum[0].value)
@@ -657,7 +664,19 @@ const sift = () => {
       transform: translateY(0px);
     }
   }
-
+  .skeleton {
+    // border: solid 1px red;
+    padding-top: 100px;
+  }
+  :deep(.van-skeleton-title) {
+    background-color: white;
+  }
+  :deep(.van-skeleton) {
+    margin-bottom: 12px;
+  }
+  :deep(.van-skeleton-paragraph) {
+    background-color: white;
+  }
   .dropdown {
     height: 31px;
     display: flex;
@@ -682,9 +701,7 @@ const sift = () => {
       background-color: rgba(255, 255, 255, 1);
       color: rgba(80, 80, 80, 1);
       font-size: 12px;
-      line-height: 150%;
-      // border: solid 1px red;
-      // text-align: center;
+      position: relative;
     }
   }
 
@@ -722,11 +739,6 @@ const sift = () => {
         // border: solid 1px red;
         display: flex;
         justify-content: space-between;
-        img {
-          width: 14px;
-          height: 14px;
-          // margin-left: auto;
-        }
       }
     }
 
@@ -763,16 +775,9 @@ const sift = () => {
         margin-left: 260px;
         margin-bottom: 5px;
         width: 83px;
-        height: 31px;
-        // color: rgb(102, 102, 102);
-        // line-height: 150%;
         font-size: 13px;
-        border-radius: 16px;
         background-color: rgba(24, 144, 255, 1);
-        color: rgba(255, 255, 255, 1);
         border: none;
-        // border: solid 1px red;
-        // background-color: red;
       }
     }
 
@@ -784,27 +789,18 @@ const sift = () => {
     }
 
     .userOptions2 {
-      // border: solid 1px red;
-      width: 100%;
-      // margin-left: 85px;
-      // margin-top: -25px;
-      // position: fixed;
+      // width: 100%;
+      padding-top: 12px;
+      margin-left: 12px;
+      margin-right: 12px;
       display: flex;
       z-index: 2;
       justify-content: flex-end;
-      // background-color: rgba(255, 255, 255, 1);
-      padding-bottom: 8px;
+      padding-bottom: 12px;
 
       .van-button {
-        width: 83px;
-        // height: 31px;
-        border: none;
-        background-color: rgba(24, 144, 255, 1);
-        color: rgba(255, 255, 255, 1);
-        border-radius: 16px;
+        width: 66px;
         margin-left: 10px;
-        // margin-bottom: 10px;
-        // color: rgba(128, 128, 128, 1);
       }
 
       .button {
@@ -821,6 +817,8 @@ const sift = () => {
 
       .button3 {
         margin-right: 9px;
+        background-color: rgba(24, 144, 255, 1);
+        border: none;
       }
     }
 
