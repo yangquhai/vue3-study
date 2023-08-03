@@ -3,7 +3,7 @@
     <div class="page-content">
         <!-- <van-pull-refresh v-model="isLoading" @refresh="onRefresh"> -->
             <!-- <div v-if="userDataList2"> -->
-                <div v-for="(item, index) in userDataList" class="card">
+                <div v-for="(item, index) in userDataList2" class="card">
 
                     <div v-if="isLoad" class="skeleton" style="height: 279px; ">
                         <van-skeleton>
@@ -159,11 +159,17 @@ const fieldName = computed(() => {
     return fieldName
 })
 
-const userDataList2 = computed(() => {
-    let userDataList2
-    userDataList2 = props.userInfoDataList.data
-    return userDataList2
+// const userDataList2 = computed(() => {
+//     let userDataList2 = props.userInfoDataList.data
+//     return userDataList2
+// })
+
+// const userDataList2 = ref('')
+watch(()=>props.userInfoDataList, (value) => {
+  userDataList2.value = value.data
+  console.log(userDataList2.value)
 })
+
 
 // 获取AJAX_Url按钮
 const AJAX_Url = computed(() => {
@@ -183,7 +189,7 @@ const KHMC = computed(() => {
                 }
             }
         }
-    // console.log(KHMC)
+    console.log(KHMC)
     return KHMC
 })
 
@@ -349,7 +355,7 @@ const KHBM = computed(() => {
     return KHMC
 })
 
-const userDataList = reactive(['','','','','','','','','','',])
+const userDataList2 = reactive(['','','','','','','','','','',])
 const chooseList = ref([])
 const totalMoney = ref([])
 const valueStr = ref([])
