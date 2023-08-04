@@ -87,7 +87,7 @@ const routes = [
         }),
     },
     {
-        path: '/wap-list/Ttablename=bxd_main/Turl=bxd.aspx/Tformnamecn=Tformnamecn/Tsystem_lcmc=4366/',
+        path: '/wap-list/',
         // ?Ttablename=bxd_main&Turl=bxd.aspx&Tformnamecn=Tformnamecn&Tsystem_lcmc=4366&Tsystem_lcmc=/
         name: 'WapList',
         component: WapList,

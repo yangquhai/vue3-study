@@ -6,22 +6,24 @@
     <div style=" position: fixed;z-index:999;width:100%;">
       <searchTab @search="search" :placeholder="placeholder"></searchTab>
       <div class="dropdown">
-        <div v-for="(item, index) in tabList" :key="index" class="dropdownList" @click="dropdown(index)"
-          :style="{ 'color': (index != chooseIndex ? 'rgba(50, 50, 51, 1)' : '#1890ff') }">
+        <div v-for="(item, index) in tabList" :key="index" class="dropdownList" @click="dropdown(index,item)"
+          :style="{ 'color': (item != chooseIndex ? 'rgba(50, 50, 51, 1)' : '#1890ff') }">
           <div>{{ item }}</div>
-          <img src="https://api.iconify.design/ic:baseline-arrow-drop-down.svg?color=%23888888" alt="" style="" v-if="index != chooseIndex">
-          <img src="https://api.iconify.design/ic:baseline-arrow-drop-up.svg?color=%231989fa" alt="" style="" v-if="index == chooseIndex"> 
+          <img src="https://api.iconify.design/ic:baseline-arrow-drop-down.svg?color=%23888888" alt="" style=""
+            v-if="index != chooseIndex">
+          <img src="https://api.iconify.design/ic:baseline-arrow-drop-up.svg?color=%231989fa" alt="" style=""
+            v-if="index == chooseIndex">
         </div>
       </div>
     </div>
     <transition>
       <div v-if="monthFlag" class="month">
         <div class="sort" v-for="(item, index) in monthList" :key="index" @click="chooseMonth(index, item)"
-          :style="{ 'color': (index != chooseMonthIndex ? 'rgba(50, 50, 51, 1)' : '#1890ff') }">
+          :style="{ 'color': (item != chooseMonthIndex ? 'rgba(50, 50, 51, 1)' : '#1890ff') }">
           <div class="sortItem">
             <div>{{ item }}</div>
             <!-- <img src="../assets/选中.svg" alt="" v-if="index == chooseMonthIndex"> -->
-            <van-icon name="success" v-if="index == chooseMonthIndex" />
+            <van-icon name="success" v-if="item == chooseMonthIndex" />
           </div>
         </div>
         <div class="calendar" v-if="calendarFlag">
@@ -40,10 +42,10 @@
     <transition>
       <div v-if="sortFlag" class="month">
         <div class="sort" v-for="(item, index) in sortList" :key="index" @click="choosesort(index, item)"
-          :style="{ 'color': (index != chooseDateIndex ? 'rgba(50, 50, 51, 1)' : 'rgba(25, 137, 250, 1)') }">
+          :style="{ 'color': (item.text != chooseDateIndex ? 'rgba(50, 50, 51, 1)' : 'rgba(25, 137, 250, 1)') }">
           <div class="sortItem">
-              <div>{{ item.text }}</div> 
-              <div class="imgList">
+            <div>{{ item.text }}</div>
+            <div class="imgList">
               <!-- <img class="img1" src="../assets/down.png" alt="" @click="up(index)" v-if="index!=chooseDateIndex">
                 <img class="img2" src="../assets/up.png" alt="" @click="down(index)" v-if="index!=chooseDateIndex">
                 <img src="../assets/black-down.svg" alt="" v-if="index==chooseDateIndex&&index==chooseDateIndex">
@@ -56,7 +58,7 @@
                 v-if="item.order != 'descd'">
               <img class="img1" src="../assets/chooseDown.png" alt="" @click="up(index, item.order, 1)"
                 v-if="item.order == 'descd'">
-             </div>
+            </div>
           </div>
         </div>
       </div>
@@ -125,9 +127,9 @@
           <!-- <van-button class="button" round type="success" size="small">重置</van-button>
           <van-button class="button1" round type="success" size="small" @click="keep">保存</van-button>
           <van-button class="button3" round type="success" size="small" @click="sift">筛选</van-button> -->
-          <van-button  class="button" type="primary" size="small">重置</van-button>
-          <van-button  type="primary" class="button1" size="small" @click="keep">保存</van-button>
-          <van-button  class="button3" type="primary" size="small" @click="sift">筛选</van-button>
+          <van-button class="button" type="primary" size="small">重置</van-button>
+          <van-button type="primary" class="button1" size="small" @click="keep">保存</van-button>
+          <van-button class="button3" type="primary" size="small" @click="sift">筛选</van-button>
         </div>
       </div>
     </transition>
@@ -138,7 +140,7 @@
         <div class="number">
           共{{ count }}条,已选{{ chooseList.length }}条
         </div>
-        <div class="number">{{totalMoneyTitle}}共{{ totalMoney }}</div>
+        <div class="number">{{ totalMoneyTitle }}共  <span v-if="!chooseList.length">{{ totalMoney }}</span>  <span v-else>{{ chooseTotalMoney }}</span> </div>
       </div>
       <div class="userOptions">
         <button class="button1" @click="del">删除</button>
@@ -148,7 +150,9 @@
       <van-action-sheet v-model:show="editFlag" :actions="actions" @select="onSelect" cancel-text="取消" />
       <van-action-sheet v-model:show="orderFlag" :actions="actions2" @select="onSelect" cancel-text="取消" />
     </div>
-    <userInfo class="userInfo" ref="info" @checked="checked" @transferOrder="transferOrder" :isLoad="isLoading"
+    <skeleton v-if="isLoading"></skeleton>
+    <userInfo class="userInfo" ref="info" @checked="checked" @transferOrder="transferOrder" :isLoad="isLoading" v-else
+      @loadMore="loadMore(0)"
       :userInfoDataList="userInfoDataList"></userInfo>
   </div>
 </template>
@@ -200,9 +204,9 @@ const tabListData = ref([])
 const userInfoDataList = ref({})
 // 转单按钮的下拉框控制
 const editFlag = ref(false)
-const actions = reactive([{ name: '批量审批' }, { name: '批量回退' }])
+const actions = ref([{ name: '批量审批' }, { name: '批量回退' }])
 const orderFlag = ref(false)
-const actions2 = reactive([{ name: '转收款' }, { name: '转订单' }, { name: '转出库' }])
+const actions2 = ref([{ name: '转收款' }, { name: '转订单' }, { name: '转出库' }])
 // 月份限制
 const minDate = ref(new Date(2020, 0, 1))
 const maxDate = ref(new Date(2025, 0, 31))
@@ -213,49 +217,54 @@ const totalMoneyTitle = ref('')
 const count = ref('')
 const toFormData = ref({
   dateType: {
-		value: {
-					dateFrom: "",
-					dateTo: ""
-				},
-				defaultValue: "",
-				fieldname: ""
-	},
-	searchKeys: "",
-	searchCondition: [],
-	lcmxmc: [],
-	orderType: {
-			orderType_sql: "",
-			orderType: 
-				{
-					filedname: "",
-					order: "",
-					text: ""
-				}
-		},
-	page : {
-		pagesize : 10,
-		pageindex : 1
-		}
-  })
+    value: {
+      dateFrom: "",
+      dateTo: ""
+    },
+    defaultValue: "",
+    fieldname: ""
+  },
+  searchKeys: "",
+  searchCondition: [],
+  lcmxmc: [],
+  orderType: {
+    orderType_sql: "",
+    orderType:
+    {
+      filedname: "",
+      order: "",
+      text: ""
+    }
+  },
+  page: {
+    pagesize: 10,
+    pageindex: 1
+  }
+})
 // const filterFormData = new FormData()
 
 // 获取页面数据,第一次进入页面时TisFirst为1，否则都为0
-const getData = async (TisFirst,filter) => {
+const getData = async (TisFirst, filter) => {
   let formData = new FormData()
   formData.append('Tformnamecn', '1665')
   formData.append('Turl', 'YXKHGZB.ASPX')
   formData.append('Ttablename', 'YXKHGZB')
   formData.append('Tsystem_lcmc', '意向客户跟踪表')
   formData.append('TisFirst', TisFirst)
-  if(filter)
-  formData.append('filter',filter)
+  formData.append('pageIndex',1)
+  formData.append('pagesize',10)
+  if (filter)
+    formData.append('filter', filter)
   try {
     const res = await request.getUserInfo(formData)
-    isLoading.value = false 
+    isLoading.value = false
     tabListData.value = res.colums
     userInfoDataList.value = res.data
-    if(tabListData.value.dateType.defaultValue)
-    tabList.value[0] = tabListData.value.dateType.defaultValue
+    console.log(userInfoDataList.value)
+    if (!tabListData.value.dateType.defaultValue)
+      tabList.value[0] = tabListData.value.dateType.defaultValue
+    else
+    tabList.delete('当月')
     placeholder.value = tabListData.value.search.text
     procedureList.value = tabListData.value.lcmxmc
     totalMoney.value = userInfoDataList.value.sum.value
@@ -270,31 +279,31 @@ const getData = async (TisFirst,filter) => {
     toFormData.value.dateType = tabListData.value.dateType
     // 选中的流程值
     // console.log(tabListData.value.lcmxmc)
-    for(let i=0;i<tabListData.value.lcmxmc.length;i++){
-        if(tabListData.value.lcmxmc[i].select)
-        toFormData.value.lcmxmc.push({value:tabListData.value.lcmxmc[i].value,ID:tabListData.value.lcmxmc[i].ID})
+    for (let i = 0; i < tabListData.value.lcmxmc.length; i++) {
+      if (tabListData.value.lcmxmc[i].select)
+        toFormData.value.lcmxmc.push({ value: tabListData.value.lcmxmc[i].value, ID: tabListData.value.lcmxmc[i].ID })
     }
     // 高级筛选五种自定义选择
-    for(let i=0;i<tabListData.value.searchCondition.length;i++){
+    for (let i = 0; i < tabListData.value.searchCondition.length; i++) {
       // console.log(tabListData.value.searchCondition[i].fieldname)
       // 为日期的时候values是对象,否则为数组
-      if(tabListData.value.searchCondition[i].type!='datetime')
-      toFormData.value.searchCondition.push({type:tabListData.value.searchCondition[i].type,fieldname:tabListData.value.searchCondition[i].fieldname,values:[]})
+      if (tabListData.value.searchCondition[i].type != 'datetime')
+        toFormData.value.searchCondition.push({ type: tabListData.value.searchCondition[i].type, fieldname: tabListData.value.searchCondition[i].fieldname, values: [] })
       else
-      toFormData.value.searchCondition.push({type:tabListData.value.searchCondition[i].type,fieldname:tabListData.value.searchCondition[i].fieldname,values:{}})
+        toFormData.value.searchCondition.push({ type: tabListData.value.searchCondition[i].type, fieldname: tabListData.value.searchCondition[i].fieldname, values: {} })
       // 将值为muliselect入参
-      if(tabListData.value.searchCondition[i].type=='muliselect'){
-        for(let j=0; j < tabListData.value.searchCondition[i].values.length ;j++){
-          if(tabListData.value.searchCondition[i].values[j].select){
-            toFormData.value.searchCondition[i].values.push({item:tabListData.value.searchCondition[i].values[j].item})
+      if (tabListData.value.searchCondition[i].type == 'muliselect') {
+        for (let j = 0; j < tabListData.value.searchCondition[i].values.length; j++) {
+          if (tabListData.value.searchCondition[i].values[j].select) {
+            toFormData.value.searchCondition[i].values.push({ item: tabListData.value.searchCondition[i].values[j].item })
           }
         }
       }
       // 将值为dateTime入参
-      if(tabListData.value.searchCondition[i].type=='datetime'){
+      if (tabListData.value.searchCondition[i].type == 'datetime') {
         // console.log(tabListData.value.searchCondition[i])
-        for(let j=0; j < tabListData.value.searchCondition[i].values.length ;j++){
-          if(tabListData.value.searchCondition[i].values[j].value=='自定义'){
+        for (let j = 0; j < tabListData.value.searchCondition[i].values.length; j++) {
+          if (tabListData.value.searchCondition[i].values[j].value == '自定义') {
             // console.log(tabListData.value.searchCondition[i].values[j].dateFrom)
             toFormData.value.searchCondition[i].values.dateFrom = tabListData.value.searchCondition[i].values[j].dateFrom
             toFormData.value.searchCondition[i].values.dateTo = tabListData.value.searchCondition[i].values[j].dateTo
@@ -311,13 +320,38 @@ const getData = async (TisFirst,filter) => {
       //   }
       // }
     }
-    console.log(toFormData.value,tabListData.value)
+    console.log(toFormData.value, tabListData.value)
     // console.log(toFormData.value,tabListData.value)
   } catch (err) {
     console.log(err)
   }
 }
 getData(1)
+
+// 加载更多数据
+const conactArray = ref([])
+const pageIndex = ref(1)
+const loadMore = async(TisFirst) =>{
+  pageIndex.value++
+  // console.log(pageIndex.value)
+  let formData = new FormData()
+  formData.append('Tformnamecn', '1665')
+  formData.append('Turl', 'YXKHGZB.ASPX')
+  formData.append('Ttablename', 'YXKHGZB')
+  formData.append('Tsystem_lcmc', '意向客户跟踪表')
+  formData.append('TisFirst', TisFirst)
+  formData.append('pageIndex',pageIndex.value)
+  formData.append('pagesize',10)
+  try {
+    const res = await request.getUserInfo(formData)
+    conactArray.value = res.data.data
+    userInfoDataList.value.data = userInfoDataList.value.data.concat(conactArray.value)
+    // console.log(conactArray.value,userInfoDataList.value.data)
+  }
+  catch(err) {
+    console.log(err)
+  }
+}
 
 // 计算排序数组
 const sortList = computed(() => {
@@ -394,27 +428,41 @@ const goAddData = () => {
   window.location.href = (baseUrl.value + tabListData.value.newUrl)
 }
 
+// 用于判断sortList中是否存在item索引
+const sortIncludes =computed(()=>{
+  let sortIncludes = []
+  for(let i =0;i<sortList.value.length;i++){
+    sortIncludes.push(sortList.value[i].text)
+  }
+  return sortIncludes
+})
+
 // 点击出现下拉框
-const dropdown = (index) => {
+const dropdown = (index,item) => {
   stop()
+  console.log(item,index,firstIndex.value)
   // console.log(this.chooseIndex,index)
-  chooseIndex.value = index
+  chooseIndex.value = item
   // console.log(this.firstIndex,index)
   // 判断是否第一次打开
-  if (firstIndex.value != index) {
-    if (index == 0) {
+  if (firstIndex.value != item) {
+    console.log(sortIncludes.value)
+    if (monthList.value.includes(item)) {
+      console.log(1111)
       monthFlag.value = true
       sortFlag.value = false
       selectFlag.value = false
       flag.value = true
     }
-    if (index == 1) {
+    if (item == '排序'|| sortIncludes.value.includes(item)) {
+      console.log(2222)
       monthFlag.value = false
       sortFlag.value = true
       selectFlag.value = false
       flag.value = true
     }
-    if (index == 2) {
+    if (item == '筛选') {
+      console.log(3333)
       monthFlag.value = false
       sortFlag.value = false
       selectFlag.value = true
@@ -424,7 +472,8 @@ const dropdown = (index) => {
   }
   // 再次点击
   else {
-    if (chooseIndex.value == index) {
+    console.log(chooseIndex.value,item)
+    if (chooseIndex.value == item) {
       chooseIndex.value = null
       flag.value = false
       monthFlag.value = false
@@ -436,18 +485,18 @@ const dropdown = (index) => {
     }
     else {
       // console.log(index,this.flag)
-      if (flag.value == false && index == 0) {
+      if (flag.value == false && monthList.value.includes(item)) {
         // console.log(index,this.flag)
         monthFlag.value = true
         flag.value = true
         return
       }
-      if (flag.value == false && index == 1) {
+      if (flag.value == false && (item == '排序'|| sortIncludes.value.includes(item))) {
         sortFlag.value = true
         flag.value = true
         return
       }
-      if (flag.value == false && index == 2) {
+      if (flag.value == false && item == '筛选') {
         selectFlag.value = true
         flag.value = true
         return
@@ -461,7 +510,7 @@ const dropdown = (index) => {
       }
     }
   }
-  firstIndex.value = index
+  firstIndex.value = item
 }
 
 // 选择月份
@@ -470,8 +519,9 @@ const chooseMonth = (index, value) => {
   console.log(index, toFormData.value)
 
   // this.chooseIndex为0选择第一个
-  chooseMonthIndex.value = index
-  if (chooseIndex.value == 0) {
+  chooseMonthIndex.value = value
+  console.log(value)
+  if (monthList.value.includes(chooseIndex.value)) {
     if (index != 7) {
       chooseIndex.value = null
       firstIndex.value = null
@@ -517,16 +567,15 @@ const getSimpleDate = (date) => {
 
 // 选择排序字段
 const choosesort = (index, value) => {
-  chooseDateIndex.value = index
-  // console.log(index,value)
+  chooseDateIndex.value = value.text
   // 再次点击相同索引，关闭下拉框
-  if (chooseIndex.value == 1) {
+  if (sortIncludes.value.includes(chooseDateIndex.value)) {
     // this.tabList[0] = value
     chooseIndex.value = null
     firstIndex.value = null
     tabList.value[1] = value.text
     // this.$set(this.tabList,1,value.text)
-    // console.log(index)
+    console.log(index)
     flag.value = false
     monthFlag.value = false
     sortFlag.value = false
@@ -609,18 +658,40 @@ const onSelect = () => {
 const search = (value) => {
   let formData = new FormData()
   // let data = {}
-  console.log(value,toFormData.value)
+  console.log(value, toFormData.value)
   toFormData.value.searchKeys = value
-  formData.append('filter',JSON.stringify(toFormData.value))
+  formData.append('filter', JSON.stringify(toFormData.value))
   console.log(formData.get('filter'))
   // getData(0,formData.get('filter'))
 }
+// 计算选中的金额
+const chooseTotalMoney = ref(0)
 const checked = (val) => {
-  console.log(val)
+  chooseTotalMoney.value = 0
+  // console.log(val)
+  // chooseList.value.push(val)
+  let chooseTotalMoneyList = []
   chooseList.value = val
+  // console.log(chooseList.value)
+  for(let i = 0;i<userInfoDataList.value.data.length;i++){
+    // console.log(userInfoDataList.value.data[i].rn)
+    for(let j = 0;j<chooseList.value.length;j++){
+      if(chooseList.value[j]==userInfoDataList.value.data[i].rn){
+        // console.log(userInfoDataList.value.data[i][userInfoDataList.value.sum.fieldname])
+        chooseTotalMoneyList.push(userInfoDataList.value.data[i][userInfoDataList.value.sum.fieldname])
+      }
+    }
+  }
+  for(let i=0;i<chooseTotalMoneyList.length;i++){
+    chooseTotalMoney.value = chooseTotalMoney.value + chooseTotalMoneyList[i]
+  }
+  if (chooseTotalMoney.value > 10000)
+     chooseTotalMoney.value = (chooseTotalMoney.value / 10000).toFixed(0).toString() + '万'
+  // console.log(chooseTotalMoney.value,chooseTotalMoneyList)
 }
+
+
 const transferOrder = () => {
-  // console.log('zhaundan++++++++')
   orderFlag.value = true
 }
 const edit = () => {
@@ -644,9 +715,10 @@ const sift = () => {
 
 <style lang="less" scoped>
 .page-content {
-    overflow-y: scroll;
-    overflow-x: hidden;
-    height: 100vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: 100vh;
+
   .v-enter-active {
     animation: testanimation 0.3s;
   }
@@ -664,19 +736,7 @@ const sift = () => {
       transform: translateY(0px);
     }
   }
-  .skeleton {
-    // border: solid 1px red;
-    padding-top: 100px;
-  }
-  :deep(.van-skeleton-title) {
-    background-color: white;
-  }
-  :deep(.van-skeleton) {
-    margin-bottom: 12px;
-  }
-  :deep(.van-skeleton-paragraph) {
-    background-color: white;
-  }
+
   .dropdown {
     height: 31px;
     display: flex;
@@ -713,6 +773,7 @@ const sift = () => {
     padding-top: 4px;
     background-color: rgba(255, 255, 255, 1);
     max-height: 70%;
+
     // border: solid 1px red;
     // border: none;
     // margin-top: -1px;
@@ -720,16 +781,19 @@ const sift = () => {
       height: 34px;
       display: flex;
       align-items: center;
+
       // justify-content: center;
       .imgList {
         // margin-left: 316px;
         display: flex;
         margin-left: auto;
+
         img {
           width: 14px;
           height: 14px;
         }
       }
+
       .sortItem {
         width: 90%;
         font-size: 12px;

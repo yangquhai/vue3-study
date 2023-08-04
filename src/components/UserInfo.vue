@@ -2,132 +2,121 @@
 <template>
     <div class="page-content">
         <!-- <van-pull-refresh v-model="isLoading" @refresh="onRefresh"> -->
-            <!-- <div v-if="userDataList2"> -->
-                <div v-for="(item, index) in userDataList2" class="card">
-
-                    <div v-if="isLoad" class="skeleton" style="height: 313px; ">
-                        <van-skeleton>
-                            <template #template>
-                                <div :style="{ display: 'flex', width: '100%', height: '100%' }">
-                                    <div :style="{ flex: 1, marginTop: '20px' }">
-                                        <van-skeleton-paragraph class="paragraphTitle" row-width="100%"
-                                            style="background-color: #f2f3f5" />
-                                        <van-skeleton-paragraph class="paragraphTitle" style="background-color: #f2f3f5" />
-                                        <van-skeleton-paragraph class="paragraphaddress" style="background-color: #f2f3f5" />
-                                        <van-skeleton-paragraph class="paragraphBZ" style="background-color: #f2f3f5" />
-                                        <van-skeleton-paragraph class="paragraphaddress" style="background-color: #f2f3f5" />
-                                    </div>
-                                </div>
-                            </template>
-                        </van-skeleton>
-                    </div>
-
-                    <div v-else>
-                        <div class="card-header flex">
-                            <div class="checked flex">
-                                <div class="checkBorder"
-                                    :style="{ 'border': (chooseList.includes(item.rn) ? 'solid 1px #ffffff' : 'solid 1px rgba(226, 226, 226, 1)') }"
-                                    @click="checked(item.rn)">
-                                    <van-icon v-show="chooseList.includes(item.rn)" name="success" />
-                                </div>
-                                <div class="name m-l-8">
-                                    {{ KHMC[index] }}
-                                </div>
-                            </div>
-
-                            <small class="options">
-                                {{ SYSTEM_LCMXMC[index] }}
-                                <van-icon name="arrow" />
-                            </small>
+        <div v-for="(item, index) in props.userInfoDataList.data" class="card">
+            <div>
+                <div class="card-header flex">
+                    <div class="checked flex">
+                        <div class="checkBorder"
+                            :style="{ 'border': (chooseList.includes(item.rn) ? 'solid 1px #ffffff' : 'solid 1px rgba(226, 226, 226, 1)') }"
+                            @click="checked(item.rn)">
+                            <van-icon v-show="chooseList.includes(item.rn)" name="success" />
                         </div>
-
-
-                        <van-divider />
-                        <div class="card-content">
-                            <div class="card-content1 m-t-8 p-l-12 p-r-12">
-                                <div class="address flex-l">
-                                    <i class="van-badge__wrapper van-icon van-icon-location m-r-4 txt-gray"></i>
-                                    <small class="addressed">{{ SHDD[index] }}</small>
-                                </div>
-                                <div class="centerList flex  m-t-8 ">
-
-                                    <div class="taglist flex flex-l">
-                                        <div class="buyOptions m-r-4 m-b-4" v-for="(item) in BQ[index]">
-                                            <div v-for="(item2) in item">
-                                                <van-tag color="#fff2e9" text-color="#fd9148" size="large" v-if="BQ[index]">
-                                                    <!-- {{ tagBM[index] }} -->
-                                                    {{ item2 }}
-                                                </van-tag>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="phone" @click="callOut(LXDH[index])">
-                                        <!-- <img src="../assets/phone.svg" alt=""> -->
-                                        <van-icon name="phone" class="txt-gray" />
-                                        <small>{{ LXDH[index] }}</small>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <small class="card-content2">
-                                <div class="van-row m-t-12 m-r-12 m-l-12">
-                                    <div class="title van-col van-col--8 flex flex-col" v-for="(item) in ZDY[index]">
-                                        <div class="titleDetails" v-if="item.value">{{ item.title }}</div>
-                                        <div class="datas m-t-4 m-b-12" v-if="item.value">{{ item.value }}</div>
-                                    </div>
-                                </div>
-                            </small>
-
-                            <div class="card-content3 m-t-0 m-l-12 m-r-12" v-if="BZ[index]">
-                                <div class="tips m-8">
-                                    <span> <small style="font-weight:bold;">最后跟进内容:</small> <small>{{ BZ[index] }}</small>
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="border m-l-12 m-r-12" v-if="!BZ[index]"></div>
-                        </div>
-
-                        <div class="card-footer">
-                            <div class="style1 m-b-12" v-if="AJAX_Url.length == 3">
-                                <small class="titleMoney">销售金额</small>
-                                <small>￥</small>
-                                <span class="moneyDetails">{{ ZJE[index] }}</span>
-                            </div>
-                            <div class="style3" v-if="AJAX_Url.length == 0">
-                                <small class="titleMoney">销售金额</small>
-                                <small>￥</small>
-                                <span class="moneyDetails3">{{ ZJE[index] }}</span>
-                            </div>
-
-                            <div class="getDetails">
-                                <div class="style2" v-if="AJAX_Url.length != 3 && AJAX_Url.length != 0">
-                                    <small class="titleMoney">销售金额</small>
-                                    <small>￥</small>
-                                    <span class="moneyDetails">{{ ZJE[index] }}</span>
-                                </div>
-
-                                <div class="bottonList flex">
-                                    <div v-for="(item2, index2) in AJAX_Url">
-                                        <button v-if="AJAX_Url.length < 3" class="userDetails borders m-l-8"
-                                            @click="goDetails">{{
-                                                item2.text1 }}</button>
-
-                                        <button v-if="AJAX_Url.length > 2 && index2 == 0" class="userDetails borders m-l-8"
-                                            @click="transferOrder">转单</button>
-                                        <button class="userDetails order m-l-8" @click="goDetails"
-                                            v-if="index2==0">{{KHBM[index]}}</button>
-                                    </div>
-                                </div>
-
-                            </div>
-
+                        <div class="name m-l-8">
+                            {{ KHMC[index] }}
                         </div>
                     </div>
 
+                    <small class="options">
+                        {{ SYSTEM_LCMXMC[index] }}
+                        <van-icon name="arrow" />
+                    </small>
                 </div>
-           <!-- </div> -->
+
+
+                <van-divider />
+                <div class="card-content">
+                    <div class="card-content1 m-t-8 p-l-12 p-r-12">
+                        <div class="address flex-l">
+                            <i class="van-badge__wrapper van-icon van-icon-location m-r-4 txt-gray"></i>
+                            <small class="addressed">{{ SHDD[index] }}</small>
+                        </div>
+                        <div class="centerList flex  m-t-8 ">
+
+                            <div class="taglist flex flex-l">
+                                <div class="buyOptions m-r-4 m-b-4" v-for="(item) in BQ[index]">
+                                    <div v-for="(item2) in item">
+                                        <van-tag color="#fff2e9" text-color="#fd9148" size="large" v-if="BQ[index]">
+                                            <!-- {{ tagBM[index] }} -->
+                                            {{ item2 }}
+                                        </van-tag>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="phone" @click="callOut(LXDH[index])">
+                                <!-- <img src="../assets/phone.svg" alt=""> -->
+                                <van-icon name="phone" class="txt-gray" />
+                                <small>{{ LXDH[index] }}</small>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <small class="card-content2">
+                        <div class="van-row m-t-12 m-r-12 m-l-12">
+                            <div class="title van-col van-col--8 flex flex-col" v-for="(item) in ZDY[index]">
+                                <div class="titleDetails" v-if="item.value">{{ item.title }}</div>
+                                <div class="datas m-t-4 m-b-12" v-if="item.value">{{ item.value }}</div>
+                            </div>
+                        </div>
+                    </small>
+
+                    <div class="card-content3 m-t-0 m-l-12 m-r-12" v-if="BZ[index]">
+                        <div class="tips m-8">
+                            <span> <small style="font-weight:bold;">最后跟进内容:</small> <small>{{ BZ[index] }}</small>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="border m-l-12 m-r-12" v-if="!BZ[index]"></div>
+                </div>
+
+                <div class="card-footer">
+                    <div class="style1 m-b-12" v-if="AJAX_Url.length == 2">
+                        <small class="titleMoney">销售金额</small>
+                        <small>￥</small>
+                        <span class="moneyDetails">{{ ZJE[index] }}</span>
+                    </div>
+                    <div class="style3" v-if="AJAX_Url.length == 0">
+                        <small class="titleMoney">销售金额</small>
+                        <small>￥</small>
+                        <span class="moneyDetails3">{{ ZJE[index] }}</span>
+                    </div>
+
+                    <div class="getDetails">
+                        <div class="style2" v-if="AJAX_Url.length != 2 && AJAX_Url.length != 0">
+                            <small class="titleMoney">销售金额</small>
+                            <small>￥</small>
+                            <span class="moneyDetails">{{ ZJE[index] }}</span>
+                        </div>
+
+                        <div class="bottonList">
+                            <div v-for="(item2, index2) in AJAX_Url"  style="display: flex;">
+                                <div v-if="AJAX_Url.length < 3">
+                                    <button class="userDetails borders m-l-8" @click="goDetails">{{
+                                    item2.text1 }}</button>
+                                </div>
+                                <div v-if="AJAX_Url.length > 2 && index2 == 0">
+                                    <button  class="userDetails borders m-l-8"
+                                    @click="transferOrder">转单</button>
+                                </div>
+
+                                <div v-if="index2 == 0">
+                                    <button class="userDetails order m-l-8" @click="goDetails"
+                                    >
+                                    {{ KHBM[index].title }}
+                                   
+                                   </button>
+                                </div>
+
+                                
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
         <!-- </van-pull-refresh> -->
         <!-- 用于唤起弹窗，拨打电话 -->
         <van-dialog v-model:show="show" show-cancel-button confirmButtonText="拨打电话" confirmButtonColor='#1890ff'
@@ -137,7 +126,7 @@
             <p class="phoneTips">为了保护数据的安全性，本次的操作被系统记录。</p>
         </van-dialog>
 
-        <div class="nomore">
+        <div class="nomore" @click="loadMore">
             <!-- {{ KHBM }} -->
             没有更多了
         </div>
@@ -150,46 +139,39 @@ import { ref, reactive, computed, watch } from 'vue'
 const props = defineProps({
     userInfoDataList: Object,
     isLoad: Boolean
-})
 
+})
 
 // 解析后端传输的字段，筛选出符合要求的数据,并对数据进行处理
 const fieldName = computed(() => {
     let fieldName = props.userInfoDataList.fieldname
     return fieldName
 })
-
-// const userDataList2 = computed(() => {
-//     let userDataList2 = props.userInfoDataList.data
-//     return userDataList2
-// })
-
-// const userDataList2 = ref('')
-watch(()=>props.userInfoDataList, (value) => {
-  userDataList2.value = value.data
-  console.log(userDataList2.value)
+watch(() => props.userInfoDataList, (value) => {
+    userDataList2.value = value.data
+    // console.log(userDataList2.value)
 })
 
 
 // 获取AJAX_Url按钮
 const AJAX_Url = computed(() => {
     let AJAX_Url = props.userInfoDataList.AJAX_Url
-    console.log(AJAX_Url)
+    // console.log(AJAX_Url)
     return AJAX_Url
 })
 
 // 客户名称筛选
 const KHMC = computed(() => {
     let KHMC = []
-    if (userDataList2.value != undefined && fieldName.value != undefined)
-        for (let i = 0; i < userDataList2.value.length; i++) {
+    if (props.userInfoDataList.data != undefined && fieldName.value != undefined)
+        for (let i = 0; i < props.userInfoDataList.data.length; i++) {
             for (let j = 0; j < fieldName.value.length; j++) {
                 if (fieldName.value[j].type == '姓名') {
-                    KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname])
+                    KHMC.push(props.userInfoDataList.data[i][fieldName.value[j].fieldname])
                 }
             }
         }
-    console.log(KHMC)
+    // console.log(KHMC)
     return KHMC
 })
 
@@ -197,11 +179,11 @@ const KHMC = computed(() => {
 
 const SYSTEM_LCMXMC = computed(() => {
     let KHMC = []
-    if (userDataList2.value != undefined && fieldName.value != undefined)
-        for (let i = 0; i < userDataList2.value.length; i++) {
+    if (props.userInfoDataList.data != undefined && fieldName.value != undefined)
+        for (let i = 0; i < props.userInfoDataList.data.length; i++) {
             for (let j = 0; j < fieldName.value.length; j++) {
                 if (fieldName.value[j].type == '状态') {
-                    KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname])
+                    KHMC.push(props.userInfoDataList.data[i][fieldName.value[j].fieldname])
                 }
             }
         }
@@ -212,11 +194,11 @@ const SYSTEM_LCMXMC = computed(() => {
 // 备注筛选
 const BZ = computed(() => {
     let KHMC = []
-    if (userDataList2.value != undefined && fieldName.value != undefined)
-        for (let i = 0; i < userDataList2.value.length; i++) {
+    if (props.userInfoDataList.data != undefined && fieldName.value != undefined)
+        for (let i = 0; i < props.userInfoDataList.data.length; i++) {
             for (let j = 0; j < fieldName.value.length; j++) {
                 if (fieldName.value[j].type == '备注') {
-                    KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname])
+                    KHMC.push(props.userInfoDataList.data[i][fieldName.value[j].fieldname])
                 }
             }
         }
@@ -228,14 +210,14 @@ const BZ = computed(() => {
 const LXDH = computed(() => {
     let KHMC = []
     // console.log(111)
-    if (userDataList2.value != undefined && fieldName.value != undefined)
-        for (let i = 0; i < userDataList2.value.length; i++) {
+    if (props.userInfoDataList.data != undefined && fieldName.value != undefined)
+        for (let i = 0; i < props.userInfoDataList.data.length; i++) {
             for (let j = 0; j < fieldName.value.length; j++) {
                 if (fieldName.value[j].type == '电话') {
-                    if (userDataList2.value[i][fieldName.value[j].fieldname].length > 11)
-                        KHMC.push((userDataList2.value[i][fieldName.value[j].fieldname].slice(0, 11) + '..'))
+                    if (props.userInfoDataList.data[i][fieldName.value[j].fieldname].length > 11)
+                        KHMC.push((props.userInfoDataList.data[i][fieldName.value[j].fieldname].slice(0, 11) + '..'))
                     else
-                        KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname])
+                        KHMC.push(props.userInfoDataList.data[i][fieldName.value[j].fieldname])
                 }
             }
         }
@@ -246,11 +228,11 @@ const LXDH = computed(() => {
 // 销售地址筛选
 const SHDD = computed(() => {
     let KHMC = []
-    if (userDataList2.value != undefined && fieldName.value != undefined)
-        for (let i = 0; i < userDataList2.value.length; i++) {
+    if (props.userInfoDataList.data != undefined && fieldName.value != undefined)
+        for (let i = 0; i < props.userInfoDataList.data.length; i++) {
             for (let j = 0; j < fieldName.value.length; j++) {
                 if (fieldName.value[j].type == '地址') {
-                    KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname])
+                    KHMC.push(props.userInfoDataList.data[i][fieldName.value[j].fieldname])
                 }
             }
         }
@@ -263,17 +245,20 @@ const ZDY = computed(() => {
     let KHMC = []
     let sum = 0
     let size = 0
-    if (userDataList2.value != undefined && fieldName.value != undefined) {
-        for (let i = 0; i < userDataList2.value.length; i++) {
+    if (props.userInfoDataList.data != undefined && fieldName.value != undefined) {
+        for (let i = 0; i < props.userInfoDataList.data.length; i++) {
             for (let j = 0; j < fieldName.value.length; j++) {
                 if (fieldName.value[j].type == '字段1') {
                     sum++
-                    if (fieldName.value[j].LB != '数据:时间框') {
+                    if (fieldName.value[j].lb != '数据:时间框') {
                         // console.log(fieldName.value[j].lb)
-                        KHMC.push({ value: userDataList2.value[i][fieldName.value[j].fieldname], title: fieldName.value[j].text })
+                        KHMC.push({ value: props.userInfoDataList.data[i][fieldName.value[j].fieldname], title: fieldName.value[j].text })
                     }
                     else {
-                        KHMC.push({ value: userDataList2.value[i][fieldName.value[j].fieldname].split('T')[0], title: fieldName.value[j].text })
+                        if(props.userInfoDataList.data[i][fieldName.value[j].fieldname])
+                        KHMC.push({ value: props.userInfoDataList.data[i][fieldName.value[j].fieldname].split('T')[0], title: fieldName.value[j].text })
+                        else
+                        KHMC.push({ value: props.userInfoDataList.data[i][fieldName.value[j].fieldname], title: fieldName.value[j].text })
                     }
                 }
             }
@@ -282,7 +267,7 @@ const ZDY = computed(() => {
         }
         // console.log(KHMC.length)
         // sliceArr(KHMC,size)
-        console.log(sliceArr(KHMC, size))
+        // console.log(sliceArr(KHMC, size))
     }
     return sliceArr(KHMC, size)
 })
@@ -293,12 +278,12 @@ const BQ = computed(() => {
     let KHMC2 = []
     let sum = 0
     let size = 0
-    if (userDataList2.value != undefined && fieldName.value != undefined) {
-        for (let i = 0; i < userDataList2.value.length; i++) {
+    if (props.userInfoDataList.data != undefined && fieldName.value != undefined) {
+        for (let i = 0; i < props.userInfoDataList.data.length; i++) {
             for (let j = 0; j < fieldName.value.length; j++) {
                 if (fieldName.value[j].type == '标签') {
                     sum++
-                    KHMC.push(userDataList2.value[i][fieldName.value[j].fieldname])
+                    KHMC.push(props.userInfoDataList.data[i][fieldName.value[j].fieldname])
                 }
             }
             size = sum
@@ -322,12 +307,12 @@ const BQ = computed(() => {
 // 总金额筛选
 const ZJE = computed(() => {
     let LXDH = []
-    if (userDataList2.value != undefined && fieldName.value != undefined)
-        for (let i = 0; i < userDataList2.value.length; i++) {
+    if (props.userInfoDataList.data != undefined && fieldName.value != undefined)
+        for (let i = 0; i < props.userInfoDataList.data.length; i++) {
             for (let j = 0; j < fieldName.value.length; j++) {
                 if (fieldName.value[j].type == '金额') {
-                    if (userDataList2.value[i][fieldName.value[j].fieldname] < 100000)
-                        LXDH.push(Math.trunc(userDataList2.value[i][fieldName.value[j].fieldname]).toString().replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g, '$1,'))
+                    if (props.userInfoDataList.data[i][fieldName.value[j].fieldname] < 100000)
+                        LXDH.push(Math.trunc(props.userInfoDataList.data[i][fieldName.value[j].fieldname]).toString().replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g, '$1,'))
                     // this.valueStr.push(this.userDataList[i].money.toString().replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g,'$1,'))
                     else
                         // this.userDataList[i].money
@@ -343,19 +328,19 @@ const ZJE = computed(() => {
 // 客户详情按钮筛选
 const KHBM = computed(() => {
     let KHMC = []
-    if (userDataList2.value != undefined && fieldName.value != undefined)
-        for (let i = 0; i < userDataList2.value.length; i++) {
+    if (props.userInfoDataList.data != undefined && fieldName.value != undefined)
+        for (let i = 0; i < props.userInfoDataList.data.length; i++) {
             for (let j = 0; j < fieldName.value.length; j++) {
                 if (fieldName.value[j].type == '客户详情按钮') {
-                    KHMC.push(fieldName.value[j].text)
+                    KHMC.push({text:fieldName.value[j].text,title:'客户详情'})
                 }
             }
         }
-    console.log(KHMC)
+    // console.log(KHMC)
     return KHMC
 })
 
-const userDataList2 = reactive(['','','','','','','','','','',])
+const userDataList2 = reactive(['', '', '', '', '', '', '', '', '', '',])
 const chooseList = ref([])
 const totalMoney = ref([])
 const valueStr = ref([])
@@ -367,7 +352,7 @@ const onRefresh = () => {
         // Toast('刷新成功');
         isLoading.value = false;
     }, 1000);
-    console.log(fieldName.value, userDataList2.value.length)
+    // console.log(fieldName.value, userDataList2.value.length)
 }
 
 // 将数组拆分
@@ -400,12 +385,16 @@ const goDetails = () => {
 }
 
 // 将组件方法暴露给父组件,
-const emit = defineEmits(['transferOrder', 'checked'])
+const emit = defineEmits(['transferOrder', 'checked','loadMore'])
 const transferOrder = () => {
     // this.orderFlag = true
     emit('transferOrder')
 }
+const loadMore = () =>{
+    emit('loadMore')
+}
 const checked = (name) => {
+    // console.log(name)
     if (!chooseList.value.includes(name)) {
         totalMoney.value.push(name) // 判断已选列表中是否存在该id，不是则追加进去
         chooseList.value.push(name) // 判断已选列表中是否存在该id，不是则追加进去
@@ -415,9 +404,9 @@ const checked = (name) => {
         chooseList.value.splice(index, 1) // 否则则删除
         totalMoney.value.splice(index, 1) // 否则则删除
     }
-    // console.log(this.chooseList)
+    // console.log(chooseList.value)
     // console.log(this.chooseList,name)
-    emit('checked',1)
+    emit('checked',chooseList.value)
 }
 </script>
 
@@ -426,6 +415,7 @@ const checked = (name) => {
     &::-webkit-scrollbar {
         display: none;
     }
+
     .card {
         border-radius: var(--van-radius-md);
 
@@ -669,7 +659,7 @@ const checked = (name) => {
         text-align: center;
         font-size: var(--van-list-text-font-size);
         height: 90px;
-        line-height: 20px;
+        line-height: 30px;
     }
 }
 </style>
