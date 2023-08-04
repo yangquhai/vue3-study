@@ -261,10 +261,9 @@ const getData = async (TisFirst, filter) => {
     tabListData.value = res.colums
     userInfoDataList.value = res.data
     console.log(userInfoDataList.value)
-    if (!tabListData.value.dateType.defaultValue)
+    if (tabListData.value.dateType.defaultValue)
       tabList.value[0] = tabListData.value.dateType.defaultValue
-    else
-    tabList.delete('当月')
+    // tabList.delete('当月')
     placeholder.value = tabListData.value.search.text
     procedureList.value = tabListData.value.lcmxmc
     totalMoney.value = userInfoDataList.value.sum.value
@@ -448,21 +447,18 @@ const dropdown = (index,item) => {
   if (firstIndex.value != item) {
     console.log(sortIncludes.value)
     if (monthList.value.includes(item)) {
-      console.log(1111)
       monthFlag.value = true
       sortFlag.value = false
       selectFlag.value = false
       flag.value = true
     }
     if (item == '排序'|| sortIncludes.value.includes(item)) {
-      console.log(2222)
       monthFlag.value = false
       sortFlag.value = true
       selectFlag.value = false
       flag.value = true
     }
     if (item == '筛选') {
-      console.log(3333)
       monthFlag.value = false
       sortFlag.value = false
       selectFlag.value = true
