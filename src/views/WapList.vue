@@ -6,7 +6,7 @@
     <div style=" position: fixed;z-index:999;width:100%;">
       <searchTab @search="search" :placeholder="placeholder"></searchTab>
       <div class="dropdown">
-        <div v-for="(item, index) in tabList" :key="index" class="dropdownList" @click="dropdown(index,item)"
+        <div v-for="(item, index) in tabList" :key="index" class="dropdownList" @click="dropdown(item)"
           :style="{ 'color': (item != chooseIndex ? 'rgba(50, 50, 51, 1)' : '#1890ff') }">
           <div>{{ item }}</div>
           <img src="https://api.iconify.design/ic:baseline-arrow-drop-down.svg?color=%23888888" alt="" style=""
@@ -134,7 +134,10 @@
       </div>
     </transition>
     <div class="bottom">
-      <div class="checkbox">
+      <div class="checkbox" 
+      :style="{ 'border': checkAllFlag ? 'solid 1px #ffffff' : 'solid 1px rgba(226, 226, 226, 1)' }"
+      @click.stop="checkedAll">
+        <van-icon v-show="checkAllFlag" name="success" />
       </div>
       <div class="total">
         <div class="number">
@@ -152,7 +155,7 @@
     </div>
     <skeleton v-if="isLoading"></skeleton>
     <userInfo class="userInfo" ref="info" @checked="checked" @transferOrder="transferOrder" :isLoad="isLoading" v-else
-      @loadMore="loadMore(0)"
+      @loadMore="loadMore(0)" 
       :userInfoDataList="userInfoDataList"></userInfo>
   </div>
 </template>
@@ -161,6 +164,7 @@
 import request from '_api'
 import { ref, reactive, computed } from 'vue'
 const tabList = ref(['当月', '排序', '筛选'])
+const sortList = ref([])
 const isLoading = ref(true)
 // 用户选中的数组
 const chooseList = ref([])
@@ -184,10 +188,6 @@ const chooseMonthIndex = ref(null)
 const chooseDateIndex = ref(null)
 // 判断是否为第一次点击
 const firstIndex = ref(null)
-// 判断点击选择的流程（可多选）
-const procedureIndex = ref([])
-// 判断选择的用户tags (可多选)
-const userTagsIndex = ref([])
 // 用于记录上一次点击的月份(处理单选框),如果值不为null说明有初始点击
 const dateLastClick = ref([null])
 const date1 = ref('请选择日期')
@@ -260,10 +260,18 @@ const getData = async (TisFirst, filter) => {
     isLoading.value = false
     tabListData.value = res.colums
     userInfoDataList.value = res.data
-    console.log(userInfoDataList.value)
-    if (tabListData.value.dateType.defaultValue)
+    // console.log(userInfoDataList.value)
+    // 当月份的值为空时,删除月份排序
+    if (tabListData.value.dateType.fieldname)
       tabList.value[0] = tabListData.value.dateType.defaultValue
-    // tabList.delete('当月')
+    else
+      tabList.value = tabList.value.filter(item => item !== "当月")
+    // 排序数组。当数组长度为空时，不显示排序字段
+    if (tabListData.value.orderType.orderType.length)
+       sortList.value = tabListData.value.orderType.orderType
+    else
+      tabList.value = tabList.value.filter(item => item !== "排序")
+    // console.log(sortList.value)
     placeholder.value = tabListData.value.search.text
     procedureList.value = tabListData.value.lcmxmc
     totalMoney.value = userInfoDataList.value.sum.value
@@ -352,12 +360,6 @@ const loadMore = async(TisFirst) =>{
   }
 }
 
-// 计算排序数组
-const sortList = computed(() => {
-  let sortList = tabListData.value.orderType.orderType
-  // console.log(tabListData.value)
-  return sortList
-})
 // 计算type类型为多选模块数组
 const usertTagList = computed(() => {
   let usertTagList = []
@@ -437,15 +439,15 @@ const sortIncludes =computed(()=>{
 })
 
 // 点击出现下拉框
-const dropdown = (index,item) => {
+const dropdown = (item) => {
   stop()
-  console.log(item,index,firstIndex.value)
+  // console.log(item,index,firstIndex.value)
   // console.log(this.chooseIndex,index)
   chooseIndex.value = item
   // console.log(this.firstIndex,index)
   // 判断是否第一次打开
   if (firstIndex.value != item) {
-    console.log(sortIncludes.value)
+    // console.log(sortIncludes.value)
     if (monthList.value.includes(item)) {
       monthFlag.value = true
       sortFlag.value = false
@@ -569,7 +571,10 @@ const choosesort = (index, value) => {
     // this.tabList[0] = value
     chooseIndex.value = null
     firstIndex.value = null
+    if(tabList.value.length==3)
     tabList.value[1] = value.text
+    else
+    tabList.value[0] = value.text
     // this.$set(this.tabList,1,value.text)
     console.log(index)
     flag.value = false
@@ -660,8 +665,9 @@ const search = (value) => {
   console.log(formData.get('filter'))
   // getData(0,formData.get('filter'))
 }
-// 计算选中的金额
+// 计算选中的金额,以及全选与反选
 const chooseTotalMoney = ref(0)
+const info = ref(null);
 const checked = (val) => {
   chooseTotalMoney.value = 0
   // console.log(val)
@@ -684,6 +690,25 @@ const checked = (val) => {
   if (chooseTotalMoney.value > 10000)
      chooseTotalMoney.value = (chooseTotalMoney.value / 10000).toFixed(0).toString() + '万'
   // console.log(chooseTotalMoney.value,chooseTotalMoneyList)
+}
+// 全选与反选
+const checkAllFlag = ref(false)
+const checkedAll = () =>{
+  checkAllFlag.value = !checkAllFlag.value
+  // 说明数组为空,进行全选操作
+
+  if(checkAllFlag.value) {
+    for(let i=0;i<userInfoDataList.value.data.length;i++){
+     info.value.chooseList.push(userInfoDataList.value.data[i].rn)
+   }
+   info.value.chooseList = [...new Set(info.value.chooseList)]
+   chooseList.value = info.value.chooseList
+   checked(chooseList.value)
+  }
+  else {
+    info.value.chooseList.length = 0
+  }
+  // console.log(chooseList.value,info.value.chooseList)
 }
 
 
@@ -886,7 +911,7 @@ const sift = () => {
       // border: solid 1px red;
       overflow: scroll;
       // height: 497px;
-      height: 60vh;
+      max-height: 60vh;
       background-color: rgba(255, 255, 255, 1);
 
       .title {
@@ -956,6 +981,18 @@ const sift = () => {
     border: solid 1px rgba(226, 226, 226, 1);
     margin-left: 8px;
     // border: solid 1px red;
+    .van-icon {
+      color: #fff;
+      background-color: #1890ff;
+      border-color: #1890ff;
+      width: 20px;
+      height: 20px;
+      text-align: center;
+      line-height: 23px;
+      box-sizing: border-box;
+      font-size: 14px;
+       border-radius: 2px;
+    }
   }
 
   .total {

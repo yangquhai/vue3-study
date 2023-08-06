@@ -1,14 +1,14 @@
 <!-- 用于card信息的渲染 -->
 <template>
     <div class="page-content">
-        <!-- <van-pull-refresh v-model="isLoading" @refresh="onRefresh"> -->
-        <div v-for="(item, index) in props.userInfoDataList.data" class="card">
+        <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
+        <div v-for="(item, index) in props.userInfoDataList.data" class="card" @click="goSystem(index)">
             <div>
                 <div class="card-header flex">
                     <div class="checked flex">
                         <div class="checkBorder"
                             :style="{ 'border': (chooseList.includes(item.rn) ? 'solid 1px #ffffff' : 'solid 1px rgba(226, 226, 226, 1)') }"
-                            @click="checked(item.rn)">
+                            @click.stop="checked(item.rn)">
                             <van-icon v-show="chooseList.includes(item.rn)" name="success" />
                         </div>
                         <div class="name m-l-8">
@@ -36,14 +36,13 @@
                                 <div class="buyOptions m-r-4 m-b-4" v-for="(item) in BQ[index]">
                                     <div v-for="(item2) in item">
                                         <van-tag color="#fff2e9" text-color="#fd9148" size="large" v-if="BQ[index]">
-                                            <!-- {{ tagBM[index] }} -->
                                             {{ item2 }}
                                         </van-tag>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="phone" @click="callOut(LXDH[index])">
+                            <div class="phone" @click.stop="callOut(LXDH[index])">
                                 <!-- <img src="../assets/phone.svg" alt=""> -->
                                 <van-icon name="phone" class="txt-gray" />
                                 <small>{{ LXDH[index] }}</small>
@@ -92,16 +91,16 @@
                         <div class="bottonList">
                             <div v-for="(item2, index2) in AJAX_Url"  style="display: flex;">
                                 <div v-if="AJAX_Url.length < 3">
-                                    <button class="userDetails borders m-l-8" @click="goDetails">{{
+                                    <button class="userDetails borders m-l-8" @click.stop="goDetails">{{
                                     item2.text1 }}</button>
                                 </div>
                                 <div v-if="AJAX_Url.length > 2 && index2 == 0">
                                     <button  class="userDetails borders m-l-8"
-                                    @click="transferOrder">转单</button>
+                                    @click.stop="transferOrder">转单</button>
                                 </div>
 
                                 <div v-if="index2 == 0">
-                                    <button class="userDetails order m-l-8" @click="goDetails"
+                                    <button class="userDetails order m-l-8" @click.stop="goDetails"
                                     >
                                     {{ KHBM[index].title }}
                                    
@@ -117,9 +116,10 @@
 
             </div>
         </div>
-        <!-- </van-pull-refresh> -->
+        </van-pull-refresh>
         <!-- 用于唤起弹窗，拨打电话 -->
         <van-dialog v-model:show="show" show-cancel-button confirmButtonText="拨打电话" confirmButtonColor='#1890ff'
+        :closeOnClickOverlay = "true"
             cancelButtonText="复制" @confirm="callPhone()">
             <!-- <p class="callPhone">{{ callPhoneNum }}</p> -->
             <p class="callPhone">18173135078</p>
@@ -134,7 +134,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch } from 'vue'
+import { ref, reactive, computed, watch,defineExpose  } from 'vue'
 
 const props = defineProps({
     userInfoDataList: Object,
@@ -151,6 +151,12 @@ watch(() => props.userInfoDataList, (value) => {
     userDataList2.value = value.data
     // console.log(userDataList2.value)
 })
+
+// 跳转值system界面
+
+const goSystem = (index) => {
+    console.log(index)
+}
 
 
 // 获取AJAX_Url按钮
@@ -404,10 +410,14 @@ const checked = (name) => {
         chooseList.value.splice(index, 1) // 否则则删除
         totalMoney.value.splice(index, 1) // 否则则删除
     }
-    // console.log(chooseList.value)
+    console.log(chooseList.value)
     // console.log(this.chooseList,name)
     emit('checked',chooseList.value)
 }
+// 暴露值给父组件
+defineExpose({
+	chooseList
+}); 
 </script>
 
 <style lang="less" scoped>
@@ -491,6 +501,7 @@ const checked = (name) => {
 
         .centerList {
             position: relative;
+            
         }
 
         .taglist {
