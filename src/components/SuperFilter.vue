@@ -43,7 +43,7 @@
 </template>
  
 <script setup>
-import { computed, ref, defineExpose} from "vue";
+import { computed, ref} from "vue";
 // const tabListData = ref('')
 // 用于控制显示
 const showPopoverSelect = ref([])
