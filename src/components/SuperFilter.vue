@@ -133,9 +133,9 @@ const onConfirm = (value, index) => {
 }
 const onCancel = () => {
     // Toast('取消');
-    this.$set(this.showPopoverSelect, this.showPopoverSelectFlag, false)
+    // this.$set(this.showPopoverSelect, this.showPopoverSelectFlag, false)
     showPopoverSelect.value[showPopoverSelectFlag.value] = false
-    showPopover.value = false
+    // showPopover.value = false
 }
 const showTextPopovers = (index) => {
     showPopoverText.value[index] = true
@@ -143,7 +143,7 @@ const showTextPopovers = (index) => {
 }
 const onConfirmText = ({ selectedOptions }) => {
     // Toast(`当前值：${value}, 当前索引：${index}`);
-    console.log(selectedOptions[0], showPopoverTextFlag.value)
+    // console.log(selectedOptions[0], showPopoverTextFlag.value)
     value1.value[showPopoverTextFlag.value] = selectedOptions[0].luoji
     // console.log(value1.value[showPopoverTextFlag.value])
     // console.log(textList.value[showPopoverTextFlag.value].condition)
@@ -152,16 +152,16 @@ const onConfirmText = ({ selectedOptions }) => {
        textList.value[showPopoverTextFlag.value].condition[i].select = false
        if(textList.value[showPopoverTextFlag.value].condition[i].id==selectedOptions[0].id){
          textList.value[showPopoverTextFlag.value].condition[i].select = true
-         console.log(textList.value[showPopoverTextFlag.value].condition[i])
+         // console.log(textList.value[showPopoverTextFlag.value].condition[i])
        }
        
     }
     showPopoverText.value[showPopoverTextFlag.value] = false
 }
 const onCancelText = () => {
-    this.$set(this.showPopoverText, index, true)
-    showPopoverText.value[index] = true
-    showPopover1.value = false
+    // this.$set(this.showPopoverText, index, true)
+    // showPopoverText.value = true
+    showPopoverText.value[showPopoverTextFlag.value] = false
 }
 
 // 暴露值给父组件

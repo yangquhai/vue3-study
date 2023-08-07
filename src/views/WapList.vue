@@ -877,7 +877,7 @@ const keep = () => {
   }
   // 值为text的保存
   for(let i=0;i<filter.value.textList.length;i++){
-    console.log(filter.value.textList[i].defaultValue)
+    // console.log(filter.value.textList[i].defaultValue)
     initDataTo.value.searchCondition.push({
           type: filter.value.textList[i].type,
           fieldname: filter.value.textList[i].fieldname,
@@ -890,7 +890,7 @@ const keep = () => {
     for(let j=0;j<filter.value.textList[i].condition.length;j++){
       // console.log(filter.value.textList[i].condition[j])
       if(filter.value.textList[i].condition[j].select){
-          console.log(filter.value.textList[i].condition[j])
+          // console.log(filter.value.textList[i].condition[j])
           initDataTo.value.searchCondition[i+dateList.value.length].condition.id = filter.value.textList[i].condition[j].id
           initDataTo.value.searchCondition[i+dateList.value.length].condition.luoji = filter.value.textList[i].condition[j].luoji
       }
