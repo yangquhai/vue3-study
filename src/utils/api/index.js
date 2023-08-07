@@ -81,6 +81,15 @@ export function getUserInfo(params) {
     return request.post(APIFiles.colloborationList, '/data/list_bill_wap.aspx?Tmethod=getlistbill.gz.initial', params, contentType.FormData)
 }
 
+/***-保存数据-***/
+
+export function saveUserInfo(params) {
+    // 打包上传
+    // return request.post(APIFiles.colloborationList, 'saveformat',params, contentType.FormData)
+    return request.post(APIFiles.colloborationList, '/data/list_bill_wap.aspx?Tmethod=saveformat', params, contentType.FormData)
+}
+
+
 export default {
     getImplementationProcess,
     uploadImplImg,
@@ -89,5 +98,6 @@ export default {
     uploadCheckInATakePhotosImgs,
     delCheckInATakePhotosImgs,
     confirmCheckInATakePhotosData,
-    getUserInfo
+    getUserInfo,
+    saveUserInfo
 }

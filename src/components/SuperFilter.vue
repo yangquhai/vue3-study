@@ -15,7 +15,7 @@
                             <van-picker :columns="item.condition" @confirm="onConfirm" @cancel="onCancel"
                                 :columns-field-names="customFieldName" show-toolbar item-height="1rem" :default-index="0" />
                         </van-popup>
-                        <van-field v-model="item.values[0].value" :placeholder="'请输入' + item.text" right-icon="search" />
+                        <van-field v-model="item.defaultValue" :placeholder="'请输入' + item.text" right-icon="search" />
                     </div>
                     <van-divider></van-divider>
                 </div>
@@ -34,46 +34,16 @@
                             <van-picker :columns="item.condition" @confirm="onConfirmText" @cancel="onCancelText"
                                 :columns-field-names="customFieldName" show-toolbar item-height="1rem" :default-index="0" />
                         </van-popup>
-                        <van-field v-model="item.values[0]" :placeholder="'请输入' + item.text" clearable />
+                        <van-field v-model="item.defaultValue" :placeholder="'请输入' + item.text" clearable />
                     </div>
                     <van-divider></van-divider>
                 </div>
             </div>
-
-            <!-- <div v-if="textList.length!=0">
-            <div v-for="(item,index) in textList" :key="item.fieldname">
-                <div>{{item.text}}</div>
-                <div class="options" >
-                    <div class="buttons" @click="showTextPopovers(index)">
-                        <div>{{value1[index].luoji}}</div> 
-                        <van-icon name="arrow-down" />
-                    </div>
-                    <van-popup v-model="showPopoverText[index]" round position="bottom" :style="{ height: '30%' }" >
-                    <van-picker
-                        :columns="item.condition"
-                        @confirm="onConfirmText"
-                        @cancel="onCancelText"
-                        value-key = "luoji"
-                        show-toolbar
-                        item-height="1rem"
-                        :default-index="1"
-                        />
-                    </van-popup>
-                    <van-field v-model="item.values[0]" :placeholder="'请输入' +item.text" clearable/>
-                </div>
-            <van-divider></van-divider>
-            </div>
-            </div> -->
-            <!-- <div class="card-footer">
-                <van-button class="button" round type="success" size="small">重置</van-button>
-                <van-button class="button1" round type="success" size="small" @click="keep">保存</van-button>
-                <van-button round type="success" size="small" @click="sift">筛选</van-button>
-            </div> -->
         </div>
 </template>
  
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, defineExpose} from "vue";
 // const tabListData = ref('')
 // 用于控制显示
 const showPopoverSelect = ref([])
@@ -126,7 +96,7 @@ const textList = computed(() => {
             // this.showPopoverText.push(false)
         }
     }
-    console.log(textList)
+    // console.log(textList)
     return textList
 })
 const onSelect = (action) => {
@@ -184,6 +154,14 @@ const onCancelText = () => {
     showPopoverText.value[index] = true
     showPopover1.value = false
 }
+
+// 暴露值给父组件
+defineExpose({
+	textList,
+    selectList,
+    value1,
+    value
+}); 
 
 </script>
  

@@ -71,7 +71,7 @@
           </div>
           <div class="checkboxPre">
             <div class="procedure" v-for="(item, index) in procedureList" :key="index"
-              @click="chooseProcedureTags(index, item.value)">
+              @click="chooseProcedureTags(index, item)">
               <!-- <van-tag class="van-tag1" color="rgba(243, 243, 243, 1)" text-color="#999999" size="medium" v-if="!procedureIndex.includes(item)">{{item.name}}</van-tag>  -->
               <van-tag class="van-tag1" color="rgba(243, 243, 243, 1)" text-color="#999999" size="medium"
                 v-if="!item.select">
@@ -121,29 +121,29 @@
             </div>
           </div>
           <van-divider v-if="usertTagList.length"></van-divider>
-          <superFilter :tabListData="tabListData" @sift="sift"></superFilter>
+          <superFilter :tabListData="tabListData" ref="filter" @sift="sift"></superFilter>
         </div>
         <div class="userOptions2">
           <!-- <van-button class="button" round type="success" size="small">重置</van-button>
           <van-button class="button1" round type="success" size="small" @click="keep">保存</van-button>
           <van-button class="button3" round type="success" size="small" @click="sift">筛选</van-button> -->
-          <van-button class="button" type="primary" size="small">重置</van-button>
+          <van-button class="button" type="primary" size="small" @click="reset">重置</van-button>
           <van-button type="primary" class="button1" size="small" @click="keep">保存</van-button>
           <van-button class="button3" type="primary" size="small" @click="sift">筛选</van-button>
         </div>
       </div>
     </transition>
     <div class="bottom">
-      <div class="checkbox" 
-      :style="{ 'border': checkAllFlag ? 'solid 1px #ffffff' : 'solid 1px rgba(226, 226, 226, 1)' }"
-      @click.stop="checkedAll">
+      <div class="checkbox" :style="{ 'border': checkAllFlag ? 'solid 1px #ffffff' : 'solid 1px rgba(226, 226, 226, 1)' }"
+        @click.stop="checkedAll">
         <van-icon v-show="checkAllFlag" name="success" />
       </div>
       <div class="total">
         <div class="number">
           共{{ count }}条,已选{{ chooseList.length }}条
         </div>
-        <div class="number">{{ totalMoneyTitle }}共  <span v-if="!chooseList.length">{{ totalMoney }}</span>  <span v-else>{{ chooseTotalMoney }}</span> </div>
+        <div class="number">{{ totalMoneyTitle }}共 <span v-if="!chooseList.length">{{ totalMoney }}</span> <span v-else>{{
+          chooseTotalMoney }}</span> </div>
       </div>
       <div class="userOptions">
         <button class="button1" @click="del">删除</button>
@@ -155,14 +155,13 @@
     </div>
     <skeleton v-if="isLoading"></skeleton>
     <userInfo class="userInfo" ref="info" @checked="checked" @transferOrder="transferOrder" :isLoad="isLoading" v-else
-      @loadMore="loadMore(0)" 
-      :userInfoDataList="userInfoDataList"></userInfo>
+      @loadMore="loadMore(0)" :userInfoDataList="userInfoDataList"></userInfo>
   </div>
 </template>
 
 <script setup>
 import request from '_api'
-import { ref, reactive, computed } from 'vue'
+import { ref, computed } from 'vue'
 const tabList = ref(['当月', '排序', '筛选'])
 const sortList = ref([])
 const isLoading = ref(true)
@@ -215,6 +214,7 @@ const baseUrl = ref('http://dx.anywellchat.com:8888/ANYWELL_hylingls/')
 const totalMoney = ref('')
 const totalMoneyTitle = ref('')
 const count = ref('')
+// init数据，用于值的初始化，前端重置数据
 const toFormData = ref({
   dateType: {
     value: {
@@ -224,7 +224,10 @@ const toFormData = ref({
     defaultValue: "",
     fieldname: ""
   },
-  searchKeys: "",
+  search: {
+    value_sql: '',
+    keyword: ''
+  },
   searchCondition: [],
   lcmxmc: [],
   orderType: {
@@ -236,25 +239,95 @@ const toFormData = ref({
       text: ""
     }
   },
-  page: {
-    pagesize: 10,
-    pageindex: 1
-  }
 })
-// const filterFormData = new FormData()
+
+// 用于初始化后端传来的数组 
+
+const initData = (tabListData,toFormData) => {
+  toFormData.value.dateType = tabListData.value.dateType
+  // 选中的流程值
+  // console.log(tabListData.value.lcmxmc)
+  for (let i = 0; i < tabListData.value.lcmxmc.length; i++) {
+    if (tabListData.value.lcmxmc[i].select)
+      toFormData.value.lcmxmc.push({ value: tabListData.value.lcmxmc[i].value, ID: tabListData.value.lcmxmc[i].ID })
+  }
+  // 高级筛选五种自定义选择
+  for (let i = 0; i < tabListData.value.searchCondition.length; i++) {
+    // console.log(tabListData.value.searchCondition[i].fieldname)
+    // 为日期的时候values是对象,否则为数组
+    if (tabListData.value.searchCondition[i].type != 'datetime')
+      toFormData.value.searchCondition.push({
+        type: tabListData.value.searchCondition[i].type,
+        fieldname: tabListData.value.searchCondition[i].fieldname,
+        fieldtype: tabListData.value.searchCondition[i].fieldtype,
+        lb: tabListData.value.searchCondition[i].lb,
+        text: tabListData.value.searchCondition[i].text,
+        defaultValue: tabListData.value.searchCondition[i].defaultValue,
+        values: [], condition: {}
+      })
+    else
+      toFormData.value.searchCondition.push({
+        type: tabListData.value.searchCondition[i].type,
+        fieldname: tabListData.value.searchCondition[i].fieldname,
+        fieldtype: tabListData.value.searchCondition[i].fieldtype,
+        lb: tabListData.value.searchCondition[i].lb,
+        text: tabListData.value.searchCondition[i].text,
+        values: {}
+      })
+    // 将值为muliselect入参
+    if (tabListData.value.searchCondition[i].type == 'muliselect') {
+      for (let j = 0; j < tabListData.value.searchCondition[i].values.length; j++) {
+        if (tabListData.value.searchCondition[i].values[j].select) {
+          toFormData.value.searchCondition[i].values.push({ item: tabListData.value.searchCondition[i].values[j].item })
+        }
+      }
+    }
+    // 将值为dateTime入参
+    if (tabListData.value.searchCondition[i].type == 'datetime') {
+      // console.log(tabListData.value.searchCondition[i])
+      for (let j = 0; j < tabListData.value.searchCondition[i].values.length; j++) {
+        if (tabListData.value.searchCondition[i].values[j].value == '自定义') {
+          // console.log(tabListData.value.searchCondition[i].values[j].dateFrom)
+          toFormData.value.searchCondition[i].values.dateFrom = tabListData.value.searchCondition[i].values[j].dateFrom
+          toFormData.value.searchCondition[i].values.dateTo = tabListData.value.searchCondition[i].values[j].dateTo
+        }
+        else {
+          toFormData.value.searchCondition[i].values.value = tabListData.value.searchCondition[i].defaultValue
+        }
+      }
+    }
+    // 将值为text入参
+    if (tabListData.value.searchCondition[i].type == 'text') {
+      for (let j = 0; j < tabListData.value.searchCondition[i].condition.length; j++) {
+        // console.log(tabListData.value.searchCondition[i].condition[j])
+        if (tabListData.value.searchCondition[i].condition[j].select) {
+          toFormData.value.searchCondition[i].condition.id = tabListData.value.searchCondition[i].condition[j].id
+          toFormData.value.searchCondition[i].condition.luoji = tabListData.value.searchCondition[i].condition[j].luoji
+        }
+      }
+    }
+    // console.log(toFormData.value.searchCondition[i].condition)
+  }
+  // 排序数据的初始化
+  toFormData.value.orderType.orderType_sql = tabListData.value.orderType.orderType_sql
+  // 搜索数据的初始化
+  toFormData.value.search.value_sql = tabListData.value.search.value_sql
+  toFormData.value.search.keyword = tabListData.value.search.keyword
+  // console.log(toFormData.value, tabListData.value)
+}
 
 // 获取页面数据,第一次进入页面时TisFirst为1，否则都为0
-const getData = async (TisFirst, filter) => {
+const getData = async (TisFirst) => {
   let formData = new FormData()
   formData.append('Tformnamecn', '1665')
   formData.append('Turl', 'YXKHGZB.ASPX')
   formData.append('Ttablename', 'YXKHGZB')
   formData.append('Tsystem_lcmc', '意向客户跟踪表')
   formData.append('TisFirst', TisFirst)
-  formData.append('pageIndex',1)
-  formData.append('pagesize',10)
-  if (filter)
-    formData.append('filter', filter)
+  formData.append('pageIndex', 1)
+  formData.append('pagesize', 10)
+  // if (filter)
+  //   formData.append('filter', filter)
   try {
     const res = await request.getUserInfo(formData)
     isLoading.value = false
@@ -262,83 +335,43 @@ const getData = async (TisFirst, filter) => {
     userInfoDataList.value = res.data
     // console.log(userInfoDataList.value)
     // 当月份的值为空时,删除月份排序
-    if (tabListData.value.dateType.fieldname)
+    if (tabListData.value.dateType.fieldname) {
+      chooseMonthIndex.value = tabListData.value.dateType.defaultValue
       tabList.value[0] = tabListData.value.dateType.defaultValue
+    }
     else
       tabList.value = tabList.value.filter(item => item !== "当月")
     // 排序数组。当数组长度为空时，不显示排序字段
     if (tabListData.value.orderType.orderType.length)
-       sortList.value = tabListData.value.orderType.orderType
+      sortList.value = tabListData.value.orderType.orderType
     else
       tabList.value = tabList.value.filter(item => item !== "排序")
     // console.log(sortList.value)
     placeholder.value = tabListData.value.search.text
-    procedureList.value = tabListData.value.lcmxmc
+    // JSON.parse(JSON.stringify(b.value))将浅拷贝转换为深拷贝,此时改变procedureList的值不会影响tabListData的值
+    procedureList.value = JSON.parse(JSON.stringify(tabListData.value.lcmxmc))
     totalMoney.value = userInfoDataList.value.sum.value
     totalMoneyTitle.value = userInfoDataList.value.sum.text
     count.value = userInfoDataList.value.sum.count
     if (totalMoney.value > 10000)
       totalMoney.value = (totalMoney.value / 10000).toFixed(0).toString() + '万'
     // console.log(userInfoDataList.value.sum[0].value)
-
-    // toFormData值的初始化,toForm的值需要传给后端
-    // 日期初始值
-    toFormData.value.dateType = tabListData.value.dateType
-    // 选中的流程值
-    // console.log(tabListData.value.lcmxmc)
-    for (let i = 0; i < tabListData.value.lcmxmc.length; i++) {
-      if (tabListData.value.lcmxmc[i].select)
-        toFormData.value.lcmxmc.push({ value: tabListData.value.lcmxmc[i].value, ID: tabListData.value.lcmxmc[i].ID })
-    }
-    // 高级筛选五种自定义选择
-    for (let i = 0; i < tabListData.value.searchCondition.length; i++) {
-      // console.log(tabListData.value.searchCondition[i].fieldname)
-      // 为日期的时候values是对象,否则为数组
-      if (tabListData.value.searchCondition[i].type != 'datetime')
-        toFormData.value.searchCondition.push({ type: tabListData.value.searchCondition[i].type, fieldname: tabListData.value.searchCondition[i].fieldname, values: [] })
-      else
-        toFormData.value.searchCondition.push({ type: tabListData.value.searchCondition[i].type, fieldname: tabListData.value.searchCondition[i].fieldname, values: {} })
-      // 将值为muliselect入参
-      if (tabListData.value.searchCondition[i].type == 'muliselect') {
-        for (let j = 0; j < tabListData.value.searchCondition[i].values.length; j++) {
-          if (tabListData.value.searchCondition[i].values[j].select) {
-            toFormData.value.searchCondition[i].values.push({ item: tabListData.value.searchCondition[i].values[j].item })
-          }
-        }
-      }
-      // 将值为dateTime入参
-      if (tabListData.value.searchCondition[i].type == 'datetime') {
-        // console.log(tabListData.value.searchCondition[i])
-        for (let j = 0; j < tabListData.value.searchCondition[i].values.length; j++) {
-          if (tabListData.value.searchCondition[i].values[j].value == '自定义') {
-            // console.log(tabListData.value.searchCondition[i].values[j].dateFrom)
-            toFormData.value.searchCondition[i].values.dateFrom = tabListData.value.searchCondition[i].values[j].dateFrom
-            toFormData.value.searchCondition[i].values.dateTo = tabListData.value.searchCondition[i].values[j].dateTo
-          }
-        }
-      }
-      // 将值为text入参
-      // if(tabListData.value.searchCondition[i].type=='text'){
-      //   for(let j=0; j < tabListData.value.searchCondition[i].condition.length ;j++){
-      //     console.log(222)
-      //     // if(tabListData.value.searchCondition[i].values[j].select){
-      //     //   toFormData.value.searchCondition[i].values.push({item:tabListData.value.searchCondition[i].values[j].item})
-      //     // }
-      //   }
-      // }
-    }
-    console.log(toFormData.value, tabListData.value)
+    // 初始化数据
+    initData(tabListData,toFormData)
+    initData(tabListData,initDataTo)
     // console.log(toFormData.value,tabListData.value)
   } catch (err) {
     console.log(err)
   }
 }
+
+
 getData(1)
 
 // 加载更多数据
 const conactArray = ref([])
 const pageIndex = ref(1)
-const loadMore = async(TisFirst) =>{
+const loadMore = async (TisFirst) => {
   pageIndex.value++
   // console.log(pageIndex.value)
   let formData = new FormData()
@@ -347,15 +380,15 @@ const loadMore = async(TisFirst) =>{
   formData.append('Ttablename', 'YXKHGZB')
   formData.append('Tsystem_lcmc', '意向客户跟踪表')
   formData.append('TisFirst', TisFirst)
-  formData.append('pageIndex',pageIndex.value)
-  formData.append('pagesize',10)
+  formData.append('pageIndex', pageIndex.value)
+  formData.append('pagesize', 10)
   try {
     const res = await request.getUserInfo(formData)
     conactArray.value = res.data.data
     userInfoDataList.value.data = userInfoDataList.value.data.concat(conactArray.value)
     // console.log(conactArray.value,userInfoDataList.value.data)
   }
-  catch(err) {
+  catch (err) {
     console.log(err)
   }
 }
@@ -372,7 +405,7 @@ const usertTagList = computed(() => {
   // console.log(usertTagList)
   return usertTagList
 })
-// 计算日期模块数组
+// 计算日期模块数组,记录初始值，用于重置
 const dateList = computed(() => {
   let dateList = []
   let index = -1
@@ -382,13 +415,14 @@ const dateList = computed(() => {
       dateList.push(tabListData.value.searchCondition[i])
       // 判断是否有初始选择框为true的情况
       // console.log(dateList[index].values,index)
-      for (let j = 0; j < dateList[index].values.length; j++) {
-        if (dateList[index].values[j].select)
-          // dateLastClick.value[index] = 1
-          console.log(111)
-      }
+      // for (let j = 0; j < dateList[index].values.length; j++) {
+      //   if (dateList[index].values[j].select)
+      //     // dateLastClick.value[index] = 1
+      //     // console.log(111)
+      // }
     }
   }
+  // JSON.parse(JSON.stringify(tabListData.value.lcmxmc)) 
   // console.log(dateList)
   return dateList
 })
@@ -430,9 +464,9 @@ const goAddData = () => {
 }
 
 // 用于判断sortList中是否存在item索引
-const sortIncludes =computed(()=>{
+const sortIncludes = computed(() => {
   let sortIncludes = []
-  for(let i =0;i<sortList.value.length;i++){
+  for (let i = 0; i < sortList.value.length; i++) {
     sortIncludes.push(sortList.value[i].text)
   }
   return sortIncludes
@@ -454,7 +488,7 @@ const dropdown = (item) => {
       selectFlag.value = false
       flag.value = true
     }
-    if (item == '排序'|| sortIncludes.value.includes(item)) {
+    if (item == '排序' || sortIncludes.value.includes(item)) {
       monthFlag.value = false
       sortFlag.value = true
       selectFlag.value = false
@@ -470,7 +504,7 @@ const dropdown = (item) => {
   }
   // 再次点击
   else {
-    console.log(chooseIndex.value,item)
+    console.log(chooseIndex.value, item)
     if (chooseIndex.value == item) {
       chooseIndex.value = null
       flag.value = false
@@ -489,7 +523,7 @@ const dropdown = (item) => {
         flag.value = true
         return
       }
-      if (flag.value == false && (item == '排序'|| sortIncludes.value.includes(item))) {
+      if (flag.value == false && (item == '排序' || sortIncludes.value.includes(item))) {
         sortFlag.value = true
         flag.value = true
         return
@@ -513,12 +547,12 @@ const dropdown = (item) => {
 
 // 选择月份
 const chooseMonth = (index, value) => {
-  console.log(chooseIndex.value)
-  console.log(index, toFormData.value)
-
+  // console.log(chooseIndex.value)
+  // console.log(index, initDataTo.value.dateType.defaultValue)
+  initDataTo.value.dateType.defaultValue = value
   // this.chooseIndex为0选择第一个
   chooseMonthIndex.value = value
-  console.log(value)
+  console.log(initDataTo.value)
   if (monthList.value.includes(chooseIndex.value)) {
     if (index != 7) {
       chooseIndex.value = null
@@ -536,16 +570,19 @@ const chooseMonth = (index, value) => {
       calendarFlag.value = !calendarFlag.value
     }
   }
+
 }
 // 唤起日历插件进行日期自定义
 const onConfirm = (date) => {
   value1.value = false;
   date1.value = getSimpleDate(date);
+  initDataTo.value.dateType.value.dateFrom = date1.value
   console.log(date1.value)
 }
 const onConfirm2 = (date) => {
   value2.value = false;
   date2.value = getSimpleDate(date);
+  initDataTo.value.dateType.value.dateTo = date2.value
   console.log(date2.value)
 }
 // 中国标准时间 转换成 年月日
@@ -571,10 +608,10 @@ const choosesort = (index, value) => {
     // this.tabList[0] = value
     chooseIndex.value = null
     firstIndex.value = null
-    if(tabList.value.length==3)
-    tabList.value[1] = value.text
+    if (tabList.value.length == 3)
+      tabList.value[1] = value.text
     else
-    tabList.value[0] = value.text
+      tabList.value[0] = value.text
     // this.$set(this.tabList,1,value.text)
     console.log(index)
     flag.value = false
@@ -621,7 +658,7 @@ const chooseProcedureTags = (index, value) => {
     procedureList.value[index].select = false
   else
     procedureList.value[index].select = true
-  console.log(value)
+  // console.log(value,initDataTo.value.lcmxmc)
 }
 // 日期单选
 const chooseDataTag = (index, index2, value) => {
@@ -675,35 +712,35 @@ const checked = (val) => {
   let chooseTotalMoneyList = []
   chooseList.value = val
   // console.log(chooseList.value)
-  for(let i = 0;i<userInfoDataList.value.data.length;i++){
+  for (let i = 0; i < userInfoDataList.value.data.length; i++) {
     // console.log(userInfoDataList.value.data[i].rn)
-    for(let j = 0;j<chooseList.value.length;j++){
-      if(chooseList.value[j]==userInfoDataList.value.data[i].rn){
+    for (let j = 0; j < chooseList.value.length; j++) {
+      if (chooseList.value[j] == userInfoDataList.value.data[i].rn) {
         // console.log(userInfoDataList.value.data[i][userInfoDataList.value.sum.fieldname])
         chooseTotalMoneyList.push(userInfoDataList.value.data[i][userInfoDataList.value.sum.fieldname])
       }
     }
   }
-  for(let i=0;i<chooseTotalMoneyList.length;i++){
+  for (let i = 0; i < chooseTotalMoneyList.length; i++) {
     chooseTotalMoney.value = chooseTotalMoney.value + chooseTotalMoneyList[i]
   }
   if (chooseTotalMoney.value > 10000)
-     chooseTotalMoney.value = (chooseTotalMoney.value / 10000).toFixed(0).toString() + '万'
+    chooseTotalMoney.value = (chooseTotalMoney.value / 10000).toFixed(0).toString() + '万'
   // console.log(chooseTotalMoney.value,chooseTotalMoneyList)
 }
 // 全选与反选
 const checkAllFlag = ref(false)
-const checkedAll = () =>{
+const checkedAll = () => {
   checkAllFlag.value = !checkAllFlag.value
   // 说明数组为空,进行全选操作
 
-  if(checkAllFlag.value) {
-    for(let i=0;i<userInfoDataList.value.data.length;i++){
-     info.value.chooseList.push(userInfoDataList.value.data[i].rn)
-   }
-   info.value.chooseList = [...new Set(info.value.chooseList)]
-   chooseList.value = info.value.chooseList
-   checked(chooseList.value)
+  if (checkAllFlag.value) {
+    for (let i = 0; i < userInfoDataList.value.data.length; i++) {
+      info.value.chooseList.push(userInfoDataList.value.data[i].rn)
+    }
+    info.value.chooseList = [...new Set(info.value.chooseList)]
+    chooseList.value = info.value.chooseList
+    checked(chooseList.value)
   }
   else {
     info.value.chooseList.length = 0
@@ -719,9 +756,158 @@ const edit = () => {
   editFlag.value = true
   console.log('edit')
 }
+// 重置选项为后端开始返回的值,只重置高级筛选内容
+const filter = ref(null)
+const reset = () => {
+  // JSON.parse(JSON.stringify(tabListData.value.lcmxmc))
+  // console.log('reset',tabListData.value)
+  // 用于value索引,当type="text"时才开始计算数组的第一个值
+  let index = -1
+  let index2 = -1
+  let index3 = -1
+  // 流程框初始化
+  procedureList.value = JSON.parse(JSON.stringify(tabListData.value.lcmxmc))
+  // console.log('reset',tabListData.value)
+  // 选择框、文本框、日期框、多选框初始化
+  for (let i = 0; i < toFormData.value.searchCondition.length; i++) {
+    // console.log(toFormData.value.searchCondition[i])
+    if (toFormData.value.searchCondition[i].type == 'text') {
+      index++
+      filter.value.value1[index] = toFormData.value.searchCondition[i].condition.luoji
+      filter.value.textList[index].defaultValue = toFormData.value.searchCondition[i].defaultValue
+    }
+    if (toFormData.value.searchCondition[i].type == 'select') {
+      index2++
+      filter.value.value[index] = toFormData.value.searchCondition[i].condition.luoji
+      filter.value.selectList[index].defaultValue = toFormData.value.searchCondition[i].defaultValue
+    }
+    if (toFormData.value.searchCondition[i].type == 'datetime') {
+      index3++
+      // console.log(toFormData.value.searchCondition[i].values.value,dateList.value[index3].values)
+      if (!toFormData.value.searchCondition[i].values.value) {
+        for (let j = 0; j < dateList.value[index3].values.length; j++) {
+          // console.log(dateList.value[index3].values[j].select)
+          dateList.value[index3].values[j].select = false
+        }
+      }
+      else {
+        for (let j = 0; j < dateList.value[index3].values.length; j++) {
+          // console.log(toFormData.value.searchCondition[i].values.value,dateList.value[index3].values[j])
+          if (toFormData.value.searchCondition[i].values.value == dateList.value[index3].values[j].value)
+            dateList.value[index3].values[j].select = true
+        }
+      }
+    }
+  }
+}
 // 保存筛选框的值
+const saveData = async(Tformat) =>{
+  let formData = new FormData()
+  formData.append('Tformnamecn', '1665')
+  formData.append('Turl', 'YXKHGZB.ASPX')
+  formData.append('Ttablename', 'YXKHGZB')
+  formData.append('Tsystem_lcmc', '意向客户跟踪表')
+  formData.append('Tformat', Tformat)
+  try {
+    const res = await request.saveUserInfo(formData)
+    console.log(res)
+  }
+  catch(err){
+    console.log(err)
+  }
+}
+const initDataTo = ref({
+  dateType: {
+    value: {
+      dateFrom: "",
+      dateTo: ""
+    },
+    defaultValue: "",
+    fieldname: ""
+  },
+  search: {
+    value_sql: '',
+    keyword: ''
+  },
+  searchCondition: [],
+  lcmxmc: [],
+  orderType: {
+    orderType_sql: "",
+    orderType:
+    {
+      filedname: "",
+      order: "",
+      text: ""
+    }
+  },
+})
+
 const keep = () => {
-  console.log('keep')
+  // console.log(initDataTo.value.searchCondition,dateList.value)
+  initDataTo.value.lcmxmc.length = 0
+  initDataTo.value.searchCondition.length = 0
+  // console.log(filter.value.textList)
+  // 流程多选的保存
+  for(let i=0;i<procedureList.value.length;i++){
+    if (procedureList.value[i].select){
+      initDataTo.value.lcmxmc.push({ value: procedureList.value[i].value, ID: procedureList.value[i].ID })
+    }
+  }
+  // console.log(initDataTo.value.searchCondition,dateList.value)
+  // 日期类型的保存
+  // toFormData.value.searchCondition.push({
+  //       type: tabListData.value.searchCondition[i].type,
+  //       fieldname: tabListData.value.searchCondition[i].fieldname,
+  //       fieldtype: tabListData.value.searchCondition[i].fieldtype,
+  //       lb: tabListData.value.searchCondition[i].lb,
+  //       text: tabListData.value.searchCondition[i].text,
+  //       defaultValue: tabListData.value.searchCondition[i].defaultValue,
+  //       values: [], condition: {}
+  //     })
+
+  // {
+	// 		"type": "datetime",
+	// 		"fieldname": "RQ",
+	// 		"fieldtype": "DATETIM",
+	// 		"lb": "数据:日期框",
+	// 		"text": "日期",
+	// 		"values": {
+	// 			"value": "自定义",
+	// 			"dateFrom": "2020-05-01",
+	// 			"dateTo": "2023-05-01"
+	// 		}
+	// 	},
+
+  for(let i = 0;i<dateList.value.length;i++){
+    // console.log(initDataTo.value.searchCondition,dateList.value[i])
+    for(let j=0 ; j<dateList.value[i].values.length;j++){
+      if(dateList.value[i].values[j].select){
+        console.log(dateList.value[i].values[j])
+        initDataTo.value.searchCondition.push({
+          type: dateList.value[i].type,
+          fieldname: dateList.value[i].fieldname,
+          fieldtype: dateList.value[i].fieldtype,
+          lb: dateList.value[i].lb,
+          text: dateList.value[i].text,
+          defaultValue: dateList.value[i].defaultValue,
+          values: {value:dateList.value[i].values[j].value,dateFrom:dateList.value[i].values[j].dateFrom,dateTo:dateList.value[i].values[j].dateTo}, 
+        })
+        // 需修改searchCondition值为动态
+        // initDataTo.value.searchCondition[0].values.value = dateList.value[i].values[j].value
+      }
+    }
+    console.log(initDataTo.value.searchCondition)
+  }
+
+
+  // 值为text的保存
+
+  // for(let i=0;i<filter.value.textList.length;i++){
+  //   console.log(filter.value.textList[i])
+  // }
+  // JSON.stringify(initDataTo.value)
+  // console.log('keep',  JSON.stringify(initDataTo.value))
+  // saveData(JSON.stringify(initDataTo.value))
 }
 
 // 筛选模块弹窗关闭
@@ -731,6 +917,7 @@ const sift = () => {
   flag.value = false
   selectFlag.value = false
   move()
+  console.log('keep',initDataTo.value)
 }
 </script>
 
@@ -980,6 +1167,7 @@ const sift = () => {
     border-radius: 2px;
     border: solid 1px rgba(226, 226, 226, 1);
     margin-left: 8px;
+
     // border: solid 1px red;
     .van-icon {
       color: #fff;
@@ -991,7 +1179,7 @@ const sift = () => {
       line-height: 23px;
       box-sizing: border-box;
       font-size: 14px;
-       border-radius: 2px;
+      border-radius: 2px;
     }
   }
 
@@ -1061,5 +1249,4 @@ const sift = () => {
     background-color: white;
     height: 50px;
   }
-}
-</style>
+}</style>
