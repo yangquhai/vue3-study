@@ -846,7 +846,7 @@ const keep = () => {
   // console.log(initDataTo.value.searchCondition,dateList.value)
   initDataTo.value.lcmxmc.length = 0
   initDataTo.value.searchCondition.length = 0
-  // console.log(filter.value.textList)
+  // console.log(initDataTo.value.searchCondition)
   // 流程多选的保存
   for(let i=0;i<procedureList.value.length;i++){
     if (procedureList.value[i].select){
@@ -855,59 +855,51 @@ const keep = () => {
   }
   // console.log(initDataTo.value.searchCondition,dateList.value)
   // 日期类型的保存
-  // toFormData.value.searchCondition.push({
-  //       type: tabListData.value.searchCondition[i].type,
-  //       fieldname: tabListData.value.searchCondition[i].fieldname,
-  //       fieldtype: tabListData.value.searchCondition[i].fieldtype,
-  //       lb: tabListData.value.searchCondition[i].lb,
-  //       text: tabListData.value.searchCondition[i].text,
-  //       defaultValue: tabListData.value.searchCondition[i].defaultValue,
-  //       values: [], condition: {}
-  //     })
-
-  // {
-	// 		"type": "datetime",
-	// 		"fieldname": "RQ",
-	// 		"fieldtype": "DATETIM",
-	// 		"lb": "数据:日期框",
-	// 		"text": "日期",
-	// 		"values": {
-	// 			"value": "自定义",
-	// 			"dateFrom": "2020-05-01",
-	// 			"dateTo": "2023-05-01"
-	// 		}
-	// 	},
-
   for(let i = 0;i<dateList.value.length;i++){
-    // console.log(initDataTo.value.searchCondition,dateList.value[i])
-    for(let j=0 ; j<dateList.value[i].values.length;j++){
-      if(dateList.value[i].values[j].select){
-        console.log(dateList.value[i].values[j])
-        initDataTo.value.searchCondition.push({
+     // console.log(dateList.value[i].values)
+     initDataTo.value.searchCondition.push({
           type: dateList.value[i].type,
           fieldname: dateList.value[i].fieldname,
           fieldtype: dateList.value[i].fieldtype,
           lb: dateList.value[i].lb,
           text: dateList.value[i].text,
-          defaultValue: dateList.value[i].defaultValue,
-          values: {value:dateList.value[i].values[j].value,dateFrom:dateList.value[i].values[j].dateFrom,dateTo:dateList.value[i].values[j].dateTo}, 
+          values:{value:'',dateFrom:'',dateTo:''}
         })
-        // 需修改searchCondition值为动态
-        // initDataTo.value.searchCondition[0].values.value = dateList.value[i].values[j].value
+     for(let j=0 ; j<dateList.value[i].values.length;j++){
+      if(dateList.value[i].values[j].select){
+        // console.log(dateList.value[i].values[j])
+        initDataTo.value.searchCondition[i].values.value = dateList.value[i].values[j].value
+        initDataTo.value.searchCondition[i].values.dateFrom = dateList.value[i].values[j].dateFrom
+        initDataTo.value.searchCondition[i].values.dateTo = dateList.value[i].values[j].dateTo
       }
     }
-    console.log(initDataTo.value.searchCondition)
+    // console.log(initDataTo.value.searchCondition)
   }
-
-
   // 值为text的保存
-
-  // for(let i=0;i<filter.value.textList.length;i++){
-  //   console.log(filter.value.textList[i])
-  // }
+  for(let i=0;i<filter.value.textList.length;i++){
+    console.log(filter.value.textList[i].defaultValue)
+    initDataTo.value.searchCondition.push({
+          type: filter.value.textList[i].type,
+          fieldname: filter.value.textList[i].fieldname,
+          fieldtype: filter.value.textList[i].fieldtype,
+          lb: filter.value.textList[i].lb,
+          text: filter.value.textList[i].text,
+          defaultValue: filter.value.textList[i].defaultValue,
+          condition:{id:'',luoji:''}
+        })
+    for(let j=0;j<filter.value.textList[i].condition.length;j++){
+      // console.log(filter.value.textList[i].condition[j])
+      if(filter.value.textList[i].condition[j].select){
+          console.log(filter.value.textList[i].condition[j])
+          initDataTo.value.searchCondition[i+dateList.value.length].condition.id = filter.value.textList[i].condition[j].id
+          initDataTo.value.searchCondition[i+dateList.value.length].condition.luoji = filter.value.textList[i].condition[j].luoji
+      }
+    }
+  }
+  console.log(initDataTo.value)
   // JSON.stringify(initDataTo.value)
   // console.log('keep',  JSON.stringify(initDataTo.value))
-  // saveData(JSON.stringify(initDataTo.value))
+  saveData(JSON.stringify(initDataTo.value))
 }
 
 // 筛选模块弹窗关闭

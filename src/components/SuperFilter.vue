@@ -145,8 +145,17 @@ const onConfirmText = ({ selectedOptions }) => {
     // Toast(`当前值：${value}, 当前索引：${index}`);
     console.log(selectedOptions[0], showPopoverTextFlag.value)
     value1.value[showPopoverTextFlag.value] = selectedOptions[0].luoji
-    // this.$set(this.value1,index,value)
-    console.log(value1.value[showPopoverTextFlag.value])
+    // console.log(value1.value[showPopoverTextFlag.value])
+    // console.log(textList.value[showPopoverTextFlag.value].condition)
+    for(let i=0;i<textList.value[showPopoverTextFlag.value].condition.length;i++){
+       // console.log(textList.value[showPopoverTextFlag.value].condition[i])
+       textList.value[showPopoverTextFlag.value].condition[i].select = false
+       if(textList.value[showPopoverTextFlag.value].condition[i].id==selectedOptions[0].id){
+         textList.value[showPopoverTextFlag.value].condition[i].select = true
+         console.log(textList.value[showPopoverTextFlag.value].condition[i])
+       }
+       
+    }
     showPopoverText.value[showPopoverTextFlag.value] = false
 }
 const onCancelText = () => {
