@@ -679,12 +679,14 @@ const chooseDataTag = (index, index2, value) => {
     if(!lastClick.value){
       dateList.value[index].values[index2].select = !dateList.value[index].values[index2].select
       calendarFlag2.value = !calendarFlag2.value
+      lastClick.value = index2+1
     }
     else {
       // lastClick.value = null
       dateList.value[index].values[index2].select = !dateList.value[index].values[index2].select
       calendarFlag2.value = !calendarFlag2.value
       dateList.value[index].values[lastClick.value-1].select = false
+      lastClick.value = null
     }
   }
   else {
@@ -692,6 +694,7 @@ const chooseDataTag = (index, index2, value) => {
     if(!lastClick.value){
       calendarFlag2.value = false
       dateList.value[index].values[index2].select = !dateList.value[index].values[index2].select
+      lastClick.value = index2+1
     }
     else {
       // console.log(lastClick.value)
@@ -699,9 +702,9 @@ const chooseDataTag = (index, index2, value) => {
       calendarFlag2.value = false
       dateList.value[index].values[index2].select = !dateList.value[index].values[index2].select
       dateList.value[index].values[lastClick.value-1].select = false
+      lastClick.value = null
     }
   }
-  lastClick.value = index2+1
   // console.log(lastClick.value)
 }
 
