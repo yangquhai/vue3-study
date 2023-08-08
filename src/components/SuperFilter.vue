@@ -31,8 +31,8 @@
                             <van-icon name="arrow-down" />
                         </div>
                         <van-popup v-model:show="showPopoverText[index]" round position="bottom" :style="{ height: '40%' }">
-                            <van-picker :columns="item.condition" @confirm="onConfirmText" @cancel="onCancelText"
-                                :columns-field-names="customFieldName" show-toolbar item-height="1rem" :default-index="0" />
+                            <van-picker :columns="item.condition" @confirm="onConfirmText" @cancel="onCancelText" v-model="textValues[index]"
+                                :columns-field-names="customFieldName" show-toolbar item-height="1rem" />
                         </van-popup>
                         <van-field v-model="item.defaultValue" :placeholder="'请输入' + item.text" clearable />
                     </div>
@@ -57,6 +57,8 @@ const customFieldName = {
     text: 'luoji',
     value: 'id',
 };
+const textValues = ref([])
+const selectValues = ref([])
 const props = defineProps({
     tabListData: Object
 })
@@ -64,14 +66,19 @@ const props = defineProps({
 // 用于筛选出type为select的数据，形成新的数组渲染
 const selectList = computed(() => {
     let selectList = []
+    let index = -1
     for (let i = 0; i < props.tabListData.searchCondition.length; i++) {
         // console.log(this.tabListData.searchCondition[i])
         if (props.tabListData.searchCondition[i].type == "select") {
             selectList.push(props.tabListData.searchCondition[i])
+            index++
+            selectValues.value.push([])
             for (let j = 0; j < props.tabListData.searchCondition[i].condition.length; j++) {
-                if (props.tabListData.searchCondition[i].condition[j].select)
-                    // console.log(i)
+                if (props.tabListData.searchCondition[i].condition[j].select){
                     value.value.push(props.tabListData.searchCondition[i].condition[j])
+                    selectValues.value[index][0] = props.tabListData.searchCondition[i].condition[j].id
+                }
+                    // console.log(i)
                 // this.value1[valueIndex].luoji = this.tabListData.searchCondition[i].condition[j].luoji
             }
         }
@@ -81,16 +88,23 @@ const selectList = computed(() => {
 // 用于筛选出type类型为text的数据，形成新的数组渲染
 const textList = computed(() => {
     let textList = []
+    let index = -1
     for (let i = 0; i < props.tabListData.searchCondition.length; i++) {
         // console.log(this.tabListData.searchCondition[i])
         if (props.tabListData.searchCondition[i].type == "text") {
             textList.push(props.tabListData.searchCondition[i])
             // this.value1.push({luoji:'包含'})
+            index++
+            textValues.value.push([])
+            // console.log(textValues.value)
             // console.log(this.tabListData.searchCondition[i])
             for (let j = 0; j < props.tabListData.searchCondition[i].condition.length; j++) {
-                if (props.tabListData.searchCondition[i].condition[j].select)
-                    // console.log(i)
+                if (props.tabListData.searchCondition[i].condition[j].select){
+                    // textValues.value[index] = props.tabListData.searchCondition[i].condition[j].id
+                    textValues.value[index][0] = props.tabListData.searchCondition[i].condition[j].id
                     value1.value.push(props.tabListData.searchCondition[i].condition[j].luoji)
+                    // console.log(props.tabListData.searchCondition[i].condition[j].id,index,textValues.value[index])
+                }
                 // this.value1[valueIndex].luoji = this.tabListData.searchCondition[i].condition[j].luoji
             }
             // this.showPopoverText.push(false)
@@ -99,23 +113,6 @@ const textList = computed(() => {
     // console.log(textList)
     return textList
 })
-const onSelect = (action) => {
-    console.log(action.text)
-    // this.name = action.text
-}
-const chooseOptions = (action) => {
-    console.log(index)
-}
-const clear = () => {
-    console.log(111)
-}
-const clear2 = () => {
-    console.log(222)
-}
-const sift = () => {
-    const emit = defineEmits(['sfit'])
-    emit('sift')
-}
 const showSelectPopovers = (index) => {
     // this.showPopoverSelect[index] = true
     // this.$set(this.showPopoverSelect,index,true)
@@ -123,13 +120,20 @@ const showSelectPopovers = (index) => {
     showPopoverSelectFlag.value = index
     // console.log(this.showPopoverSelect[index])
 }
-const onConfirm = (value, index) => {
+const onConfirm = ({ selectedOptions }) => {
     // Toast(`当前值：${value}, 当前索引：${index}`);
-    console.log(index, value, showPopoverSelectFlag.value, value[this.showPopoverSelectFlag].value)
-    value.value[showPopoverSelectFlag.value] = value
-    // this.$set(this.value,index,value)
-    this.$set(this.showPopoverSelect, this.showPopoverSelectFlag, false)
-    console.log(this.showPopoverSelect)
+    console.log(selectedOptions[0], showPopoverSelectFlag.value)
+    // console.log(index, value, showPopoverSelectFlag.value, value[this.showPopoverSelectFlag].value)
+    value.value[showPopoverSelectFlag.value] = selectedOptions[0].luoji
+    for(let i=0;i<selectList.value[showPopoverSelectFlag.value].condition.length;i++){
+       // console.log(textList.value[showPopoverTextFlag.value].condition[i])
+       selectList.value[showPopoverSelectFlag.value].condition[i].select = false
+       if(selectList.value[showPopoverSelectFlag.value].condition[i].id==selectedOptions[0].id){
+        selectList.value[showPopoverSelectFlag.value].condition[i].select = true
+         // console.log(textList.value[showPopoverTextFlag.value].condition[i])
+       }
+    }
+    showPopoverText.value[showPopoverTextFlag.value] = false
 }
 const onCancel = () => {
     // Toast('取消');
@@ -143,7 +147,7 @@ const showTextPopovers = (index) => {
 }
 const onConfirmText = ({ selectedOptions }) => {
     // Toast(`当前值：${value}, 当前索引：${index}`);
-    // console.log(selectedOptions[0], showPopoverTextFlag.value)
+    console.log(selectedOptions[0], showPopoverTextFlag.value)
     value1.value[showPopoverTextFlag.value] = selectedOptions[0].luoji
     // console.log(value1.value[showPopoverTextFlag.value])
     // console.log(textList.value[showPopoverTextFlag.value].condition)

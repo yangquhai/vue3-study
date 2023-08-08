@@ -243,7 +243,7 @@ const toFormData = ref({
 
 // 用于初始化后端传来的数组 
 
-const initData = (tabListData,toFormData) => {
+const initData = (tabListData, toFormData) => {
   toFormData.value.dateType = tabListData.value.dateType
   // 选中的流程值
   // console.log(tabListData.value.lcmxmc)
@@ -253,9 +253,9 @@ const initData = (tabListData,toFormData) => {
   }
   // 高级筛选五种自定义选择
   for (let i = 0; i < tabListData.value.searchCondition.length; i++) {
-    // console.log(tabListData.value.searchCondition[i].fieldname)
+    // console.log(tabListData.value.searchCondition[i])
     // 为日期的时候values是对象,否则为数组
-    if (tabListData.value.searchCondition[i].type != 'datetime')
+    if (tabListData.value.searchCondition[i].type == 'text' || tabListData.value.searchCondition[i].type == 'select')
       toFormData.value.searchCondition.push({
         type: tabListData.value.searchCondition[i].type,
         fieldname: tabListData.value.searchCondition[i].fieldname,
@@ -263,9 +263,18 @@ const initData = (tabListData,toFormData) => {
         lb: tabListData.value.searchCondition[i].lb,
         text: tabListData.value.searchCondition[i].text,
         defaultValue: tabListData.value.searchCondition[i].defaultValue,
-        values: [], condition: {}
+        condition: {id:'',luoji:''}
       })
-    else
+      if (tabListData.value.searchCondition[i].type == 'muliselect')
+      toFormData.value.searchCondition.push({
+        type: tabListData.value.searchCondition[i].type,
+        fieldname: tabListData.value.searchCondition[i].fieldname,
+        fieldtype: tabListData.value.searchCondition[i].fieldtype,
+        lb: tabListData.value.searchCondition[i].lb,
+        text: tabListData.value.searchCondition[i].text,
+        values: [],
+      })
+      if (tabListData.value.searchCondition[i].type == 'datetime')
       toFormData.value.searchCondition.push({
         type: tabListData.value.searchCondition[i].type,
         fieldname: tabListData.value.searchCondition[i].fieldname,
@@ -292,14 +301,17 @@ const initData = (tabListData,toFormData) => {
           toFormData.value.searchCondition[i].values.dateTo = tabListData.value.searchCondition[i].values[j].dateTo
         }
         else {
-          toFormData.value.searchCondition[i].values.value = tabListData.value.searchCondition[i].defaultValue
+          // console.log(tabListData.value.searchCondition[i].values[j].select)
+          if (tabListData.value.searchCondition[i].values[j].select)
+            toFormData.value.searchCondition[i].values.value = tabListData.value.searchCondition[i].values[j].value
         }
       }
+      // console.log(toFormData.value.searchCondition[i],tabListData.value.searchCondition[i].values)
     }
     // 将值为text入参
     if (tabListData.value.searchCondition[i].type == 'text') {
       for (let j = 0; j < tabListData.value.searchCondition[i].condition.length; j++) {
-        // console.log(tabListData.value.searchCondition[i].condition[j])
+        // console.log(toFormData.value.searchCondition[i].condition.id)
         if (tabListData.value.searchCondition[i].condition[j].select) {
           toFormData.value.searchCondition[i].condition.id = tabListData.value.searchCondition[i].condition[j].id
           toFormData.value.searchCondition[i].condition.luoji = tabListData.value.searchCondition[i].condition[j].luoji
@@ -357,8 +369,8 @@ const getData = async (TisFirst) => {
       totalMoney.value = (totalMoney.value / 10000).toFixed(0).toString() + '万'
     // console.log(userInfoDataList.value.sum[0].value)
     // 初始化数据
-    initData(tabListData,toFormData)
-    initData(tabListData,initDataTo)
+    initData(tabListData, toFormData)
+    initData(tabListData, initDataTo)
     // console.log(toFormData.value,tabListData.value)
   } catch (err) {
     console.log(err)
@@ -643,7 +655,7 @@ const down = (index, value, type) => {
 
 // 判断多选列表
 const chooseUserTag = (index, index2, value) => {
-  console.log(usertTagList.value[index].values[index2].select)
+  // console.log(usertTagList.value[index].values[index2].select)
   if (usertTagList.value[index].values[index2].select) {
     // console.log(this.usertTagList[index].values[index2].select)
     usertTagList.value[index].values[index2].select = false
@@ -651,8 +663,9 @@ const chooseUserTag = (index, index2, value) => {
   else {
     usertTagList.value[index].values[index2].select = true
   }
-  console.log(value)
+  // console.log(value)
 }
+// 流程框多选
 const chooseProcedureTags = (index, value) => {
   if (procedureList.value[index].select)
     procedureList.value[index].select = false
@@ -662,28 +675,27 @@ const chooseProcedureTags = (index, value) => {
 }
 // 日期单选
 const chooseDataTag = (index, index2, value) => {
-  // console.log(value)
+  // console.log(index, index2, value,dateList.value[index])
+  for (let i = 0; i < dateList.value[index].values.length; i++) {
+    dateList.value[index].values[i].select = false
+  }
   // console.log(dateLastClick.value[index])
   if (value.value == '自定义') {
-    // 说明有初始值
-    if (dateLastClick.value[index] != null)
-      dateList.value[index].values[dateLastClick.value[index]].select = false
+    // dateList.value[index].values[dateLastClick.value[index]].select = false
     dateList.value[index].values[index2].select = true
     calendarFlag2.value = true
   }
   // 当点击值为非自定义时
   else {
+    // console.log(dateList.value[index].values[index2].select)
     calendarFlag2.value = false
     // 点击到相同的框
-    if (dateList.value[index].values[index2].select) {
-      // console.log(this.usertTagList[index].values[index2].select)
+    if (dateLastClick.value[index] == index2) {
       dateList.value[index].values[index2].select = false
     }
-    else {
-      if (dateLastClick.value[index] != null)
-        dateList.value[index].values[dateLastClick.value[index]].select = false
+    else
       dateList.value[index].values[index2].select = true
-    }
+    // console.log(dateList.value[index].values[index2].select)
   }
   dateLastClick.value[index] = index2
   // console.log(dateLastClick.value[index])
@@ -765,6 +777,7 @@ const reset = () => {
   let index = -1
   let index2 = -1
   let index3 = -1
+  let index4 = -1
   // 流程框初始化
   procedureList.value = JSON.parse(JSON.stringify(tabListData.value.lcmxmc))
   // console.log('reset',tabListData.value)
@@ -773,6 +786,8 @@ const reset = () => {
     // console.log(toFormData.value.searchCondition[i])
     if (toFormData.value.searchCondition[i].type == 'text') {
       index++
+      // console.log(toFormData.value.searchCondition[i].defaultValue)
+      // console.log(filter.value.textList[index].defaultValue)
       filter.value.value1[index] = toFormData.value.searchCondition[i].condition.luoji
       filter.value.textList[index].defaultValue = toFormData.value.searchCondition[i].defaultValue
     }
@@ -783,7 +798,7 @@ const reset = () => {
     }
     if (toFormData.value.searchCondition[i].type == 'datetime') {
       index3++
-      // console.log(toFormData.value.searchCondition[i].values.value,dateList.value[index3].values)
+      // console.log(toFormData.value.searchCondition[i].values)
       if (!toFormData.value.searchCondition[i].values.value) {
         for (let j = 0; j < dateList.value[index3].values.length; j++) {
           // console.log(dateList.value[index3].values[j].select)
@@ -798,10 +813,24 @@ const reset = () => {
         }
       }
     }
+    if (toFormData.value.searchCondition[i].type == 'muliselect') {
+      index4++
+      for(let k=0;k<usertTagList.value[index4].values.length;k++){
+        usertTagList.value[index4].values[k].select = false
+        // console.log(usertTagList.value[index4].values[k])
+        for(let j=0; j<toFormData.value.searchCondition[i].values.length;j++){
+         // console.log(toFormData.value.searchCondition[i].values[j])
+         if(toFormData.value.searchCondition[i].values[j].item == usertTagList.value[index4].values[k].item)
+         // console.log(33123)
+         usertTagList.value[index4].values[k].select = true
+       }
+      }
+      // console.log('muliselect',toFormData.value.searchCondition[i],usertTagList.value[index4])
+    }
   }
 }
 // 保存筛选框的值
-const saveData = async(Tformat) =>{
+const saveData = async (Tformat) => {
   let formData = new FormData()
   formData.append('Tformnamecn', '1665')
   formData.append('Turl', 'YXKHGZB.ASPX')
@@ -812,7 +841,7 @@ const saveData = async(Tformat) =>{
     const res = await request.saveUserInfo(formData)
     console.log(res)
   }
-  catch(err){
+  catch (err) {
     console.log(err)
   }
 }
@@ -848,25 +877,25 @@ const keep = () => {
   initDataTo.value.searchCondition.length = 0
   // console.log(initDataTo.value.searchCondition)
   // 流程多选的保存
-  for(let i=0;i<procedureList.value.length;i++){
-    if (procedureList.value[i].select){
+  for (let i = 0; i < procedureList.value.length; i++) {
+    if (procedureList.value[i].select) {
       initDataTo.value.lcmxmc.push({ value: procedureList.value[i].value, ID: procedureList.value[i].ID })
     }
   }
   // console.log(initDataTo.value.searchCondition,dateList.value)
   // 日期类型的保存
-  for(let i = 0;i<dateList.value.length;i++){
-     // console.log(dateList.value[i].values)
-     initDataTo.value.searchCondition.push({
-          type: dateList.value[i].type,
-          fieldname: dateList.value[i].fieldname,
-          fieldtype: dateList.value[i].fieldtype,
-          lb: dateList.value[i].lb,
-          text: dateList.value[i].text,
-          values:{value:'',dateFrom:'',dateTo:''}
-        })
-     for(let j=0 ; j<dateList.value[i].values.length;j++){
-      if(dateList.value[i].values[j].select){
+  for (let i = 0; i < dateList.value.length; i++) {
+    // console.log(dateList.value[i].values)
+    initDataTo.value.searchCondition.push({
+      type: dateList.value[i].type,
+      fieldname: dateList.value[i].fieldname,
+      fieldtype: dateList.value[i].fieldtype,
+      lb: dateList.value[i].lb,
+      text: dateList.value[i].text,
+      values: { value: '', dateFrom: '', dateTo: '' }
+    })
+    for (let j = 0; j < dateList.value[i].values.length; j++) {
+      if (dateList.value[i].values[j].select) {
         // console.log(dateList.value[i].values[j])
         initDataTo.value.searchCondition[i].values.value = dateList.value[i].values[j].value
         initDataTo.value.searchCondition[i].values.dateFrom = dateList.value[i].values[j].dateFrom
@@ -875,24 +904,64 @@ const keep = () => {
     }
     // console.log(initDataTo.value.searchCondition)
   }
-  // 值为text的保存
-  for(let i=0;i<filter.value.textList.length;i++){
+  // 值为多选框的保存
+  for(let i=0;i<usertTagList.value.length;i++){
+    // console.log(usertTagList.value[i])
+    initDataTo.value.searchCondition.push({
+      type: usertTagList.value[i].type,
+      fieldname: usertTagList.value[i].fieldname,
+      fieldtype: usertTagList.value[i].fieldtype,
+      lb: usertTagList.value[i].lb,
+      text: usertTagList.value[i].text,
+      values:[],
+    })
+    for(let j = 0; j<usertTagList.value[i].values.length;j++){
+      if(usertTagList.value[i].values[j].select)
+      // console.log(usertTagList.value[i].values[j].item)
+      initDataTo.value.searchCondition[i+dateList.value.length].values.push({item:usertTagList.value[i].values[j].item})
+    }
+  }
+  // 值为select的保存
+  for (let i = 0; i < filter.value.selectList.length; i++) {
     // console.log(filter.value.textList[i].defaultValue)
     initDataTo.value.searchCondition.push({
-          type: filter.value.textList[i].type,
-          fieldname: filter.value.textList[i].fieldname,
-          fieldtype: filter.value.textList[i].fieldtype,
-          lb: filter.value.textList[i].lb,
-          text: filter.value.textList[i].text,
-          defaultValue: filter.value.textList[i].defaultValue,
-          condition:{id:'',luoji:''}
-        })
-    for(let j=0;j<filter.value.textList[i].condition.length;j++){
+      type: filter.value.selectList[i].type,
+      fieldname: filter.value.selectList[i].fieldname,
+      fieldtype: filter.value.selectList[i].fieldtype,
+      lb: filter.value.selectList[i].lb,
+      text: filter.value.selectList[i].text,
+      defaultValue: filter.value.selectList[i].defaultValue,
+      condition: { id: '', luoji: '' }
+    })
+    for (let j = 0; j < filter.value.selectList[i].condition.length; j++) {
       // console.log(filter.value.textList[i].condition[j])
-      if(filter.value.textList[i].condition[j].select){
-          // console.log(filter.value.textList[i].condition[j])
-          initDataTo.value.searchCondition[i+dateList.value.length].condition.id = filter.value.textList[i].condition[j].id
-          initDataTo.value.searchCondition[i+dateList.value.length].condition.luoji = filter.value.textList[i].condition[j].luoji
+      if (filter.value.selectList[i].condition[j].select) {
+        // console.log(filter.value.textList[i].condition[j])
+        initDataTo.value.searchCondition[i + dateList.value.length +usertTagList.value.length].condition.id = filter.value.selectList[i].condition[j].id
+        initDataTo.value.searchCondition[i + dateList.value.length +usertTagList.value.length].condition.luoji = filter.value.selectList[i].condition[j].luoji
+      }
+    }
+  }
+
+
+  // 值为text的保存
+  for (let i = 0; i < filter.value.textList.length; i++) {
+    // console.log(filter.value.textList[i].defaultValue)
+    initDataTo.value.searchCondition.push({
+      type: filter.value.textList[i].type,
+      fieldname: filter.value.textList[i].fieldname,
+      fieldtype: filter.value.textList[i].fieldtype,
+      lb: filter.value.textList[i].lb,
+      text: filter.value.textList[i].text,
+      defaultValue: filter.value.textList[i].defaultValue,
+      condition: { id: '', luoji: '' }
+    })
+    for (let j = 0; j < filter.value.textList[i].condition.length; j++) {
+      // console.log(filter.value.textList[i].condition[j])
+      if (filter.value.textList[i].condition[j].select) {
+        // console.log(filter.value.textList[i].condition[j])
+        initDataTo.value.searchCondition[i + dateList.value.length + filter.value.selectList.length +usertTagList.value.length].condition.id = filter.value.textList[i].condition[j].id
+        initDataTo.value.searchCondition[i + dateList.value.length + filter.value.selectList.length +usertTagList.value.length].condition.luoji = filter.value.textList[i].condition[j].luoji
       }
     }
   }
@@ -909,7 +978,7 @@ const sift = () => {
   flag.value = false
   selectFlag.value = false
   move()
-  console.log('keep',initDataTo.value)
+  console.log('keep', initDataTo.value)
 }
 </script>
 
@@ -1241,4 +1310,5 @@ const sift = () => {
     background-color: white;
     height: 50px;
   }
-}</style>
+}
+</style>

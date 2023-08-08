@@ -134,7 +134,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch,defineExpose  } from 'vue'
+import { ref, reactive, computed, watch  } from 'vue'
 
 const props = defineProps({
     userInfoDataList: Object,
