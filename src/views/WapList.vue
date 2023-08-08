@@ -383,7 +383,7 @@ getData()
 // 加载更多数据
 const conactArray = ref([])
 const pageIndex = ref(1)
-const loadMore = async (TisFirst) => {
+const loadMore = async () => {
   pageIndex.value++
   // console.log(pageIndex.value)
   let formData = new FormData()
@@ -391,7 +391,6 @@ const loadMore = async (TisFirst) => {
   formData.append('Turl', 'YXKHGZB.ASPX')
   formData.append('Ttablename', 'YXKHGZB')
   formData.append('Tsystem_lcmc', '意向客户跟踪表')
-  formData.append('TisFirst', TisFirst)
   formData.append('pageIndex', pageIndex.value)
   formData.append('pagesize', 10)
   try {
@@ -981,6 +980,7 @@ const keep = () => {
 // 筛选数据接口
 const siftUserInfo = async (Tformat) => {
   isLoading.value = true
+  pageIndex.value = 1
   let formData = new FormData()
   formData.append('Tformnamecn', '1665')
   formData.append('Turl', 'YXKHGZB.ASPX')
