@@ -138,8 +138,7 @@ import { ref, reactive, computed, watch  } from 'vue'
 
 const props = defineProps({
     userInfoDataList: Object,
-    isLoad: Boolean
-
+    isLoad: Boolean,
 })
 
 // 解析后端传输的字段，筛选出符合要求的数据,并对数据进行处理
@@ -301,6 +300,7 @@ const BQ = computed(() => {
             // console.log(sliceArr(KHMC,size)[i])
             for (let j = 0; j < sliceArr(KHMC, size)[i].length; j++) {
                 // console.log(sliceArr(KHMC,size)[i][j].split(','))
+                if(sliceArr(KHMC, size)[i][j].split(','))
                 KHMC2.push(sliceArr(KHMC, size)[i][j].split(','))
             }
         }
@@ -410,7 +410,7 @@ const checked = (name) => {
         chooseList.value.splice(index, 1) // 否则则删除
         totalMoney.value.splice(index, 1) // 否则则删除
     }
-    console.log(chooseList.value)
+    // console.log(chooseList.value)
     // console.log(this.chooseList,name)
     emit('checked',chooseList.value)
 }
