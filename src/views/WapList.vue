@@ -155,7 +155,7 @@
     </div>
     <skeleton v-if="isLoading"></skeleton>
     <userInfo class="userInfo" ref="info" @checked="checked" @transferOrder="transferOrder" :isLoad="isLoading" v-else
-      @loadMore="loadMore(0)" :userInfoDataList="userInfoDataList"></userInfo>
+      @loadMore="loadMore" :userInfoDataList="userInfoDataList"></userInfo>
   </div>
 </template>
 
@@ -670,38 +670,38 @@ const chooseDataTag = (index, index2, value) => {
   for (let i = 0; i < dateList.value[index].values.length; i++) {
     // dateList.value[index].values[i].select = false
     // console.log(dateList.value[index].values[i].select)
-    if(dateList.value[index].values[i].select){
-      lastClick.value = i+1
+    if (dateList.value[index].values[i].select) {
+      lastClick.value = i + 1
     }
   }
   if (value.value == '自定义') {
     // 判断之前是否有点击
-    if(!lastClick.value){
+    if (!lastClick.value) {
       dateList.value[index].values[index2].select = !dateList.value[index].values[index2].select
       calendarFlag2.value = !calendarFlag2.value
-      lastClick.value = index2+1
+      lastClick.value = index2 + 1
     }
     else {
       // lastClick.value = null
       dateList.value[index].values[index2].select = !dateList.value[index].values[index2].select
       calendarFlag2.value = !calendarFlag2.value
-      dateList.value[index].values[lastClick.value-1].select = false
+      dateList.value[index].values[lastClick.value - 1].select = false
       lastClick.value = null
     }
   }
   else {
     // 第一次点击
-    if(!lastClick.value){
+    if (!lastClick.value) {
       calendarFlag2.value = false
       dateList.value[index].values[index2].select = !dateList.value[index].values[index2].select
-      lastClick.value = index2+1
+      lastClick.value = index2 + 1
     }
     else {
       // console.log(lastClick.value)
       // lastClick.value = null
       calendarFlag2.value = false
       dateList.value[index].values[index2].select = !dateList.value[index].values[index2].select
-      dateList.value[index].values[lastClick.value-1].select = false
+      dateList.value[index].values[lastClick.value - 1].select = false
       lastClick.value = null
     }
   }
