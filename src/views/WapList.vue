@@ -385,16 +385,19 @@ const conactArray = ref([])
 const pageIndex = ref(1)
 const loadMore = async () => {
   pageIndex.value++
-  // console.log(pageIndex.value)
+  siftDataTo.value = JSON.parse(JSON.stringify(initDataTo.value))
+  siftDataTo.value.sum = { fieldname: sumFieldName.value, text: totalMoneyTitle.value }
+  console.log(siftDataTo.value)
   let formData = new FormData()
   formData.append('Tformnamecn', '1665')
   formData.append('Turl', 'YXKHGZB.ASPX')
   formData.append('Ttablename', 'YXKHGZB')
   formData.append('Tsystem_lcmc', '意向客户跟踪表')
+  formData.append('Tfilter', JSON.stringify(siftDataTo.value))
   formData.append('pageIndex', pageIndex.value)
   formData.append('pagesize', 10)
   try {
-    const res = await request.getUserInfo(formData)
+    const res = await request.siftUserInfo(formData)
     conactArray.value = res.data.data
     userInfoDataList.value.data = userInfoDataList.value.data.concat(conactArray.value)
     // console.log(conactArray.value,userInfoDataList.value.data)
@@ -553,18 +556,16 @@ const chooseMonth = (index, value) => {
   initDataTo.value.dateType.defaultValue = value
   // this.chooseIndex为0选择第一个
   chooseMonthIndex.value = value
-  console.log(initDataTo.value)
   if (monthList.value.includes(chooseIndex.value)) {
     if (index != 7) {
       chooseIndex.value = null
       firstIndex.value = null
-      // this.tabList[0] = value
       tabList.value[0] = value
-      // this.$set(this.tabList,0,value)
-      // console.log(index)
       flag.value = false
       monthFlag.value = false
       sortFlag.value = false
+      copyData(siftDataTo,initDataTo)
+      siftUserInfo(JSON.stringify(siftDataTo.value))
       move()
     }
     else {
@@ -709,16 +710,6 @@ const chooseDataTag = (index, index2, value) => {
 
 const onSelect = () => {
   console.log(333)
-}
-// 点击搜索数据
-const search = (value) => {
-  let formData = new FormData()
-  // let data = {}
-  console.log(value, toFormData.value)
-  toFormData.value.searchKeys = value
-  formData.append('filter', JSON.stringify(toFormData.value))
-  console.log(formData.get('filter'))
-  // getData(0,formData.get('filter'))
 }
 // 计算选中的金额,以及全选与反选
 const chooseTotalMoney = ref(0)
@@ -999,8 +990,11 @@ const siftUserInfo = async (Tformat) => {
     totalMoneyTitle.value = res.data.sum.text
     sumFieldName.value = res.data.sum.fieldname
     count.value = res.data.sum.count
+    userInfoDataList.value.sum.count = res.data.sum.count
+    if (totalMoney.value > 10000)
+      totalMoney.value = (totalMoney.value / 10000).toFixed(0).toString() + '万'
     // chooseList.length = 0
-    console.log(userInfoDataList.value.data)
+    console.log(userInfoDataList.value.sum)
   }
   catch (err) {
     console.log(err)
@@ -1008,16 +1002,32 @@ const siftUserInfo = async (Tformat) => {
 }
 
 const siftDataTo = ref('')
+
+// 将initData值赋给siftData
+const copyData = (siftDataTo,initDataTo) =>{
+  // 深拷贝一个数组siftDataTo用于筛选数据
+  siftDataTo.value = JSON.parse(JSON.stringify(initDataTo.value))
+  siftDataTo.value.sum = { fieldname: sumFieldName.value, text: totalMoneyTitle.value }
+  chooseList.value.length = 0
+  checkAllFlag.value = false
+  console.log('sift', siftDataTo.value)
+}
 const sumFieldName = ref('')
 // 筛选模块弹窗关闭
 const sift = () => {
   close()
   keep()
-  // procedureList.value = JSON.parse(JSON.stringify(tabListData.value.lcmxmc)) "sum": { "fieldname": "XSJE", "text": "销售金额" } }
-  // 深拷贝一个数组siftDataTo用于筛选数据
-  siftDataTo.value = JSON.parse(JSON.stringify(initDataTo.value))
-  siftDataTo.value.sum = { fieldname: sumFieldName.value, text: totalMoneyTitle.value }
-  console.log('sift', siftDataTo.value, initDataTo.value)
+  copyData(siftDataTo,initDataTo)
+  siftUserInfo(JSON.stringify(siftDataTo.value))
+}
+// 点击搜索数据
+const search = (value) => {
+  // let formData = new FormData()
+  // let data = {}
+  console.log(initDataTo.value)
+  initDataTo.value.search.keyword = value
+  copyData(siftDataTo,initDataTo)
+  // console.log(value,siftDataTo.value)
   siftUserInfo(JSON.stringify(siftDataTo.value))
 }
 </script>

@@ -21,8 +21,6 @@
                             <van-icon name="arrow" />
                         </small>
                     </div>
-
-
                     <van-divider />
                     <div class="card-content">
                         <div class="card-content1 m-t-8 p-l-12 p-r-12">
@@ -41,16 +39,13 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="phone" @click.stop="callOut(LXDH[index])">
                                     <!-- <img src="../assets/phone.svg" alt=""> -->
                                     <van-icon name="phone" class="txt-gray" />
                                     <small>{{ LXDH[index] }}</small>
                                 </div>
                             </div>
-
                         </div>
-
                         <small class="card-content2">
                             <div class="van-row m-t-12 m-r-12 m-l-12">
                                 <div class="title van-col van-col--8 flex flex-col" v-for="(item) in ZDY[index]">
@@ -80,14 +75,12 @@
                             <small>￥</small>
                             <span class="moneyDetails3">{{ ZJE[index] }}</span>
                         </div>
-
                         <div class="getDetails">
                             <div class="style2" v-if="AJAX_Url.length != 2 && AJAX_Url.length != 0">
                                 <small class="titleMoney">销售金额</small>
                                 <small>￥</small>
                                 <span class="moneyDetails">{{ ZJE[index] }}</span>
                             </div>
-
                             <div class="bottonList">
                                 <div v-for="(item2, index2) in AJAX_Url" style="display: flex;">
                                     <div v-if="AJAX_Url.length < 3">
@@ -97,21 +90,15 @@
                                     <div v-if="AJAX_Url.length > 2 && index2 == 0">
                                         <button class="userDetails borders m-l-8" @click.stop="transferOrder">转单</button>
                                     </div>
-
                                     <div v-if="index2 == 0">
                                         <button class="userDetails order m-l-8" @click.stop="goDetails">
                                             {{ KHBM[index].title }}
-
                                         </button>
                                     </div>
-
-
                                 </div>
                             </div>
-
                         </div>
                     </div>
-
                 </div>
             </div>
         </van-pull-refresh>
@@ -125,7 +112,8 @@
 
         <div class="nomore">
             <!-- {{ KHBM }} -->
-            <span v-if="!(props.userInfoDataList.data.length < props.userInfoDataList.sum.count)">没有更多了</span> 
+            <span v-if="props.userInfoDataList.sum.count==props.userInfoDataList.data.length || !props.userInfoDataList.data.length">没有更多了</span> 
+            <van-loading v-else />
         </div>
     </div>
 </template>
@@ -165,13 +153,16 @@ const AJAX_Url = computed(() => {
 // 客户名称筛选
 const KHMC = computed(() => {
     let KHMC = []
+    console.log(props.userInfoDataList.data.length)
     if (props.userInfoDataList.data != undefined && fieldName.value != undefined)
         for (let i = 0; i < props.userInfoDataList.data.length; i++) {
             for (let j = 0; j < fieldName.value.length; j++) {
                 if (fieldName.value[j].type == '姓名') {
                     KHMC.push(props.userInfoDataList.data[i][fieldName.value[j].fieldname])
+                    // console.log(props.userInfoDataList.data[i][fieldName.value[j].fieldname])
                 }
             }
+            // console.log(props.userInfoDataList.data)
         }
     // console.log(KHMC)
     return KHMC
@@ -425,7 +416,7 @@ onMounted(() => {
             if(props.userInfoDataList.data.length< props.userInfoDataList.sum.count){
                 loadMore()
             }
-            console.log(scrollTop, offsetHeight, scrollHeight,props.userInfoDataList.sum.count)
+            console.log(props.userInfoDataList.data.length, props.userInfoDataList.sum.count)
         }
     })
 })
