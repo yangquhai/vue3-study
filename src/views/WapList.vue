@@ -35,7 +35,7 @@
             <van-calendar v-model:show="value2" :show-confirm="false" @confirm="onConfirm2" :min-date="minDate"
               :max-date="maxDate" />
           </div>
-          <van-button round size="small" type="primary" @click="close">确认</van-button>
+          <van-button round size="small" type="primary" @click="confirmDate">确认</van-button>
         </div>
       </div>
     </transition>
@@ -46,10 +46,6 @@
           <div class="sortItem">
             <div>{{ item.text }}</div>
             <div class="imgList">
-              <!-- <img class="img1" src="../assets/down.png" alt="" @click="up(index)" v-if="index!=chooseDateIndex">
-                <img class="img2" src="../assets/up.png" alt="" @click="down(index)" v-if="index!=chooseDateIndex">
-                <img src="../assets/black-down.svg" alt="" v-if="index==chooseDateIndex&&index==chooseDateIndex">
-                <img src="../assets/up.svg" alt="" v-if="index==chooseDateIndex&&index==chooseDateIndex"> -->
               <img class="img1" src="../assets/down.png" alt="" @click="down(index, item.order, 0)"
                 v-if="item.order != 'desc'">
               <img class="img1" src="../assets/chooseDown.png" alt="" @click="down(index, item.order, 1)"
@@ -133,16 +129,16 @@
         </div>
       </div>
     </transition>
-    <div class="bottom">
+    <div class="bottom" :style="{ 'border-bottom': isIos ? '0.3rem solid white' : '' }">
       <div class="checkbox" :style="{ 'border': checkAllFlag ? 'solid 1px #ffffff' : 'solid 1px rgba(226, 226, 226, 1)' }"
         @click.stop="checkedAll">
         <van-icon v-show="checkAllFlag" name="success" />
       </div>
-      <div class="total">
+      <div class="total" @click.stop="checkedAll">
         <div class="number">
           共{{ count }}条,已选{{ chooseList.length }}条
         </div>
-        <div class="number">{{ totalMoneyTitle }}共 <span v-if="!chooseList.length">{{ totalMoney }}</span> <span v-else>{{
+        <div class="number">{{ totalMoneyTitle }}共<span v-if="!chooseList.length">{{ totalMoney }}</span> <span v-else>{{
           chooseTotalMoney }}</span> </div>
       </div>
       <div class="userOptions">
@@ -162,8 +158,8 @@
 <script setup>
 import request from '_api'
 import { ref, computed } from 'vue'
-import { showToast } from 'vant';
-const tabList = ref(['当月', '排序', '筛选'])
+import { showToast,showDialog } from 'vant';
+const tabList = ref(['', '排序', '筛选'])
 const sortList = ref([])
 const isLoading = ref(true)
 // 用户选中的数组
@@ -204,7 +200,7 @@ const userInfoDataList = ref({})
 const editFlag = ref(false)
 const actions = ref([{ name: '批量审批' }, { name: '批量回退' }])
 const orderFlag = ref(false)
-const actions2 = ref([{ name: '转收款' }, { name: '转订单' }, { name: '转出库' }])
+const actions2 = ref([])
 // 月份限制
 const minDate = ref(new Date(2020, 0, 1))
 const maxDate = ref(new Date(2025, 0, 31))
@@ -213,6 +209,7 @@ const baseUrl = ref('http://dx.anywellchat.com:8888/ANYWELL_hylingls/')
 const totalMoney = ref('')
 const totalMoneyTitle = ref('')
 const count = ref('')
+const isIos = /(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)
 // init数据，用于值的初始化，前端重置数据
 const toFormData = ref({
   dateType: {
@@ -432,20 +429,6 @@ const dateList = computed(() => {
 })
 
 
-//禁止滚动条滚动
-const stop = () => {
-  document.body.style.overflow = 'hidden';
-  // document.addEventListener("touchmove",mo,{ passive: false });//禁止页面滑动
-}
-//取消滑动限制
-const move = () => {
-  var mo = function (e) {
-    e.preventDefault();
-  };
-  document.body.style.overflow = '';//出现滚动条
-  document.removeEventListener("touchmove", mo, false);
-}
-
 // 关闭下拉框
 const close = () => {
   // console.log(this.value1.getFullYear())
@@ -456,7 +439,7 @@ const close = () => {
   sortFlag.value = false
   selectFlag.value = false
   flag.value = false
-  move()
+  // move()
 }
 // 点击跳转新增页面
 const goAddData = () => {
@@ -478,7 +461,7 @@ const sortIncludes = computed(() => {
 
 // 点击出现下拉框
 const dropdown = (item) => {
-  stop()
+  // stop()
   // console.log(item,index,firstIndex.value)
   // console.log(this.chooseIndex,index)
   chooseIndex.value = item
@@ -516,7 +499,7 @@ const dropdown = (item) => {
       sortFlag.value = false
       selectFlag.value = false
       firstIndex.value = null
-      move()
+      // move()
       return
     }
     else {
@@ -564,9 +547,11 @@ const chooseMonth = (index, value) => {
       flag.value = false
       monthFlag.value = false
       sortFlag.value = false
-      copyData(siftDataTo,initDataTo)
+      // keep()
+      copyData(siftDataTo, initDataTo)
+      calendarFlag.value = false
       siftUserInfo(JSON.stringify(siftDataTo.value))
-      move()
+      // move()
     }
     else {
       calendarFlag.value = !calendarFlag.value
@@ -587,6 +572,17 @@ const onConfirm2 = (date) => {
   initDataTo.value.dateType.value.dateTo = date2.value
   console.log(date2.value)
 }
+// 选中自定义日期
+const confirmDate = () => {
+  console.log(initDataTo.value)
+  // keep()
+  copyData(siftDataTo, initDataTo)
+  // console.log(value,siftDataTo.value)
+  tabList.value[0] = '自定义'
+  siftUserInfo(JSON.stringify(siftDataTo.value))
+  calendarFlag.value = false
+  close()
+}
 // 中国标准时间 转换成 年月日
 const getSimpleDate = (date) => {
   var y = date.getFullYear();
@@ -605,21 +601,19 @@ const getSimpleDate = (date) => {
 // 选择排序字段
 const choosesort = (index, value) => {
   chooseDateIndex.value = value.text
+  console.log('+++++')
   // 再次点击相同索引，关闭下拉框
   if (sortIncludes.value.includes(chooseDateIndex.value)) {
-    // this.tabList[0] = value
     chooseIndex.value = null
     firstIndex.value = null
     if (tabList.value.length == 3)
       tabList.value[1] = value.text
     else
       tabList.value[0] = value.text
-    // this.$set(this.tabList,1,value.text)
     console.log(index)
     flag.value = false
     monthFlag.value = false
     sortFlag.value = false
-    move()
   }
 }
 
@@ -757,13 +751,40 @@ const checkedAll = () => {
   // console.log(chooseList.value,info.value.chooseList)
 }
 
-
+// 将actions2数组赋值
+const AJAX_UrlButton = (actions2) => {
+  actions2.value.length = 0
+  userInfoDataList.value.AJAX_Url.forEach(function (value, index) {
+    // console.log(value,index,actions2.value[index])
+    actions2.value.push({ name: value.text1 })
+  })
+  // console.log(userInfoDataList.value.AJAX_Url,actions2.value)
+}
 const transferOrder = () => {
   orderFlag.value = true
+  AJAX_UrlButton(actions2)
 }
 const edit = () => {
+  if(chooseList.value.length)
   editFlag.value = true
+else
+  showDialog({
+  message: '请选择数据',
+}).then(() => {
+  // on close
+});
+  // AJAX_UrlButton(actions)
   console.log('edit')
+}
+const del = () =>{
+  if(chooseList.value.length)
+   console.log('delete',chooseList.value.length)
+   else
+  showDialog({
+  message: '请选择数据',
+}).then(() => {
+  // on close
+});
 }
 // 重置选项为后端开始返回的值,只重置高级筛选内容
 const filter = ref(null)
@@ -827,7 +848,7 @@ const reset = () => {
   }
 }
 // 保存筛选框的值
-const saveData = async (Tformat) => {
+const saveData = async (Tformat,type) => {
   let formData = new FormData()
   formData.append('Tformnamecn', '1665')
   formData.append('Turl', 'YXKHGZB.ASPX')
@@ -836,7 +857,8 @@ const saveData = async (Tformat) => {
   formData.append('Tformat', Tformat)
   try {
     const res = await request.saveUserInfo(formData)
-    console.log(res)
+    // console.log(res)
+    if(type!=1)
     showToast(res.msg);
   }
   catch (err) {
@@ -869,8 +891,8 @@ const initDataTo = ref({
   },
 })
 
-const keep = () => {
-  // console.log(initDataTo.value.searchCondition,dateList.value)
+const keep = (type) => {
+  // console.log(filter.value)
   initDataTo.value.lcmxmc.length = 0
   initDataTo.value.searchCondition.length = 0
   // console.log(initDataTo.value.searchCondition)
@@ -963,10 +985,10 @@ const keep = () => {
       }
     }
   }
-  console.log(initDataTo.value)
+  // console.log(initDataTo.value)
   // JSON.stringify(initDataTo.value)
   // console.log('keep',  JSON.stringify(initDataTo.value))
-  saveData(JSON.stringify(initDataTo.value))
+  saveData(JSON.stringify(initDataTo.value),type)
 }
 // 筛选数据接口
 const siftUserInfo = async (Tformat) => {
@@ -983,7 +1005,7 @@ const siftUserInfo = async (Tformat) => {
   try {
     const res = await request.siftUserInfo(formData)
     isLoading.value = false
-    console.log(res.data.sum)
+    // console.log(res.data.sum)
     userInfoDataList.value.data = res.data.data
     // userInfoCard.value = res.data.data
     totalMoney.value = res.data.sum.value
@@ -994,7 +1016,7 @@ const siftUserInfo = async (Tformat) => {
     if (totalMoney.value > 10000)
       totalMoney.value = (totalMoney.value / 10000).toFixed(0).toString() + '万'
     // chooseList.length = 0
-    console.log(userInfoDataList.value.sum)
+    // console.log(userInfoDataList.value.sum)
   }
   catch (err) {
     console.log(err)
@@ -1004,7 +1026,7 @@ const siftUserInfo = async (Tformat) => {
 const siftDataTo = ref('')
 
 // 将initData值赋给siftData
-const copyData = (siftDataTo,initDataTo) =>{
+const copyData = (siftDataTo, initDataTo) => {
   // 深拷贝一个数组siftDataTo用于筛选数据
   siftDataTo.value = JSON.parse(JSON.stringify(initDataTo.value))
   siftDataTo.value.sum = { fieldname: sumFieldName.value, text: totalMoneyTitle.value }
@@ -1013,20 +1035,22 @@ const copyData = (siftDataTo,initDataTo) =>{
   console.log('sift', siftDataTo.value)
 }
 const sumFieldName = ref('')
-// 筛选模块弹窗关闭
+// 筛选模块弹窗关闭,需要调用keep函数，获取修改后的值
 const sift = () => {
   close()
-  keep()
-  copyData(siftDataTo,initDataTo)
+  keep(1)
+  copyData(siftDataTo, initDataTo)
   siftUserInfo(JSON.stringify(siftDataTo.value))
 }
 // 点击搜索数据
 const search = (value) => {
   // let formData = new FormData()
   // let data = {}
-  console.log(initDataTo.value)
+  // console.log(initDataTo.value)
   initDataTo.value.search.keyword = value
-  copyData(siftDataTo,initDataTo)
+  // console.log(filter.value)
+  // keep()
+  copyData(siftDataTo, initDataTo)
   // console.log(value,siftDataTo.value)
   siftUserInfo(JSON.stringify(siftDataTo.value))
 }

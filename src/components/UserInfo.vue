@@ -17,6 +17,7 @@
                         </div>
 
                         <small class="options">
+                            <!-- <a href="WAPYXKHGZB.ASPX?Tsystem_id=64DSSJTB"></a>   -->
                             {{ SYSTEM_LCMXMC[index] }}
                             <van-icon name="arrow" />
                         </small>
@@ -24,7 +25,7 @@
                     <van-divider />
                     <div class="card-content">
                         <div class="card-content1 m-t-8 p-l-12 p-r-12">
-                            <div class="address flex-l">
+                            <div class="address flex-l" v-if=" SHDD[index] ">
                                 <i class="van-badge__wrapper van-icon van-icon-location m-r-4 txt-gray"></i>
                                 <small class="addressed">{{ SHDD[index] }}</small>
                             </div>
@@ -33,13 +34,13 @@
                                 <div class="taglist flex flex-l">
                                     <div class="buyOptions m-r-4 m-b-4" v-for="(item) in BQ[index]">
                                         <div v-for="(item2) in item">
-                                            <van-tag color="#fff2e9" text-color="#fd9148" size="large" v-if="BQ[index]">
+                                            <van-tag color="#fff2e9" text-color="#fd9148" size="large" v-if="item2">
                                                 {{ item2 }}
                                             </van-tag>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="phone" @click.stop="callOut(LXDH[index])">
+                                <div class="phone" @click.stop="callOut(LXDH[index])" v-if="LXDH[index]">
                                     <!-- <img src="../assets/phone.svg" alt=""> -->
                                     <van-icon name="phone" class="txt-gray" />
                                     <small>{{ LXDH[index] }}</small>
@@ -70,13 +71,13 @@
                             <small>￥</small>
                             <span class="moneyDetails">{{ ZJE[index] }}</span>
                         </div>
-                        <div class="style3" v-if="AJAX_Url.length == 0">
+                        <div class="style3" v-if="AJAX_Url.length == 0 || AJAX_Url.length == 1">
                             <small class="titleMoney">销售金额</small>
                             <small>￥</small>
                             <span class="moneyDetails3">{{ ZJE[index] }}</span>
                         </div>
                         <div class="getDetails">
-                            <div class="style2" v-if="AJAX_Url.length != 2 && AJAX_Url.length != 0">
+                            <div class="style2" v-if="AJAX_Url.length == 3">
                                 <small class="titleMoney">销售金额</small>
                                 <small>￥</small>
                                 <span class="moneyDetails">{{ ZJE[index] }}</span>
@@ -87,6 +88,7 @@
                                         <button class="userDetails borders m-l-8" @click.stop="goDetails">{{
                                             item2.text1 }}</button>
                                     </div>
+                                    <!-- 为了只渲染一次，限制只有index2为零才渲染 -->
                                     <div v-if="AJAX_Url.length > 2 && index2 == 0">
                                         <button class="userDetails borders m-l-8" @click.stop="transferOrder">转单</button>
                                     </div>
@@ -101,6 +103,14 @@
                     </div>
                 </div>
             </div>
+            <div class="nomore" v-if="props.userInfoDataList.sum.count">
+                <!-- {{ KHBM }} -->
+                <span
+                    v-if="props.userInfoDataList.sum.count == props.userInfoDataList.data.length">没有更多了</span>
+                <van-loading v-else size="24px">加载中...</van-loading>
+            </div>
+
+            <van-empty v-if="!props.userInfoDataList.sum.count" description="没有数据了" />
         </van-pull-refresh>
         <!-- 用于唤起弹窗，拨打电话 -->
         <van-dialog v-model:show="show" show-cancel-button confirmButtonText="拨打电话" confirmButtonColor='#1890ff'
@@ -109,18 +119,15 @@
             <p class="callPhone">18173135078</p>
             <p class="phoneTips">为了保护数据的安全性，本次的操作被系统记录。</p>
         </van-dialog>
-
-        <div class="nomore">
-            <!-- {{ KHBM }} -->
-            <span v-if="props.userInfoDataList.sum.count==props.userInfoDataList.data.length || !props.userInfoDataList.data.length">没有更多了</span> 
-            <van-loading v-else />
-        </div>
     </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed, watch, onMounted } from 'vue'
 
+const onSelect = () => {
+  console.log(333)
+}
 const props = defineProps({
     userInfoDataList: Object,
     isLoad: Boolean,
@@ -137,23 +144,26 @@ watch(() => props.userInfoDataList, (value) => {
 })
 
 // 跳转值system界面
-
+const baseUrl = ref('http://dx.anywellchat.com:8888/ANYWELL_hylingls/')
 const goSystem = (index) => {
-    console.log(index)
+    console.log(SYSTEM_URL.value[index],index)
+    // http://dx.anywellchat.com:8888/anywell_hylingls/WAPYXKHGZB.ASPX?Tsystem_id=2023080414170266873090102c6ca   WAPYXKHGZB.ASPX?Tsystem_id=54DSSJTB
+    window.location.href = (baseUrl.value + SYSTEM_URL.value[index])
+    // window.open = (baseUrl.value,SYSTEM_URL.value[index])
+    // window.open("https://www.cnblogs.com/guorongtao/")
 }
 
 
 // 获取AJAX_Url按钮
 const AJAX_Url = computed(() => {
     let AJAX_Url = props.userInfoDataList.AJAX_Url
-    // console.log(AJAX_Url)
+    console.log(AJAX_Url.length)
     return AJAX_Url
 })
 
 // 客户名称筛选
 const KHMC = computed(() => {
     let KHMC = []
-    console.log(props.userInfoDataList.data.length)
     if (props.userInfoDataList.data != undefined && fieldName.value != undefined)
         for (let i = 0; i < props.userInfoDataList.data.length; i++) {
             for (let j = 0; j < fieldName.value.length; j++) {
@@ -176,6 +186,22 @@ const SYSTEM_LCMXMC = computed(() => {
         for (let i = 0; i < props.userInfoDataList.data.length; i++) {
             for (let j = 0; j < fieldName.value.length; j++) {
                 if (fieldName.value[j].type == '状态') {
+                    KHMC.push(props.userInfoDataList.data[i][fieldName.value[j].fieldname])
+                }
+            }
+        }
+    // console.log(KHMC)
+    return KHMC
+})
+
+// SYSTEM_URL链接跳转
+
+const SYSTEM_URL = computed(()=>{
+    let KHMC = []
+    if (props.userInfoDataList.data != undefined && fieldName.value != undefined)
+        for (let i = 0; i < props.userInfoDataList.data.length; i++) {
+            for (let j = 0; j < fieldName.value.length; j++) {
+                if (fieldName.value[j].type == 'SYSTEM_URL') {
                     KHMC.push(props.userInfoDataList.data[i][fieldName.value[j].fieldname])
                 }
             }
@@ -330,7 +356,7 @@ const KHBM = computed(() => {
                 }
             }
         }
-    // console.log(KHMC)
+    // console.log(KHMC.length)
     return KHMC
 })
 
@@ -376,13 +402,13 @@ const callOut = (phoneNum) => {
 const goDetails = () => {
     console.log(222)
     // console.log(userDataList.value[0].money.toString().replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g,'$1,'),formDate.value)
-    // this.$router.push({path: '/details', query: {selected: "2"}});
+    // this.$router.push({path: '/details', query: {selected: "2"}});  
 }
 
 // 将组件方法暴露给父组件,
 const emit = defineEmits(['transferOrder', 'checked', 'loadMore', 'onRefresh'])
 const transferOrder = () => {
-    // this.orderFlag = true
+    // orderFlag.value = true
     emit('transferOrder')
 }
 const loadMore = () => {
@@ -411,9 +437,9 @@ onMounted(() => {
     scrollRef.value.addEventListener('scroll', () => {
         const { scrollTop, offsetHeight, scrollHeight } = scrollRef.value
         // console.log(scrollTop, offsetHeight, scrollHeight,)
-        if (scrollTop + offsetHeight >= scrollHeight-1) {
+        if (scrollTop + offsetHeight >= scrollHeight - 1) {
             //滚动条到达底部
-            if(props.userInfoDataList.data.length< props.userInfoDataList.sum.count){
+            if (props.userInfoDataList.data.length < props.userInfoDataList.sum.count) {
                 loadMore()
             }
             console.log(props.userInfoDataList.data.length, props.userInfoDataList.sum.count)
@@ -430,6 +456,10 @@ defineExpose({
 .page-content {
     &::-webkit-scrollbar {
         display: none;
+    }
+
+    .van-pull-refresh {
+        overflow: none;
     }
 
     .card {
@@ -664,5 +694,4 @@ defineExpose({
         height: 90px;
         line-height: 30px;
     }
-}
-</style>
+}</style>
