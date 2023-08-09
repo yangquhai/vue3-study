@@ -6,20 +6,21 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref,watch } from 'vue'
 const value = ref('')
 // const flag = ref(['1','2','3'])
 const props = defineProps({
-  placeholder: String
+  placeholder: String,
+  keyword:String,
 })
 const emit = defineEmits(['search'])
 const onSearch = () => {
-  // console.log(props.placeholder)
+  console.log(props.keyword)
   emit('search', value.value)
 }
-const onCancel = () => {
-  console.log(222)
-} 
+watch(()=>props.keyword,(newVal)=>{
+  value.value = newVal
+})
 </script>
 
 <style lang="less" scoped>

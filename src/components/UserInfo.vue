@@ -692,6 +692,6 @@ defineExpose({
         text-align: center;
         font-size: var(--van-list-text-font-size);
         height: 90px;
-        line-height: 30px;
+        line-height: 20px;
     }
 }</style>

@@ -4,7 +4,7 @@
     <!-- <div class="mask" style="z-index:-1;background-color:rgb(239, 242, 245);"></div> -->
     <van-overlay z-index='100' :show="flag" @click="close" />
     <div style=" position: fixed;z-index:999;width:100%;">
-      <searchTab @search="search" :placeholder="placeholder"></searchTab>
+      <searchTab @search="search" :keyword="keyword" :placeholder="placeholder"></searchTab>
       <div class="dropdown">
         <div v-for="(item, index) in tabList" :key="index" class="dropdownList" @click="dropdown(item)"
           :style="{ 'color': (item != chooseIndex ? 'rgba(50, 50, 51, 1)' : '#1890ff') }">
@@ -166,6 +166,7 @@ const isLoading = ref(true)
 const chooseList = ref([])
 // 用户选择框
 const placeholder = ref('')
+const keyword = ref('')
 // 自定义month月份选择
 const monthList = ref(['昨日', '当日', '当周', '当月', '近30天', '当年', '全部', '自定义'])
 // 高级筛选流程列表
@@ -356,6 +357,7 @@ const getData = async () => {
       tabList.value = tabList.value.filter(item => item !== "排序")
     // console.log(sortList.value)
     placeholder.value = tabListData.value.search.text
+    keyword.value = tabListData.value.search.keyword
     // JSON.parse(JSON.stringify(b.value))将浅拷贝转换为深拷贝,此时改变procedureList的值不会影响tabListData的值
     procedureList.value = JSON.parse(JSON.stringify(tabListData.value.lcmxmc))
     totalMoney.value = userInfoDataList.value.sum.value
