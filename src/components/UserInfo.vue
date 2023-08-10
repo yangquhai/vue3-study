@@ -402,6 +402,13 @@ const callOut = (phoneNum) => {
 // 转单，转操作，转订单详细操作
 const goDetails = () => {
     console.log(props.userInfoDataList.AJAX_Url)
+//     dd.biz.util.openLink({
+//     url:"https://open.dingtalk.com/",//要打开链接的地址
+//     onSuccess : function(result) {
+//         /**/
+//     },
+//     onFail : function(err) {}
+// })
 }
 
 // 将组件方法暴露给父组件,
