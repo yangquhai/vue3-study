@@ -126,6 +126,7 @@
 
 <script setup>
 import { ref, reactive, computed, watch, onMounted } from 'vue'
+import axios from 'axios'
 import request from '_api'
 
 const props = defineProps({
@@ -405,24 +406,31 @@ const goDetails = () => {
 
 // 将组件方法暴露给父组件,
 const emit = defineEmits([ 'checked', 'loadMore', 'onRefresh'])
-// 转单接口一
-const transferOrderData = async (FC,tformname,tsystem_id,tmaintablename) => {
+// 转单接口一加载单据的接口
+const loadTransferOrderData = async (FC,tformname,tsystem_id,tmaintablename) => {
   let formData = new FormData()
   formData.append('tformname', tformname)
   formData.append('tsystem_id', tsystem_id)
   formData.append('tmaintablename', tmaintablename)
   formData.append('tflag', 1)
-  // formData.append('tflagLS', '')
-  try {
-    const res = await request.transferOrder(formData,FC)
-    console.log(111)
-  }
-  catch (err) {
-    console.log(JSON.stringify(err))
-    // console.log(err)
-  }
+  const res = await request.getTransferOrderData(formData,FC)
+  return res.data
 }
 
+// 转单接口二进行转单
+
+const changeTransferOrderData = async (FC,DT,formdata,tformname,ttablename,tsystem_id,tliuchengmc,TLIUCHENGMXMC) => {
+  let formData = new FormData()
+  formData.append('formdata',formdata)
+  formData.append('tformname', tformname)
+  formData.append('ttablename', ttablename)
+  formData.append('tsystem_id', tsystem_id)
+  formData.append('tliuchengmc', tliuchengmc)
+  formData.append('TLIUCHENGMXMC', TLIUCHENGMXMC)
+  formData.append('tselecteddatagridsstr', [])
+  const res = await request.changeTransferOrderData(formData,FC,DT)
+  console.log(res)
+}
 
 
 const actions2 = ref([])
@@ -444,10 +452,19 @@ const AJAX_UrlButton = (actions2) => {
 }
 const transferOrderIndex = ref('')
 // 点击获取转单操作
-const onSelect = (item) => {
-  console.log(transferOrderIndex.value,props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID)
+const onSelect = async(item) => {
+  // console.log(transferOrderIndex.value,props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID)
   console.log(item)
-  // transferOrderData(item.tformname,item.tformname,props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID,item.tmaintablename)
+  const data =  await loadTransferOrderData(item.tformname,item.tformname,props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID,item.tmaintablename)
+  console.log(JSON.stringify(data))
+  const data2 = await changeTransferOrderData(item.tformname,item.dt,JSON.stringify(data),
+  item.tformname,
+  item.tmaintablename,
+  props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID,
+  props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_LCMC,
+  props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_LCMXMC_ORG,
+  )
+  console.log(data2)
 }
 
 

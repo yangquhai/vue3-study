@@ -1,4 +1,5 @@
 import request from '_request'
+import axios from 'axios'
 import { useRoute } from 'vue-router'
 
 let route = null
@@ -96,13 +97,24 @@ export function siftUserInfo(params) {
     return request.post(APIFiles.colloborationList, '/data/list_bill_wap.aspx?Tmethod=getlist.gz.data', params, contentType.FormData)
 }
 
-/***-转单-***/
 
-export function transferOrder(params,FC) {
-    // 打包上传
-    // return request.post(APIFiles.colloborationList, 'getlist.gz.data',params, contentType.FormData)
-    return request.post(APIFiles.colloborationList, `/ForceCheckScript/FC_${FC}?Tmethod=FormLoad`, params, contentType.FormData)
+
+// export function transferOrder(params,FC) {
+//     // 打包上传
+//     // return request.post(APIFiles.colloborationList, 'getlist.gz.data',params, contentType.FormData)
+//     return request.post(APIFiles.colloborationList, `/ForceCheckScript/FC_${FC}?Tmethod=FormLoad`, params, contentType.FormData)
+// }
+/***-转单接口一-***/
+export function  getTransferOrderData(params,FC) {
+   let data =  axios({url: `/api/ForceCheckScript/FC_${FC}?Tmethod=FormLoad`,method:'post', data:  params})
+    return data
 }
+
+/***-转单接口二-***/
+export function  changeTransferOrderData(params,FC,DT) {
+    let data =  axios({ url: `/api/ForceCheckScript/FC_${FC}?Tmethod=CFCLICK_${DT}`,method:'post', data:  params})
+    return data
+ }
 
 export default {
     getImplementationProcess,
@@ -115,5 +127,6 @@ export default {
     getUserInfo,
     saveUserInfo,
     siftUserInfo,
-    transferOrder
+    getTransferOrderData,
+    changeTransferOrderData
 }
