@@ -25,7 +25,7 @@
                     <van-divider />
                     <div class="card-content">
                         <div class="card-content1 m-t-8 p-l-12 p-r-12">
-                            <div class="address flex-l" v-if=" SHDD[index] ">
+                            <div class="address flex-l" v-if="SHDD[index]">
                                 <i class="van-badge__wrapper van-icon van-icon-location m-r-4 txt-gray"></i>
                                 <small class="addressed">{{ SHDD[index] }}</small>
                             </div>
@@ -90,7 +90,8 @@
                                     </div>
                                     <!-- 为了只渲染一次，限制只有index2为零才渲染 -->
                                     <div v-if="AJAX_Url.length > 2 && index2 == 0">
-                                        <button class="userDetails borders m-l-8" @click.stop="transferOrder(index)">转单</button>
+                                        <button class="userDetails borders m-l-8"
+                                            @click.stop="transferOrder(index)">转单</button>
                                     </div>
                                     <div v-if="index2 == 0">
                                         <button class="userDetails order m-l-8" @click.stop="goDetails">
@@ -105,8 +106,7 @@
             </div>
             <div class="nomore" v-if="props.userInfoDataList.sum.count">
                 <!-- {{ KHBM }} -->
-                <span
-                    v-if="props.userInfoDataList.sum.count == props.userInfoDataList.data.length">没有更多了</span>
+                <span v-if="props.userInfoDataList.sum.count == props.userInfoDataList.data.length">没有更多了</span>
                 <van-loading v-else size="24px">加载中...</van-loading>
             </div>
 
@@ -147,7 +147,7 @@ watch(() => props.userInfoDataList, (value) => {
 // 跳转值system界面
 const baseUrl = ref('http://dx.anywellchat.com:8888/ANYWELL_hylingls/')
 const goSystem = (index) => {
-    console.log(SYSTEM_URL.value[index],index)
+    console.log(SYSTEM_URL.value[index], index)
     // http://dx.anywellchat.com:8888/anywell_hylingls/WAPYXKHGZB.ASPX?Tsystem_id=2023080414170266873090102c6ca   WAPYXKHGZB.ASPX?Tsystem_id=54DSSJTB
     window.location.href = (baseUrl.value + SYSTEM_URL.value[index])
     // window.open = (baseUrl.value,SYSTEM_URL.value[index])
@@ -197,7 +197,7 @@ const SYSTEM_LCMXMC = computed(() => {
 
 // SYSTEM_URL链接跳转
 
-const SYSTEM_URL = computed(()=>{
+const SYSTEM_URL = computed(() => {
     let KHMC = []
     if (props.userInfoDataList.data != undefined && fieldName.value != undefined)
         for (let i = 0; i < props.userInfoDataList.data.length; i++) {
@@ -405,33 +405,38 @@ const goDetails = () => {
 }
 
 // 将组件方法暴露给父组件,
-const emit = defineEmits([ 'checked', 'loadMore', 'onRefresh'])
+const emit = defineEmits(['checked', 'loadMore', 'onRefresh'])
 // 转单接口一加载单据的接口
-const loadTransferOrderData = async (FC,tformname,tsystem_id,tmaintablename) => {
-  let formData = new FormData()
-  formData.append('tformname', tformname)
-  formData.append('tsystem_id', tsystem_id)
-  formData.append('tmaintablename', tmaintablename)
-  formData.append('tflag', 1)
-  const res = await request.getTransferOrderData(formData,FC)
-  return res.data
+const loadTransferOrderData = async (FC, tformname, tsystem_id, tmaintablename) => {
+    let formData = new FormData()
+    formData.append('tformname', tformname)
+    formData.append('tsystem_id', tsystem_id)
+    formData.append('tmaintablename', tmaintablename)
+    formData.append('tflag', 1)
+    const res = await request.getTransferOrderData(formData, FC)
+    return res.data
 }
 
 // 转单接口二进行转单
 
-const changeTransferOrderData = async (FC,DT,formdata,tformname,ttablename,tsystem_id,tliuchengmc,TLIUCHENGMXMC) => {
-  let formData = new FormData()
-  formData.append('formdata',formdata)
-  formData.append('tformname', tformname)
-  formData.append('ttablename', ttablename)
-  formData.append('tsystem_id', tsystem_id)
-  formData.append('tliuchengmc', tliuchengmc)
-  formData.append('TLIUCHENGMXMC', TLIUCHENGMXMC)
-  formData.append('tselecteddatagridsstr',JSON.stringify([]))
-  // formData.append('tselecteddatagridsstr', [])
-  const res = await request.changeTransferOrderData(formData,FC,DT)
-  // console.log(res)
-  return res.data
+const changeTransferOrderData = async (FC, DT, formdata, tformname, ttablename, tsystem_id, tliuchengmc, TLIUCHENGMXMC) => {
+    let formData = new FormData()
+    formData.append('formdata', formdata)
+    formData.append('tformname', tformname)
+    formData.append('ttablename', ttablename)
+    formData.append('tsystem_id', tsystem_id)
+    formData.append('tliuchengmc', tliuchengmc)
+    formData.append('TLIUCHENGMXMC', TLIUCHENGMXMC)
+    formData.append('tselecteddatagridsstr', JSON.stringify([]))
+    try {
+        const res = await request.changeTransferOrderData(formData, FC, DT)
+        // console.log(res)
+        return res.data
+    }
+    catch (err) {
+        console.log(err)
+    }
+    // formData.append('tselecteddatagridsstr', [])
 }
 
 
@@ -445,33 +450,39 @@ const transferOrder = (index) => {
 }
 // 将actions2数组赋值
 const AJAX_UrlButton = (actions2) => {
-  actions2.value.length = 0
-  props.userInfoDataList.AJAX_Url.forEach(function (value, index) {
-    // console.log(value,index)
-    actions2.value.push({ name: value.text1, tformname:value.name, tmaintablename: value.tablename, dt: value.dt})
-  })
-  // console.log(userInfoDataList.value.AJAX_Url,actions2.value)
+    actions2.value.length = 0
+    props.userInfoDataList.AJAX_Url.forEach(function (value, index) {
+        // console.log(value,index)
+        actions2.value.push({ name: value.text1, tformname: value.name, tmaintablename: value.tablename, dt: value.dt })
+    })
+    // console.log(userInfoDataList.value.AJAX_Url,actions2.value)
 }
 const transferOrderIndex = ref('')
 // 点击获取转单操作
-const onSelect = async(item) => {
-  // console.log(transferOrderIndex.value,props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID)
-  // console.log(item)
-  const data =  await loadTransferOrderData(item.tformname,item.tformname,props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID,item.tmaintablename)
-  // console.log(JSON.stringify(data))
-  const data2 = await changeTransferOrderData(item.tformname,item.dt,JSON.stringify(data),
-  item.tformname,
-  item.tmaintablename,
-  props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID,
-  props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_LCMC,
-  props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_LCMXMC_ORG,
-  )
-  console.log(data2.PAPA3)
-  // window.location.href = ('http://www.baidu.com')
-  if(data2.PAPA3)
-  window.location.href = (baseUrl.value + data2.PAPA3)
-  else
-  showToast(data2.MSG)
+const onSelect = async (item) => {
+    // console.log(transferOrderIndex.value,props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID)
+    // console.log(item)
+    const data = await loadTransferOrderData(item.tformname, item.tformname, props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID, item.tmaintablename)
+    // console.log(JSON.stringify(data))
+    const data2 = await changeTransferOrderData(item.tformname, item.dt, JSON.stringify(data),
+        item.tformname,
+        item.tmaintablename,
+        props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID,
+        props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_LCMC,
+        props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_LCMXMC_ORG,
+    )
+    try {
+        console.log(data2.PAPA3)
+        // window.location.href = ('http://www.baidu.com')
+        if (data2.PAPA3)
+            window.location.href = (baseUrl.value + data2.PAPA3)
+        else
+            showToast(data2.MSG)
+    }
+    catch (err) {
+        console.log(err)
+    }
+
 }
 
 
@@ -758,4 +769,5 @@ defineExpose({
         height: 90px;
         line-height: 20px;
     }
-}</style>
+}
+</style>
