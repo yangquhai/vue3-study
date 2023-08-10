@@ -90,7 +90,7 @@
                                     </div>
                                     <!-- 为了只渲染一次，限制只有index2为零才渲染 -->
                                     <div v-if="AJAX_Url.length > 2 && index2 == 0">
-                                        <button class="userDetails borders m-l-8" @click.stop="transferOrder">转单</button>
+                                        <button class="userDetails borders m-l-8" @click.stop="transferOrder(index)">转单</button>
                                     </div>
                                     <div v-if="index2 == 0">
                                         <button class="userDetails order m-l-8" @click.stop="goDetails">
@@ -119,15 +119,15 @@
             <p class="callPhone">18173135078</p>
             <p class="phoneTips">为了保护数据的安全性，本次的操作被系统记录。</p>
         </van-dialog>
+        <!-- 用于转单链接 -->
+        <van-action-sheet v-model:show="orderFlag" :actions="actions2" @select="onSelect" cancel-text="取消" />
     </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed, watch, onMounted } from 'vue'
+import request from '_api'
 
-const onSelect = () => {
-  console.log(333)
-}
 const props = defineProps({
     userInfoDataList: Object,
     isLoad: Boolean,
@@ -400,17 +400,57 @@ const callOut = (phoneNum) => {
 
 // 转单，转操作，转订单详细操作
 const goDetails = () => {
-    console.log(222)
-    // console.log(userDataList.value[0].money.toString().replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g,'$1,'),formDate.value)
-    // this.$router.push({path: '/details', query: {selected: "2"}});  
+    console.log(props.userInfoDataList.AJAX_Url)
 }
 
 // 将组件方法暴露给父组件,
-const emit = defineEmits(['transferOrder', 'checked', 'loadMore', 'onRefresh'])
-const transferOrder = () => {
-    // orderFlag.value = true
-    emit('transferOrder')
+const emit = defineEmits([ 'checked', 'loadMore', 'onRefresh'])
+// 转单接口一
+const transferOrderData = async (FC,tformname,tsystem_id,tmaintablename) => {
+  let formData = new FormData()
+  formData.append('tformname', tformname)
+  formData.append('tsystem_id', tsystem_id)
+  formData.append('tmaintablename', tmaintablename)
+  formData.append('tflag', 1)
+  // formData.append('tflagLS', '')
+  try {
+    const res = await request.transferOrder(formData,FC)
+    console.log(111)
+  }
+  catch (err) {
+    console.log(JSON.stringify(err))
+    // console.log(err)
+  }
 }
+
+
+
+const actions2 = ref([])
+const orderFlag = ref(false)
+const transferOrder = (index) => {
+    orderFlag.value = true
+    // console.log(index)
+    transferOrderIndex.value = index
+    AJAX_UrlButton(actions2)
+}
+// 将actions2数组赋值
+const AJAX_UrlButton = (actions2) => {
+  actions2.value.length = 0
+  props.userInfoDataList.AJAX_Url.forEach(function (value, index) {
+    // console.log(value,index)
+    actions2.value.push({ name: value.text1, tformname:value.name, tmaintablename: value.tablename, dt: value.dt})
+  })
+  // console.log(userInfoDataList.value.AJAX_Url,actions2.value)
+}
+const transferOrderIndex = ref('')
+// 点击获取转单操作
+const onSelect = (item) => {
+  console.log(transferOrderIndex.value,props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID)
+  console.log(item)
+  // transferOrderData(item.tformname,item.tformname,props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID,item.tmaintablename)
+}
+
+
 const loadMore = () => {
     emit('loadMore')
 }

@@ -147,10 +147,10 @@
         <button class="button2" @click="goAddData" v-if="tabListData.newUrl">新增</button>
       </div>
       <van-action-sheet v-model:show="editFlag" :actions="actions" @select="onSelect" cancel-text="取消" />
-      <van-action-sheet v-model:show="orderFlag" :actions="actions2" @select="onSelect" cancel-text="取消" />
+      <!-- <van-action-sheet v-model:show="orderFlag" :actions="actions2" @select="onSelect" cancel-text="取消" /> -->
     </div>
     <skeleton v-if="isLoading"></skeleton>
-    <userInfo class="userInfo" ref="info" @checked="checked" @transferOrder="transferOrder" :isLoad="isLoading" v-else
+    <userInfo class="userInfo" ref="info" @checked="checked" :isLoad="isLoading" v-else
       @loadMore="loadMore" :userInfoDataList="userInfoDataList"></userInfo>
   </div>
 </template>
@@ -450,6 +450,12 @@ const goAddData = () => {
   // window.open = (this.baseUrl + this.tabListData.newUrl,"blank")
   // window.location.href = ('http://www.baidu.com')
   window.location.href = (baseUrl.value + tabListData.value.newUrl)
+  //   dd.openLink({
+  //   url: 'http://www.dingtalk.com',
+  //   success: () => {},
+  //   fail: () => {},
+  //   complete: () => {},
+  // });
 }
 
 // 用于判断sortList中是否存在item索引
@@ -704,9 +710,6 @@ const chooseDataTag = (index, index2, value) => {
   // console.log(lastClick.value)
 }
 
-const onSelect = () => {
-  console.log(333)
-}
 // 计算选中的金额,以及全选与反选
 const chooseTotalMoney = ref(0)
 const info = ref(null);
@@ -753,19 +756,16 @@ const checkedAll = () => {
   // console.log(chooseList.value,info.value.chooseList)
 }
 
-// 将actions2数组赋值
-const AJAX_UrlButton = (actions2) => {
-  actions2.value.length = 0
-  userInfoDataList.value.AJAX_Url.forEach(function (value, index) {
-    // console.log(value,index,actions2.value[index])
-    actions2.value.push({ name: value.text1 })
-  })
-  // console.log(userInfoDataList.value.AJAX_Url,actions2.value)
-}
 const transferOrder = () => {
-  orderFlag.value = true
-  AJAX_UrlButton(actions2)
+  // orderFlag.value = true
+  // AJAX_UrlButton(actions2)
 }
+// 点击获取转单操作
+const onSelect = (item) => {
+  console.log(item)
+  // transferOrderData(item.tformname)
+}
+
 const edit = () => {
   if(chooseList.value.length)
   editFlag.value = true
@@ -778,15 +778,17 @@ else
   // AJAX_UrlButton(actions)
   console.log('edit')
 }
+
 const del = () =>{
-  if(chooseList.value.length)
-   console.log('delete',chooseList.value.length)
+  if(chooseList.value.length){
+    console.log('delete',chooseList.value.length)
+  }
    else
-  showDialog({
-  message: '请选择数据',
-}).then(() => {
-  // on close
-});
+      showDialog({
+      message: '请选择数据',
+    }).then(() => {
+      // on close
+    });
 }
 // 重置选项为后端开始返回的值,只重置高级筛选内容
 const filter = ref(null)

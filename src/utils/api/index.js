@@ -96,6 +96,14 @@ export function siftUserInfo(params) {
     return request.post(APIFiles.colloborationList, '/data/list_bill_wap.aspx?Tmethod=getlist.gz.data', params, contentType.FormData)
 }
 
+/***-转单-***/
+
+export function transferOrder(params,FC) {
+    // 打包上传
+    // return request.post(APIFiles.colloborationList, 'getlist.gz.data',params, contentType.FormData)
+    return request.post(APIFiles.colloborationList, `/ForceCheckScript/FC_${FC}?Tmethod=FormLoad`, params, contentType.FormData)
+}
+
 export default {
     getImplementationProcess,
     uploadImplImg,
@@ -106,5 +114,6 @@ export default {
     confirmCheckInATakePhotosData,
     getUserInfo,
     saveUserInfo,
-    siftUserInfo
+    siftUserInfo,
+    transferOrder
 }

@@ -92,7 +92,7 @@ const routes = [
         name: 'WapList',
         component: WapList,
         meta: {
-            title:`意向客户跟踪列表`
+            title:'意向客户跟踪列表'
         },
         // beforeEnter: (to, from, next) => {
         //     document.title = to.params.Ttablename  // 根据页面状态设置标题
