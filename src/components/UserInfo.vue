@@ -427,7 +427,8 @@ const changeTransferOrderData = async (FC,DT,formdata,tformname,ttablename,tsyst
   formData.append('tsystem_id', tsystem_id)
   formData.append('tliuchengmc', tliuchengmc)
   formData.append('TLIUCHENGMXMC', TLIUCHENGMXMC)
-  formData.append('tselecteddatagridsstr', [])
+  formData.append('tselecteddatagridsstr',JSON.stringify([]))
+  // formData.append('tselecteddatagridsstr', [])
   const res = await request.changeTransferOrderData(formData,FC,DT)
   console.log(res)
 }
