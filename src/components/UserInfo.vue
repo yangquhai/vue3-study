@@ -126,8 +126,8 @@
 
 <script setup>
 import { ref, reactive, computed, watch, onMounted } from 'vue'
-import axios from 'axios'
 import request from '_api'
+import { showToast } from 'vant';
 
 const props = defineProps({
     userInfoDataList: Object,
@@ -430,7 +430,8 @@ const changeTransferOrderData = async (FC,DT,formdata,tformname,ttablename,tsyst
   formData.append('tselecteddatagridsstr',JSON.stringify([]))
   // formData.append('tselecteddatagridsstr', [])
   const res = await request.changeTransferOrderData(formData,FC,DT)
-  console.log(res)
+  // console.log(res)
+  return res.data
 }
 
 
@@ -455,9 +456,9 @@ const transferOrderIndex = ref('')
 // 点击获取转单操作
 const onSelect = async(item) => {
   // console.log(transferOrderIndex.value,props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID)
-  console.log(item)
+  // console.log(item)
   const data =  await loadTransferOrderData(item.tformname,item.tformname,props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID,item.tmaintablename)
-  console.log(JSON.stringify(data))
+  // console.log(JSON.stringify(data))
   const data2 = await changeTransferOrderData(item.tformname,item.dt,JSON.stringify(data),
   item.tformname,
   item.tmaintablename,
@@ -465,7 +466,12 @@ const onSelect = async(item) => {
   props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_LCMC,
   props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_LCMXMC_ORG,
   )
-  console.log(data2)
+  console.log(data2.PAPA3)
+  // window.location.href = ('http://www.baidu.com')
+  if(data2.PAPA3)
+  window.location.href = (baseUrl.value + data2.PAPA3)
+  else
+  showToast(data2.MSG)
 }
 
 
