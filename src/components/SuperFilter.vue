@@ -60,9 +60,9 @@ const customFieldName = {
 const textValues = ref([])
 const selectValues = ref([])
 const props = defineProps({
-    tabListData: Object
+    tabListData: Object,
 })
-// console.log(props.tabListData)
+// console.log(props.selectList)
 // 用于筛选出type为select的数据，形成新的数组渲染
 const selectList = computed(() => {
     let selectList = []

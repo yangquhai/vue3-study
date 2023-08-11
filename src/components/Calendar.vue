@@ -20,15 +20,19 @@ const value1 = ref(false)
 const value2 = ref(false)
 const minDate = ref(new Date(2020, 0, 1))
 const maxDate = ref(new Date(2025, 0, 31))
+// 将组件方法暴露给父组件,
+const emit = defineEmits(['onConfirmDate', 'onConfirmDate2'])
 const onConfirm = (date) => {
   value1.value = false;
   date1.value = getSimpleDate(date);
-  console.log(date1.value)
+  emit('onConfirmDate', date1.value)
+  // console.log(date1.value)
 }
 const onConfirm2 = (date) => {
   value2.value = false;
   date2.value = getSimpleDate(date);
-  console.log(date2.value)
+  emit('onConfirmDate2', date2.value)
+  // console.log(date2.value)
 }
 const getSimpleDate = (date) => {
   var y = date.getFullYear();
@@ -42,8 +46,7 @@ const getSimpleDate = (date) => {
   var s = date.getSeconds();
   s = s < 10 ? '0' + s : s;
   return y + '-' + m + '-' + d;
-}
-
+} 
 </script>
 
 <style lang="less" scoped>

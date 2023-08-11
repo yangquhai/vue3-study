@@ -14,11 +14,13 @@
           <img src="https://api.iconify.design/ic:baseline-arrow-drop-up.svg?color=%231989fa" alt="" style=""
             v-if="item == chooseIndex">
         </div>
-          <div v-else class="skeleton">
-            <van-skeleton-paragraph class="paragraphTitle" row-width="30%" style="background-color: #f2f3f5" />
-            <van-skeleton-paragraph class="paragraphTitle" row-width="30%" style="background-color: #f2f3f5;margin-top: 0px;" />
-            <van-skeleton-paragraph class="paragraphTitle" row-width="30%" style="margin-top: 0px; background-color: #f2f3f5" />
-          </div>
+        <div v-else class="skeleton">
+          <van-skeleton-paragraph class="paragraphTitle" row-width="30%" style="background-color: #f2f3f5" />
+          <van-skeleton-paragraph class="paragraphTitle" row-width="30%"
+            style="background-color: #f2f3f5;margin-top: 0px;" />
+          <van-skeleton-paragraph class="paragraphTitle" row-width="30%"
+            style="margin-top: 0px; background-color: #f2f3f5" />
+        </div>
       </div>
     </div>
     <transition>
@@ -100,7 +102,7 @@
                 }}</van-tag>
               </div>
             </div>
-            <calendar v-if="calendarFlag2"></calendar>
+            <calendar v-if="calendarFlag2" @onConfirmDate="onConfirmDate" @onConfirmDate2="onConfirmDate2"></calendar>
           </div>
           <van-divider></van-divider>
 
@@ -135,21 +137,34 @@
       </div>
     </transition>
     <div class="bottom" :style="{ 'border-bottom': isIos ? '0.3rem solid white' : '' }">
-      <div class="checkbox" :style="{ 'border': checkAllFlag ? 'solid 1px #ffffff' : 'solid 1px rgba(226, 226, 226, 1)' }"
-        @click.stop="checkedAll">
-        <van-icon v-show="checkAllFlag" name="success" />
-      </div>
-      <div class="total" @click.stop="checkedAll">
-        <div class="number">
-          共{{ count }}条,已选{{ chooseList.length }}条
+      <div v-if="!isLoading" style="position: relative;width: 100%; display: flex;align-items: center;">
+        <div class="checkbox"
+          :style="{ 'border': checkAllFlag ? 'solid 1px #ffffff' : 'solid 1px rgba(226, 226, 226, 1)' }"
+          @click.stop="checkedAll">
+          <van-icon v-show="checkAllFlag" name="success" />
         </div>
-        <div class="number">{{ totalMoneyTitle }}共<span v-if="!chooseList.length">{{ totalMoney }}</span> <span v-else>{{
-          chooseTotalMoney }}</span> </div>
+        <div class="total" @click.stop="checkedAll">
+          <div class="number">
+            共{{ count }}条,已选{{ chooseList.length }}条
+          </div>
+          <div class="number">{{ totalMoneyTitle }}共<span v-if="!chooseList.length">{{ totalMoney }}</span> <span
+              v-else>{{
+                chooseTotalMoney }}</span> </div>
+        </div>
+        <div class="userOptions">
+          <button class="button1" @click="del">删除</button>
+          <button class="button3" @click="edit">批量操作</button>
+          <button class="button2" @click="goAddData" v-if="tabListData.newUrl">新增</button>
+        </div>
       </div>
-      <div class="userOptions">
-        <button class="button1" @click="del">删除</button>
-        <button class="button3" @click="edit">批量操作</button>
-        <button class="button2" @click="goAddData" v-if="tabListData.newUrl">新增</button>
+      <div v-else class="skeleton">
+        <van-skeleton-paragraph class="paragraphTitle" row-width="30%" style="background-color: #f2f3f5" />
+        <van-skeleton-paragraph class="paragraphTitle2 paragraphTitle" row-width="20%"
+          style="background-color: #f2f3f5;margin-top: 0px;" />
+        <van-skeleton-paragraph class="paragraphTitle2 paragraphTitle" row-width="20%"
+          style="background-color: #f2f3f5;margin-top: 0px;" />
+        <van-skeleton-paragraph class="paragraphTitle2 paragraphTitle" row-width="20%"
+          style="background-color: #f2f3f5;margin-top: 0px;" />
       </div>
       <van-action-sheet v-model:show="editFlag" :actions="actions" @select="onSelect" cancel-text="取消" />
     </div>
@@ -378,6 +393,52 @@ const getData = async () => {
 
 getData()
 
+// 点击获取转单操作
+const tsystem_idlist = ref('')
+const onSelect = async (item) => {
+  let Tsystem_ids = "";
+  for (let i = 0; i < chooseSYSTEM_ID.value.length; i++) {
+    Tsystem_ids += chooseSYSTEM_ID.value[i] + ",";
+  }
+  Tsystem_ids = Tsystem_ids.substring(0, Tsystem_ids.length - 1);
+  let formData = new FormData()
+  formData.append('Tformnamecn', '1665')
+  formData.append('Turl', 'YXKHGZB.ASPX')
+  formData.append('Ttablename', 'YXKHGZB')
+  formData.append('Tsystem_lcmc', '意向客户跟踪表')
+  formData.append('Tsystem_ids', Tsystem_ids)
+  try {
+    const res = await request.batchOperation(formData)
+    tsystem_idlist.value = res.data.data
+  }
+  catch (err) {
+    console.log(err)
+  }
+  // console.log(item)
+  // console.log(chooseSYSTEM_ID.value)
+  let Turl = 'YXKHGZB.ASPX'
+  if (item.name == '批量审批') {
+    // console.log(baseUrl.value + `${Turl}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
+    window.location.href = (baseUrl.value + `${Turl}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
+  }
+  else {
+    // console.log(baseUrl.value + `${Turl}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
+    window.location.href = (baseUrl.value + `${Turl}?Tflag=8&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
+  }
+}
+
+const edit = () => {
+  if (chooseList.value.length) {
+    editFlag.value = true
+  }
+  else
+    showDialog({
+      message: '请选择数据',
+    }).then(() => {
+      // on close
+    });
+}
+
 // 加载更多数据
 const conactArray = ref([])
 const pageIndex = ref(1)
@@ -429,7 +490,6 @@ const dateList = computed(() => {
   return dateList
 })
 
-
 // 关闭下拉框
 const close = () => {
   // console.log(this.value1.getFullYear())
@@ -449,6 +509,8 @@ const goAddData = () => {
   // window.open = (this.baseUrl + this.tabListData.newUrl,"blank")
   // window.location.href = ('http://www.baidu.com')
   window.location.href = (baseUrl.value + tabListData.value.newUrl)
+
+  // window.open("https://www.cnblogs.com/guorongtao/");
   //   dd.openLink({
   //   url: 'http://www.dingtalk.com',
   //   success: () => {},
@@ -711,14 +773,17 @@ const chooseDataTag = (index, index2, value) => {
 
 // 计算选中的金额,以及全选与反选
 const chooseTotalMoney = ref(0)
+const chooseSYSTEM_ID = ref([])
+// 获取userinfo属性
 const info = ref(null);
-const checked = (val) => {
+const checked = (val, SYSTEM_ID) => {
   chooseTotalMoney.value = 0
-  // console.log(val)
+  // console.log(val,SYSTEM_ID)
   // chooseList.value.push(val)
   let chooseTotalMoneyList = []
   chooseList.value = val
-  // console.log(chooseList.value)
+  chooseSYSTEM_ID.value = SYSTEM_ID
+  // console.log(chooseList.value,chooseSYSTEM_ID.value)
   for (let i = 0; i < userInfoDataList.value.data.length; i++) {
     // console.log(userInfoDataList.value.data[i].rn)
     for (let j = 0; j < chooseList.value.length; j++) {
@@ -755,28 +820,9 @@ const checkedAll = () => {
   // console.log(chooseList.value,info.value.chooseList)
 }
 
-// 点击获取转单操作
-const onSelect = (item) => {
-  console.log(item)
-  // transferOrderData(item.tformname)
-}
-
-const edit = () => {
-  if (chooseList.value.length)
-    editFlag.value = true
-  else
-    showDialog({
-      message: '请选择数据',
-    }).then(() => {
-      // on close
-    });
-  // AJAX_UrlButton(actions)
-  console.log('edit')
-}
-
 const del = () => {
   if (chooseList.value.length) {
-    console.log('delete', chooseList.value.length)
+    console.log('delete', chooseList.value)
   }
   else
     showDialog({
@@ -888,6 +934,17 @@ const initDataTo = ref({
     }
   },
 })
+// 日期框选择的日期
+const conditionDate = ref('')
+const conditionDate2 = ref('')
+const onConfirmDate = (val) => {
+  console.log(val)
+  conditionDate.value = val
+}
+const onConfirmDate2 = (val) => {
+  console.log(val)
+  conditionDate2.value = val
+}
 // 将用户选择的数据收集起来,后续用于保存还是筛选分不同的点击
 const keepData = () => {
   // console.log(filter.value)
@@ -916,8 +973,16 @@ const keepData = () => {
       if (dateList.value[i].values[j].select) {
         // console.log(dateList.value[i].values[j])
         initDataTo.value.searchCondition[i].values.value = dateList.value[i].values[j].value
-        initDataTo.value.searchCondition[i].values.dateFrom = dateList.value[i].values[j].dateFrom
-        initDataTo.value.searchCondition[i].values.dateTo = dateList.value[i].values[j].dateTo
+        if (dateList.value[i].values[j].value == '自定义') {
+          if (conditionDate.value && conditionDate2.value) {
+            initDataTo.value.searchCondition[i].values.dateFrom = conditionDate.value
+            initDataTo.value.searchCondition[i].values.dateTo = conditionDate2.value
+          }
+          else {
+            initDataTo.value.searchCondition[i].values.dateFrom = dateList.value[i].values[j].dateFrom.split('T')[0]
+            initDataTo.value.searchCondition[i].values.dateTo = dateList.value[i].values[j].dateTo.split('T')[0]
+          }
+        }
       }
     }
     // console.log(initDataTo.value.searchCondition)
@@ -988,7 +1053,7 @@ const keepData = () => {
   // console.log('keep',  JSON.stringify(initDataTo.value))
   // saveData(JSON.stringify(initDataTo.value))
 }
-const keep = () =>{
+const keep = () => {
   keepData()
   saveData(JSON.stringify(initDataTo.value))
 }
@@ -1095,6 +1160,7 @@ const search = (value) => {
       height: 21px;
       // margin-left: 40px;
     }
+
     .dropdownList {
       display: flex;
       align-items: center;
@@ -1107,15 +1173,18 @@ const search = (value) => {
       font-size: 12px;
       position: relative;
     }
+
     .skeleton {
-      display: flex; align-items: flex-start; 
-      position: relative; 
+      display: flex;
+      align-items: flex-start;
+      position: relative;
       justify-content: space-between;
       width: 100%;
       margin: 0px 12px 0px 12px;
+
       .paragraphTitle {
         height: 20px;
-     }
+      }
     }
   }
 
@@ -1394,6 +1463,28 @@ const search = (value) => {
     z-index: 50;
     background-color: white;
     height: 50px;
+
+    .skeleton {
+      width: 100%;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      // margin-left: 38px;
+      // border: solid 1px red;
+      margin-top: 6px;
+      margin-left: 12px;
+
+      .paragraphTitle {
+        background-color: #f2f3f5;
+        height: 35px;
+        margin-right: 12px;
+      }
+
+      .paragraphTitle2 {
+        border-radius: 16px;
+        height: 30px;
+      }
+    }
   }
 }
 </style>

@@ -8,7 +8,7 @@
                         <div class="checked flex">
                             <div class="checkBorder"
                                 :style="{ 'border': (chooseList.includes(item.rn) ? 'solid 1px #ffffff' : 'solid 1px rgba(226, 226, 226, 1)') }"
-                                @click.stop="checked(item.rn)">
+                                @click.stop="checked(item.rn,item.SYSTEM_ID)">
                                 <van-icon v-show="chooseList.includes(item.rn)" name="success" />
                             </div>
                             <div class="name m-l-8">
@@ -478,13 +478,13 @@ const onSelect = async (item) => {
         props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_LCMXMC_ORG,
     )
     try {
-        // console.log(baseUrl.value + 'WAP' + data2.PAPA3)
         // window.location.href = ('http://www.baidu.com')
         if (data2.PAPA3)
-            window.location.href = (baseUrl.value + 'WAP' + data2.PAPA3)
+            // window.location.href = ('http://www.baidu.com')
+           window.location.href = (baseUrl.value + 'WAP' + data2.PAPA3)
         else {
-            console.log(data2.MSG,data2.RESULT)
-            showToast(data2.MSG)
+            // console.log(data2.MSG.split(data2.RESULT)[1])
+            showToast(data2.MSG.split(data2.RESULT)[1].replace(/\[|]/g, '' ))
         }
             
     }
@@ -498,20 +498,24 @@ const onSelect = async (item) => {
 const loadMore = () => {
     emit('loadMore')
 }
-const checked = (name) => {
+const chooseSYSTEM_ID = ref([])
+const checked = (name,SYSTEM_ID) => {
     // console.log(name)
+    // let chooseSYSTEM_ID = []
     if (!chooseList.value.includes(name)) {
         totalMoney.value.push(name) // 判断已选列表中是否存在该id，不是则追加进去
         chooseList.value.push(name) // 判断已选列表中是否存在该id，不是则追加进去
+        chooseSYSTEM_ID.value.push(SYSTEM_ID)
     } else {
         let index = chooseList.value.indexOf(name) // 求出当前id的所在位置
         // console.log()
         chooseList.value.splice(index, 1) // 否则则删除
         totalMoney.value.splice(index, 1) // 否则则删除
+        chooseSYSTEM_ID.value.splice(index, 1)
     }
     // console.log(chooseList.value)
     // console.log(this.chooseList,name)
-    emit('checked', chooseList.value)
+    emit('checked', chooseList.value,chooseSYSTEM_ID.value)
 }
 
 const scrollRef = ref() //名字需要跟上面模板中定义的一样

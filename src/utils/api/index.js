@@ -74,6 +74,8 @@ export function recordPhoneCall(params) {
     return request.post('saveCallRecords', { ...getCommonParam(), ...params })
 }
 
+
+
 /***-获取卡片信息以及下拉框数据-***/
 
 export function getUserInfo(params) {
@@ -97,16 +99,24 @@ export function siftUserInfo(params) {
     return request.post(APIFiles.colloborationList, '/data/list_bill_wap.aspx?Tmethod=getlist.gz.data', params, contentType.FormData)
 }
 
+/***-批量操作审批数据-***/
+
+export function batchOperation(params) {
+     // let data = axios({ url: `/anywell_hylingls/data/Aiot_list_bill.aspx?Tmethod=Batch_delivery`, method: 'post', data: params })
+     let data =  axios({url: `/api/data/Aiot_list_bill.aspx?Tmethod=Batch_delivery`,method:'post', data:  params})
+     return data
+}
+
 /***-转单接口一-***/
 export function getTransferOrderData(params, FC) {
-    // let data = axios({ url: `/ANYWELL_hylingls/ForceCheckScript/FC_${FC}?Tmethod=FormLoad`, method: 'post', data: params })
+    // let data = axios({ url: `/anywell_hylingls/ForceCheckScript/FC_${FC}?Tmethod=FormLoad`, method: 'post', data: params })
     let data =  axios({url: `/api/ForceCheckScript/FC_${FC}?Tmethod=FormLoad`,method:'post', data:  params})
     return data
 }
 
 /***-转单接口二-***/
 export function changeTransferOrderData(params, FC, DT) {
-    // let data = axios({ url: `/ANYWELL_hylingls/ForceCheckScript/FC_${FC}?Tmethod=CFCLICK_${DT}`, method: 'post', data: params })
+    // let data = axios({ url: `/anywell_hylingls/ForceCheckScript/FC_${FC}?Tmethod=CFCLICK_${DT}`, method: 'post', data: params })
     let data =  axios({ url: `/api/ForceCheckScript/FC_${FC}?Tmethod=CFCLICK_${DT}`,method:'post', data:  params})
     return data
 }
@@ -123,5 +133,6 @@ export default {
     saveUserInfo,
     siftUserInfo,
     getTransferOrderData,
-    changeTransferOrderData
+    changeTransferOrderData,
+    batchOperation
 }
