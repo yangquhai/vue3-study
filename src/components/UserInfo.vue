@@ -8,7 +8,7 @@
                         <div class="checked flex">
                             <div class="checkBorder"
                                 :style="{ 'border': (chooseList.includes(item.rn) ? 'solid 1px #ffffff' : 'solid 1px rgba(226, 226, 226, 1)') }"
-                                @click.stop="checked(item.rn,item.SYSTEM_ID)">
+                                @click.stop="checked(item.rn, item.SYSTEM_ID)">
                                 <van-icon v-show="chooseList.includes(item.rn)" name="success" />
                             </div>
                             <div class="name m-l-8">
@@ -126,6 +126,7 @@
 
 <script setup>
 import { ref, reactive, computed, watch, onMounted } from 'vue'
+import * as dd from 'dingtalk-jsapi';
 import request from '_api'
 import { showToast } from 'vant';
 
@@ -149,9 +150,23 @@ const baseUrl = ref('http://dx.anywellchat.com:8888/ANYWELL_hylingls/')
 const goSystem = (index) => {
     console.log(SYSTEM_URL.value[index], index)
     // http://dx.anywellchat.com:8888/anywell_hylingls/WAPYXKHGZB.ASPX?Tsystem_id=2023080414170266873090102c6ca   WAPYXKHGZB.ASPX?Tsystem_id=54DSSJTB
-    window.location.href = (baseUrl.value + SYSTEM_URL.value[index])
+
     // window.open = (baseUrl.value,SYSTEM_URL.value[index])
     // window.open("https://www.cnblogs.com/guorongtao/")
+    if (dd.env.platform !== "notInDingTalk") {
+        dd.biz.util.openLink({
+            // url:"http://oa.gzwebway.com:8888/oa/WAPGZRZ.ASPX?Tsystem_id=RZ756089&IsShowLiePi=1",//要打开链接的地址
+            url: `${baseUrl.value}${SYSTEM_URL.value[index]}`,
+            onSuccess: function (result) {
+                /**/
+            },
+            onFail: function (err) { }
+        })
+    }
+    else {
+        window.location.href = (baseUrl.value + SYSTEM_URL.value[index])
+        // window.location.href = 'http://oa.gzwebway.com:8888/OA/'
+    }
 }
 
 
@@ -402,13 +417,26 @@ const callOut = (phoneNum) => {
 // 转单，转操作，转订单详细操作
 const goDetails = () => {
     console.log(props.userInfoDataList.AJAX_Url)
-//     dd.biz.util.openLink({
-//     url:"https://open.dingtalk.com/",//要打开链接的地址
-//     onSuccess : function(result) {
-//         /**/
-//     },
-//     onFail : function(err) {}
-// })
+    // console.log(dd.env.platform);
+    if (dd.env.platform !== "notInDingTalk") {
+        //     dd.biz.util.openLink({
+        //     url:"https://open.dingtalk.com/",//要打开链接的地址
+        //     onSuccess : function(result) {
+        //         /**/
+        //     },
+        //     onFail : function(err) {}
+        // })
+    }
+    else {
+        console.log(props.userInfoDataList.AJAX_Url)
+    }
+    //     dd.biz.util.openLink({
+    //     url:"https://open.dingtalk.com/",//要打开链接的地址
+    //     onSuccess : function(result) {
+    //         /**/
+    //     },
+    //     onFail : function(err) {}
+    // })
 }
 
 // 将组件方法暴露给父组件,
@@ -481,12 +509,12 @@ const onSelect = async (item) => {
         // window.location.href = ('http://www.baidu.com')
         if (data2.PAPA3)
             // window.location.href = ('http://www.baidu.com')
-           window.location.href = (baseUrl.value + 'WAP' + data2.PAPA3)
+            window.location.href = (baseUrl.value + 'WAP' + data2.PAPA3)
         else {
             // console.log(data2.MSG.split(data2.RESULT)[1])
-            showToast(data2.MSG.split(data2.RESULT)[1].replace(/\[|]/g, '' ))
+            showToast(data2.MSG.split(data2.RESULT)[1].replace(/\[|]/g, ''))
         }
-            
+
     }
     catch (err) {
         console.log(err)
@@ -499,7 +527,7 @@ const loadMore = () => {
     emit('loadMore')
 }
 const chooseSYSTEM_ID = ref([])
-const checked = (name,SYSTEM_ID) => {
+const checked = (name, SYSTEM_ID) => {
     // console.log(name)
     // let chooseSYSTEM_ID = []
     if (!chooseList.value.includes(name)) {
@@ -515,7 +543,7 @@ const checked = (name,SYSTEM_ID) => {
     }
     // console.log(chooseList.value)
     // console.log(this.chooseList,name)
-    emit('checked', chooseList.value,chooseSYSTEM_ID.value)
+    emit('checked', chooseList.value, chooseSYSTEM_ID.value)
 }
 
 const scrollRef = ref() //名字需要跟上面模板中定义的一样
