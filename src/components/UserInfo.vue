@@ -425,7 +425,6 @@ const loadTransferOrderData = async (FC, tformname, tsystem_id, tmaintablename) 
 }
 
 // 转单接口二进行转单
-
 const changeTransferOrderData = async (FC, DT, formdata, tformname, ttablename, tsystem_id, tliuchengmc, TLIUCHENGMXMC) => {
     let formData = new FormData()
     formData.append('formdata', formdata)
@@ -479,12 +478,15 @@ const onSelect = async (item) => {
         props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_LCMXMC_ORG,
     )
     try {
-        console.log(data2.PAPA3)
+        // console.log(baseUrl.value + 'WAP' + data2.PAPA3)
         // window.location.href = ('http://www.baidu.com')
         if (data2.PAPA3)
-            window.location.href = (baseUrl.value + data2.PAPA3)
-        else
+            window.location.href = (baseUrl.value + 'WAP' + data2.PAPA3)
+        else {
+            console.log(data2.MSG,data2.RESULT)
             showToast(data2.MSG)
+        }
+            
     }
     catch (err) {
         console.log(err)

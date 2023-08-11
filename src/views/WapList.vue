@@ -7,13 +7,18 @@
       <searchTab @search="search" :keyword="keyword" :placeholder="placeholder"></searchTab>
       <div class="dropdown">
         <div v-for="(item, index) in tabList" :key="index" class="dropdownList" @click="dropdown(item)"
-          :style="{ 'color': (item != chooseIndex ? 'rgba(50, 50, 51, 1)' : '#1890ff') }">
+          :style="{ 'color': (item != chooseIndex ? 'rgba(50, 50, 51, 1)' : '#1890ff') }" v-if="!isLoading">
           <div>{{ item }}</div>
           <img src="https://api.iconify.design/ic:baseline-arrow-drop-down.svg?color=%23888888" alt="" style=""
             v-if="item != chooseIndex">
           <img src="https://api.iconify.design/ic:baseline-arrow-drop-up.svg?color=%231989fa" alt="" style=""
             v-if="item == chooseIndex">
         </div>
+          <div v-else class="skeleton">
+            <van-skeleton-paragraph class="paragraphTitle" row-width="30%" style="background-color: #f2f3f5" />
+            <van-skeleton-paragraph class="paragraphTitle" row-width="30%" style="background-color: #f2f3f5;margin-top: 0px;" />
+            <van-skeleton-paragraph class="paragraphTitle" row-width="30%" style="margin-top: 0px; background-color: #f2f3f5" />
+          </div>
       </div>
     </div>
     <transition>
@@ -147,18 +152,17 @@
         <button class="button2" @click="goAddData" v-if="tabListData.newUrl">新增</button>
       </div>
       <van-action-sheet v-model:show="editFlag" :actions="actions" @select="onSelect" cancel-text="取消" />
-      <!-- <van-action-sheet v-model:show="orderFlag" :actions="actions2" @select="onSelect" cancel-text="取消" /> -->
     </div>
     <skeleton v-if="isLoading"></skeleton>
-    <userInfo class="userInfo" ref="info" @checked="checked" :isLoad="isLoading" v-else
-      @loadMore="loadMore" :userInfoDataList="userInfoDataList"></userInfo>
+    <userInfo class="userInfo" ref="info" @checked="checked" :isLoad="isLoading" v-else @loadMore="loadMore"
+      :userInfoDataList="userInfoDataList"></userInfo>
   </div>
 </template>
 
 <script setup>
 import request from '_api'
 import { ref, computed } from 'vue'
-import { showToast,showDialog } from 'vant';
+import { showToast, showDialog, Toast } from 'vant';
 const tabList = ref(['', '排序', '筛选'])
 const sortList = ref([])
 const isLoading = ref(true)
@@ -200,8 +204,6 @@ const userInfoDataList = ref({})
 // 转单按钮的下拉框控制
 const editFlag = ref(false)
 const actions = ref([{ name: '批量审批' }, { name: '批量回退' }])
-const orderFlag = ref(false)
-const actions2 = ref([])
 // 月份限制
 const minDate = ref(new Date(2020, 0, 1))
 const maxDate = ref(new Date(2025, 0, 31))
@@ -326,7 +328,7 @@ const initData = (tabListData, toFormData) => {
   // console.log(toFormData.value, tabListData.value)
 }
 
-// 获取页面数据,第一次进入页面时TisFirst为1，否则都为0
+// 获取页面数据,第一次进入页面
 const getData = async () => {
   let formData = new FormData()
   formData.append('Tformnamecn', '1665')
@@ -335,8 +337,6 @@ const getData = async () => {
   formData.append('Tsystem_lcmc', '意向客户跟踪表')
   formData.append('pageIndex', 1)
   formData.append('pagesize', 10)
-  // if (filter)
-  //   formData.append('filter', filter)
   try {
     const res = await request.getUserInfo(formData)
     isLoading.value = false
@@ -375,7 +375,6 @@ const getData = async () => {
     console.log(err)
   }
 }
-
 
 getData()
 
@@ -756,10 +755,6 @@ const checkedAll = () => {
   // console.log(chooseList.value,info.value.chooseList)
 }
 
-const transferOrder = () => {
-  // orderFlag.value = true
-  // AJAX_UrlButton(actions2)
-}
 // 点击获取转单操作
 const onSelect = (item) => {
   console.log(item)
@@ -767,24 +762,24 @@ const onSelect = (item) => {
 }
 
 const edit = () => {
-  if(chooseList.value.length)
-  editFlag.value = true
-else
-  showDialog({
-  message: '请选择数据',
-}).then(() => {
-  // on close
-});
+  if (chooseList.value.length)
+    editFlag.value = true
+  else
+    showDialog({
+      message: '请选择数据',
+    }).then(() => {
+      // on close
+    });
   // AJAX_UrlButton(actions)
   console.log('edit')
 }
 
-const del = () =>{
-  if(chooseList.value.length){
-    console.log('delete',chooseList.value.length)
+const del = () => {
+  if (chooseList.value.length) {
+    console.log('delete', chooseList.value.length)
   }
-   else
-      showDialog({
+  else
+    showDialog({
       message: '请选择数据',
     }).then(() => {
       // on close
@@ -852,7 +847,7 @@ const reset = () => {
   }
 }
 // 保存筛选框的值
-const saveData = async (Tformat,type) => {
+const saveData = async (Tformat) => {
   let formData = new FormData()
   formData.append('Tformnamecn', '1665')
   formData.append('Turl', 'YXKHGZB.ASPX')
@@ -861,8 +856,7 @@ const saveData = async (Tformat,type) => {
   formData.append('Tformat', Tformat)
   try {
     const res = await request.saveUserInfo(formData)
-    // console.log(res)
-    if(type!=1)
+    console.log(res)
     showToast(res.msg);
   }
   catch (err) {
@@ -894,8 +888,8 @@ const initDataTo = ref({
     }
   },
 })
-
-const keep = (type) => {
+// 将用户选择的数据收集起来,后续用于保存还是筛选分不同的点击
+const keepData = () => {
   // console.log(filter.value)
   initDataTo.value.lcmxmc.length = 0
   initDataTo.value.searchCondition.length = 0
@@ -992,7 +986,11 @@ const keep = (type) => {
   // console.log(initDataTo.value)
   // JSON.stringify(initDataTo.value)
   // console.log('keep',  JSON.stringify(initDataTo.value))
-  saveData(JSON.stringify(initDataTo.value),type)
+  // saveData(JSON.stringify(initDataTo.value))
+}
+const keep = () =>{
+  keepData()
+  saveData(JSON.stringify(initDataTo.value))
 }
 // 筛选数据接口
 const siftUserInfo = async (Tformat) => {
@@ -1042,7 +1040,7 @@ const sumFieldName = ref('')
 // 筛选模块弹窗关闭,需要调用keep函数，获取修改后的值
 const sift = () => {
   close()
-  keep(1)
+  keepData()
   copyData(siftDataTo, initDataTo)
   siftUserInfo(JSON.stringify(siftDataTo.value))
 }
@@ -1097,7 +1095,6 @@ const search = (value) => {
       height: 21px;
       // margin-left: 40px;
     }
-
     .dropdownList {
       display: flex;
       align-items: center;
@@ -1109,6 +1106,16 @@ const search = (value) => {
       color: rgba(80, 80, 80, 1);
       font-size: 12px;
       position: relative;
+    }
+    .skeleton {
+      display: flex; align-items: flex-start; 
+      position: relative; 
+      justify-content: space-between;
+      width: 100%;
+      margin: 0px 12px 0px 12px;
+      .paragraphTitle {
+        height: 20px;
+     }
     }
   }
 

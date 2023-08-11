@@ -15,7 +15,7 @@ function getCommonParam() {
 
 const APIFiles = {
     colloboration: './data/FormService_xt.aspx?Tmethod=',
-    colloborationList:'./data/list_bill_wap.aspx?Tmethod=',
+    colloborationList: './data/list_bill_wap.aspx?Tmethod=',
     oneClientOneGroup: './data/FormService_ykyq.aspx?Tmethod=',
 }
 
@@ -97,24 +97,19 @@ export function siftUserInfo(params) {
     return request.post(APIFiles.colloborationList, '/data/list_bill_wap.aspx?Tmethod=getlist.gz.data', params, contentType.FormData)
 }
 
-
-
-// export function transferOrder(params,FC) {
-//     // 打包上传
-//     // return request.post(APIFiles.colloborationList, 'getlist.gz.data',params, contentType.FormData)
-//     return request.post(APIFiles.colloborationList, `/ForceCheckScript/FC_${FC}?Tmethod=FormLoad`, params, contentType.FormData)
-// }
 /***-转单接口一-***/
-export function  getTransferOrderData(params,FC) {
-   let data =  axios({url: `/api/ForceCheckScript/FC_${FC}?Tmethod=FormLoad`,method:'post', data:  params})
+export function getTransferOrderData(params, FC) {
+    // let data = axios({ url: `/ANYWELL_hylingls/ForceCheckScript/FC_${FC}?Tmethod=FormLoad`, method: 'post', data: params })
+    let data =  axios({url: `/api/ForceCheckScript/FC_${FC}?Tmethod=FormLoad`,method:'post', data:  params})
     return data
 }
 
 /***-转单接口二-***/
-export function  changeTransferOrderData(params,FC,DT) {
+export function changeTransferOrderData(params, FC, DT) {
+    // let data = axios({ url: `/ANYWELL_hylingls/ForceCheckScript/FC_${FC}?Tmethod=CFCLICK_${DT}`, method: 'post', data: params })
     let data =  axios({ url: `/api/ForceCheckScript/FC_${FC}?Tmethod=CFCLICK_${DT}`,method:'post', data:  params})
     return data
- }
+}
 
 export default {
     getImplementationProcess,
