@@ -91,15 +91,19 @@ const routes = [
         // ?Ttablename=bxd_main&Turl=bxd.aspx&Tformnamecn=Tformnamecn&Tsystem_lcmc=4366&Tsystem_lcmc=/
         name: 'WapList',
         component: WapList,
-        meta: {
-            title: '意向客户跟踪列表'
-        },
         props: route => ({
             Tformnamecn: route.params.Tformnamecn,
             Turl: route.params.Turl,
             Ttablename: route.params.Ttablename,
             Tsystem_lcmc: route.params.Tsystem_lcmc,
         }),
+        meta: {
+            title: '意向客户跟踪列表'
+        },
+        beforeEnter: (to, from, next) => {
+            document.title = to.params.Tsystem_lcmc + '列表' // 根据页面状态设置标题
+            next()
+        }
         // beforeEnter: (to, from, next) => {
         //     document.title = to.params.Ttablename  // 根据页面状态设置标题
         //     next()

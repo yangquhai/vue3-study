@@ -42,7 +42,7 @@
             <van-calendar v-model:show="value2" :show-confirm="false" @confirm="onConfirm2" :min-date="minDate"
               :max-date="maxDate" />
           </div>
-          <van-button round size="small" type="primary" @click="confirmDate">确认</van-button>
+          <van-button round size="small" type="primary" @click="confirmDate">确 认</van-button>
         </div>
       </div>
     </transition>
@@ -136,9 +136,9 @@
           <!-- <van-button class="button" round type="success" size="small">重置</van-button>
           <van-button class="button1" round type="success" size="small" @click="keep">保存</van-button>
           <van-button class="button3" round type="success" size="small" @click="sift">筛选</van-button> -->
-          <van-button class="button" type="primary" size="small" @click="reset">重置</van-button>
-          <van-button type="primary" class="button1" size="small" @click="keep">保存</van-button>
-          <van-button class="button3" type="primary" size="small" @click="sift">筛选</van-button>
+          <van-button class="button" type="primary" size="small" @click="reset">重 置</van-button>
+          <van-button type="primary" class="button1" size="small" @click="keep">保 存</van-button>
+          <van-button class="button3" type="primary" size="small" @click="sift">筛 选</van-button>
         </div>
       </div>
     </transition>
@@ -158,9 +158,9 @@
                 chooseTotalMoney }}</span> </div>
         </div>
         <div class="userOptions">
-          <button class="button1" @click="del">删除</button>
+          <button class="button1" @click="del">删 除</button>
           <button class="button3" @click="edit">批量操作</button>
-          <button class="button2" @click="goAddData" v-if="tabListData.newUrl">新增</button>
+          <button class="button2" @click="goAddData" v-if="tabListData.newUrl">新 增</button>
         </div>
       </div>
       <div v-else class="skeleton">
@@ -810,17 +810,19 @@ const getSimpleDate = (date) => {
 }
 
 // 选择排序字段
-const orderType = ref(0)
+const orderType = ref(1)
 const choosesort = (index, value) => {
+  let initOrderFlag = 0
   initDataTo.value.orderType.orderType.fieldname = value.fieldname
   initDataTo.value.orderType.orderType.text = value.text
   chooseDateIndex.value = value.text
-  console.log(initDataTo.value.orderType.orderType, sortList.value)
+  // console.log(initDataTo.value.orderType.orderType, sortList.value)
   // console.log(chooseDateIndex.value)
   // console.log(value.order)
   sortList.value.forEach(function(item){
     item.select = false
   })
+  // 无初始值
   if (!orderType.value) {
     initDataTo.value.orderType.orderType.order = 'DESC'
     sortList.value[index].order = 'DESC'
@@ -1343,10 +1345,8 @@ const search = (value) => {
         // margin-left: 316px;
         display: flex;
         margin-left: auto;
-
-        img {
-          width: 14px;
-          height: 14px;
+        span {
+          font-size: 12px;
         }
       }
 
@@ -1392,12 +1392,15 @@ const search = (value) => {
       }
 
       .van-button {
-        margin-left: 260px;
-        margin-bottom: 5px;
-        width: 83px;
+        display: block;
+        margin-bottom: 12px;
+        width: 66px;
         font-size: 13px;
         background-color: rgba(24, 144, 255, 1);
         border: none;
+        margin-top: 12px;
+        margin-left: auto;
+        margin-right: 12px;
       }
     }
 
@@ -1410,9 +1413,9 @@ const search = (value) => {
 
     .userOptions2 {
       // width: 100%;
-      padding-top: 12px;
+      // padding-top: 12px;
       margin-left: 12px;
-      margin-right: 12px;
+      margin-right: 2px;
       display: flex;
       z-index: 2;
       justify-content: flex-end;
@@ -1421,6 +1424,7 @@ const search = (value) => {
       .van-button {
         width: 66px;
         margin-left: 10px;
+        border-radius: 16px;
       }
 
       .button {
@@ -1459,6 +1463,7 @@ const search = (value) => {
 
       .checkboxPre {
         // border: solid 1px red;
+        margin-right: 12px;
         display: flex;
         margin-left: 15px;
         flex-wrap: wrap

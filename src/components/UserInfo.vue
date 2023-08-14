@@ -65,19 +65,19 @@
                     </div>
 
                     <div class="card-footer">
-                        <div class="style1 m-b-12" v-if="AJAX_Url.length == 2">
-                            <small class="titleMoney">销售金额</small>
+                        <div class="style1 m-b-12" v-if="buttonNumber == 3">
+                            <small class="titleMoney">{{ ZJEText }}</small>
                             <small>￥</small>
                             <span class="moneyDetails">{{ ZJE[index] }}</span>
                         </div>
-                        <div class="style3" v-if="AJAX_Url.length == 0 || AJAX_Url.length == 1">
-                            <small class="titleMoney">销售金额</small>
+                        <div class="style3" v-if="buttonNumber == 0">
+                            <small class="titleMoney">{{ ZJEText }}</small>
                             <small>￥</small>
                             <span class="moneyDetails3">{{ ZJE[index] }}</span>
                         </div>
                         <div class="getDetails">
-                            <div class="style2" v-if="AJAX_Url.length == 3">
-                                <small class="titleMoney">销售金额</small>
+                            <div class="style2" v-if="buttonNumber != 3 && buttonNumber != 0">
+                                <small class="titleMoney">{{ ZJEText }}</small>
                                 <small>￥</small>
                                 <span class="moneyDetails">{{ ZJE[index] }}</span>
                             </div>
@@ -90,7 +90,7 @@
                                     <!-- 为了只渲染一次，限制只有index2为零才渲染 -->
                                     <div v-if="AJAX_Url.length > 2 && index2 == 0">
                                         <button class="userDetails borders m-l-8"
-                                            @click.stop="transferOrder(index)">转单</button>
+                                            @click.stop="transferOrder(index)">转 单</button>
                                     </div>
                                     <div v-if="index2 == 0 && KHBM.length">
                                         <button class="userDetails order m-l-8" @click.stop="goKhDetails(index)">
@@ -169,13 +169,21 @@ const goSystem = (index) => {
 }
 const goKhDetails = (index) =>{
    console.log(index,KHBM.value[index])
-   // window.location.href = (baseUrl.value + KHBM.value[index].systemId)
+   window.location.href = (baseUrl.value + 'wapCustomerBill.aspx?khbm=' + KHBM.value[index].systemId)
 }
 
 // 获取AJAX_Url按钮
+const buttonNumber = ref(0)
 const AJAX_Url = computed(() => {
     let AJAX_Url = props.userInfoDataList.AJAX_Url
-    // console.log(AJAX_Url.length)
+    console.log(AJAX_Url.length,KHBM.value.length)
+    if(!KHBM.value.length){
+        buttonNumber.value =  AJAX_Url.length
+    }
+    else {
+        buttonNumber.value =  AJAX_Url.length + 1
+    }
+    console.log(buttonNumber.value)
     return AJAX_Url
 })
 
@@ -354,12 +362,14 @@ const BQ = computed(() => {
     return sliceArr(KHMC, size)
 })
 // 总金额筛选
+const ZJEText = ref('')
 const ZJE = computed(() => {
     let LXDH = []
     if (props.userInfoDataList.data != undefined && fieldName.value != undefined)
         for (let i = 0; i < props.userInfoDataList.data.length; i++) {
             for (let j = 0; j < fieldName.value.length; j++) {
                 if (fieldName.value[j].type == '金额') {
+                    ZJEText.value = fieldName.value[j].text
                     if (props.userInfoDataList.data[i][fieldName.value[j].fieldname] < 100000)
                         LXDH.push(Math.trunc(props.userInfoDataList.data[i][fieldName.value[j].fieldname]).toString().replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g, '$1,'))
                     // this.valueStr.push(this.userDataList[i].money.toString().replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g,'$1,'))
@@ -370,7 +380,7 @@ const ZJE = computed(() => {
                 }
             }
         }
-    // console.log(LXDH)
+    // console.log(LXDH,ZJEText.value)
     return LXDH
 })
 
@@ -787,7 +797,7 @@ defineExpose({
         justify-content: flex-end;
         align-items: baseline;
         margin-bottom: 8px;
-
+        // border: solid 1px red;
         // height: 24px;
         // line-height: 24px;
         .titleMoney {
