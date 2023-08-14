@@ -53,10 +53,19 @@
           <div class="sortItem">
             <div>{{ item.text }}</div>
             <div class="imgList">
-              <img class="img1" src="../assets/down.png" alt="" v-if="item.order != 'desc'">
-              <img class="img1" src="../assets/chooseDown.png" alt="" v-if="item.order == 'desc'">
-              <img class="img2" src="../assets/up.png" alt="" v-if="item.order != 'descd'">
-              <img class="img1" src="../assets/chooseDown.png" alt="" v-if="item.order == 'descd'">
+              <!-- 被选中 -->
+              <div v-if="item.select">
+                <span class="iconfont icon-paixu-jiangxu" style="color:black" v-if="item.order != 'DESC'"></span>
+                <span class="iconfont icon-paixu-shengxu" v-if="item.order == ''"></span>
+                <span class="iconfont icon-paixu-jiangxu" v-if="item.order == 'DESC'"></span>
+                <span class="iconfont icon-paixu-shengxu" style="color:black" v-if="item.order != ''"></span> 
+              </div>
+              <div v-else>
+                <span class="iconfont icon-paixu-jiangxu" style="color:black"></span>
+                <span class="iconfont icon-paixu-shengxu" style="color:black"></span>
+              </div>
+              <!-- 未被选中 -->
+
             </div>
           </div>
         </div>
@@ -98,7 +107,8 @@
                 }}</van-tag>
               </div>
             </div>
-            <calendar v-if="calendarFlag2" @onConfirmDate="onConfirmDate" @onConfirmDate2="onConfirmDate2"></calendar>
+            <calendar v-if="calendarFlag2" :calendarDate1List="calendarDate1List" @onConfirmDate="onConfirmDate"
+              @onConfirmDate2="onConfirmDate2"></calendar>
           </div>
           <van-divider></van-divider>
 
@@ -252,7 +262,8 @@ const toFormData = ref({
 })
 
 // 用于初始化后端传来的数组 
-
+// 传入到高级筛选模块的日期框
+const calendarDate1List = ref({ dateFrom: '请选择日期', dateTo: '请选择日期' })
 const initData = (tabListData, toFormData) => {
   toFormData.value.dateType = tabListData.value.dateType
   // 选中的流程值
@@ -307,7 +318,12 @@ const initData = (tabListData, toFormData) => {
       for (let j = 0; j < tabListData.value.searchCondition[i].values.length; j++) {
         if (tabListData.value.searchCondition[i].values[j].value == '自定义') {
           // console.log(tabListData.value.searchCondition[i].values[j].dateFrom)
+          // calendarDate2.value = tabListData.value.searchCondition[i].values[j]
           // toFormData.value.searchCondition[i].values.value = ''
+          if (tabListData.value.searchCondition[i].values[j].select) {
+            calendarDate1List.value = tabListData.value.searchCondition[i].values[j]
+            calendarFlag2.value = true
+          }
           toFormData.value.searchCondition[i].values.dateFrom = tabListData.value.searchCondition[i].values[j].dateFrom
           toFormData.value.searchCondition[i].values.dateTo = tabListData.value.searchCondition[i].values[j].dateTo
         }
@@ -337,7 +353,7 @@ const initData = (tabListData, toFormData) => {
   toFormData.value.search.value_sql = tabListData.value.search.value_sql
   toFormData.value.search.keyword = tabListData.value.search.keyword
   // 排序数据的初始化
-  tabListData.value.orderType.orderType.forEach(function (value, index) {
+  tabListData.value.orderType.orderType.forEach(function (value) {
     if (value.select) {
       toFormData.value.orderType.orderType.fieldname = value.fieldname
       toFormData.value.orderType.orderType.order = value.order
@@ -349,10 +365,10 @@ const initData = (tabListData, toFormData) => {
 
 // 获取页面数据,第一次进入页面
 
-const Tformnamecn = ref('1665')
-const Turl = ref('YXKHGZB.ASPX')
-const Ttablename = ref('YXKHGZB')
-const Tsystem_lcmc = ref('意向客户跟踪表')
+const Tformnamecn = ref('')
+const Turl = ref('')
+const Ttablename = ref('')
+const Tsystem_lcmc = ref('')
 
 const props = defineProps({
   Tformnamecn: {
@@ -372,14 +388,16 @@ const props = defineProps({
     required: true
   },
 })
-const getPageUrl = () =>{
+// 获取页面路由上面的参数，将参数动态化
+const getPageUrl = () => {
   Tformnamecn.value = props.Tformnamecn
   Turl.value = props.Turl
   Ttablename.value = props.Ttablename
   Tsystem_lcmc.value = props.Tsystem_lcmc
 }
 getPageUrl()
-// console.log(props.Ttablename)
+
+// 第一次请求页面获取参数
 const getData = async () => {
   let formData = new FormData()
   formData.append('Tformnamecn', Tformnamecn.value)
@@ -395,6 +413,12 @@ const getData = async () => {
     userInfoDataList.value = res.data
     // console.log(userInfoCard.value)
     // 当月份的值为空时,删除月份排序
+    if (tabListData.value.dateType.defaultValue == '自定义') {
+      calendarFlag.value = true
+      console.log(tabListData.value.dateType.value)
+      date1.value = tabListData.value.dateType.value.dateFrom
+      date2.value = tabListData.value.dateType.value.dateTo
+    }
     if (tabListData.value.dateType.fieldname) {
       chooseMonthIndex.value = tabListData.value.dateType.defaultValue
       tabList.value[0] = tabListData.value.dateType.defaultValue
@@ -409,6 +433,7 @@ const getData = async () => {
         sortList.value.forEach(function (value) {
           if (value.select) {
             tabList.value[1] = value.text
+            chooseDateIndex.value = value.text
           }
         })
       }
@@ -416,6 +441,7 @@ const getData = async () => {
         sortList.value.forEach(function (value) {
           if (value.select) {
             tabList.value[0] = value.text
+            chooseDateIndex.value = value.text
           }
         })
       }
@@ -496,9 +522,6 @@ const edit = () => {
 const deleteWords = (wordIds) => {
   userInfoDataList.value.data = userInfoDataList.value.data.filter(item => !wordIds.includes(item.SYSTEM_ID))
 }
-// deleteWords(wordIds){
-//      this.dictOrigin = this.dictOrigin.filter(item => !wordIds.includes(item.id))
-//  }
 const del = async () => {
   if (chooseList.value.length) {
     console.log('delete')
@@ -539,6 +562,7 @@ const del = async () => {
       Tsystem_ids = ""
       Pwork = ""
       userChoose.length = 0
+      showToast(res.msg)
       console.log(res)
     }
     catch (err) {
@@ -564,7 +588,7 @@ const loadMore = async () => {
   pageIndex.value++
   siftDataTo.value = JSON.parse(JSON.stringify(initDataTo.value))
   siftDataTo.value.sum = { fieldname: sumFieldName.value, text: totalMoneyTitle.value }
-  console.log(siftDataTo.value)
+  // console.log(siftDataTo.value)
   let formData = new FormData()
   formData.append('Tformnamecn', Tformnamecn.value)
   formData.append('Turl', Turl.value)
@@ -786,12 +810,29 @@ const getSimpleDate = (date) => {
 }
 
 // 选择排序字段
+const orderType = ref(0)
 const choosesort = (index, value) => {
-  console.log(initDataTo.value, value)
   initDataTo.value.orderType.orderType.fieldname = value.fieldname
   initDataTo.value.orderType.orderType.text = value.text
-  initDataTo.value.orderType.orderType.order = 'desc'
   chooseDateIndex.value = value.text
+  console.log(initDataTo.value.orderType.orderType, sortList.value)
+  // console.log(chooseDateIndex.value)
+  // console.log(value.order)
+  sortList.value.forEach(function(item){
+    item.select = false
+  })
+  if (!orderType.value) {
+    initDataTo.value.orderType.orderType.order = 'DESC'
+    sortList.value[index].order = 'DESC'
+    sortList.value[index].select = true
+    orderType.value++
+  }
+  else {
+    initDataTo.value.orderType.orderType.order = ''
+    sortList.value[index].order = ''
+    sortList.value[index].select = true
+    orderType.value = 0
+  }
   // 再次点击相同索引，关闭下拉框
   if (sortIncludes.value.includes(chooseDateIndex.value)) {
     chooseIndex.value = null
@@ -1028,15 +1069,13 @@ const initDataTo = ref({
   },
 })
 // 日期框选择的日期
-const conditionDate = ref('')
-const conditionDate2 = ref('')
 const onConfirmDate = (val) => {
   console.log(val)
-  conditionDate.value = val
+  calendarDate1List.value.dateFrom = val
 }
 const onConfirmDate2 = (val) => {
   console.log(val)
-  conditionDate2.value = val
+  calendarDate1List.value.dateTo = val
 }
 // 将用户选择的数据收集起来,后续用于保存还是筛选分不同的点击
 const keepData = () => {
@@ -1067,9 +1106,10 @@ const keepData = () => {
         // console.log(dateList.value[i].values[j])
         initDataTo.value.searchCondition[i].values.value = dateList.value[i].values[j].value
         if (dateList.value[i].values[j].value == '自定义') {
-          if (conditionDate.value && conditionDate2.value) {
-            initDataTo.value.searchCondition[i].values.dateFrom = conditionDate.value
-            initDataTo.value.searchCondition[i].values.dateTo = conditionDate2.value
+          if (dateList.value[i].values[j].select) {
+            // calendarDate1List
+            initDataTo.value.searchCondition[i].values.dateFrom = calendarDate1List.value.dateFrom
+            initDataTo.value.searchCondition[i].values.dateTo = calendarDate1List.value.dateTo
           }
           else {
             initDataTo.value.searchCondition[i].values.dateFrom = dateList.value[i].values[j].dateFrom.split('T')[0]

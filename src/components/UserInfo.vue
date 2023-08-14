@@ -8,7 +8,7 @@
                         <div class="checked flex">
                             <div class="checkBorder"
                                 :style="{ 'border': (chooseList.includes(item.rn) ? 'solid 1px #ffffff' : 'solid 1px rgba(226, 226, 226, 1)') }"
-                                @click.stop="checked(item.rn, item.SYSTEM_ID,item.SYSTEM_LCMC,item.SYSTEM_LCMXMC_ORG)">
+                                @click.stop="checked(item.rn, item.SYSTEM_ID, item.SYSTEM_LCMC, item.SYSTEM_LCMXMC_ORG)">
                                 <van-icon v-show="chooseList.includes(item.rn)" name="success" />
                             </div>
                             <div class="name m-l-8">
@@ -33,11 +33,9 @@
 
                                 <div class="taglist flex flex-l">
                                     <div class="buyOptions m-r-4 m-b-4" v-for="(item) in BQ[index]">
-                                        <div v-for="(item2) in item">
-                                            <van-tag color="#fff2e9" text-color="#fd9148" size="large" v-if="item2">
-                                                {{ item2 }}
-                                            </van-tag>
-                                        </div>
+                                        <van-tag color="#fff2e9" text-color="#fd9148" size="large" v-if="item">
+                                                {{ item }}
+                                        </van-tag>
                                     </div>
                                 </div>
                                 <div class="phone" @click.stop="callOut(LXDH[index])" v-if="LXDH[index]">
@@ -62,7 +60,8 @@
                                 </span>
                             </div>
                         </div>
-                        <div class="border m-l-12 m-r-12" v-if="!BZ[index]"></div>
+                        <!-- <div class="border m-l-12 m-r-12" v-if="!BZ[index]"></div> -->
+                        <van-divider class="m-l-12 m-r-12" v-if="!BZ[index]" />
                     </div>
 
                     <div class="card-footer">
@@ -83,9 +82,9 @@
                                 <span class="moneyDetails">{{ ZJE[index] }}</span>
                             </div>
                             <div class="bottonList">
-                                <div v-for="(item2, index2) in AJAX_Url" style="display: flex;">
+                                <div v-for="(item2, index2) in AJAX_Url" style="display: flex; justify-content: flex-end;">
                                     <div v-if="AJAX_Url.length < 3">
-                                        <button class="userDetails borders m-l-8" @click.stop="goDetails">{{
+                                        <button class="userDetails borders m-l-8" @click.stop="goDetails(item2, index)">{{
                                             item2.text1 }}</button>
                                     </div>
                                     <!-- 为了只渲染一次，限制只有index2为零才渲染 -->
@@ -93,8 +92,8 @@
                                         <button class="userDetails borders m-l-8"
                                             @click.stop="transferOrder(index)">转单</button>
                                     </div>
-                                    <div v-if="index2 == 0">
-                                        <button class="userDetails order m-l-8" @click.stop="goDetails">
+                                    <div v-if="index2 == 0 && KHBM.length">
+                                        <button class="userDetails order m-l-8" @click.stop="goKhDetails(index)">
                                             {{ KHBM[index].title }}
                                         </button>
                                     </div>
@@ -168,12 +167,15 @@ const goSystem = (index) => {
         // window.location.href = 'http://oa.gzwebway.com:8888/OA/'
     }
 }
-
+const goKhDetails = (index) =>{
+   console.log(index,KHBM.value[index])
+   // window.location.href = (baseUrl.value + KHBM.value[index].systemId)
+}
 
 // 获取AJAX_Url按钮
 const AJAX_Url = computed(() => {
     let AJAX_Url = props.userInfoDataList.AJAX_Url
-    console.log(AJAX_Url.length)
+    // console.log(AJAX_Url.length)
     return AJAX_Url
 })
 
@@ -304,6 +306,7 @@ const ZDY = computed(() => {
         // sliceArr(KHMC,size)
         // console.log(sliceArr(KHMC, size))
     }
+    // console.log(sliceArr(KHMC, size))
     return sliceArr(KHMC, size)
 })
 
@@ -324,22 +327,32 @@ const BQ = computed(() => {
             size = sum
             sum = 0
         }
-        // console.log(KHMC.length)
+        // console.log(sliceArr(KHMC,size))
         // sliceArr(KHMC,size)
         for (let i = 0; i < sliceArr(KHMC, size).length; i++) {
             // console.log(sliceArr(KHMC,size)[i])
             for (let j = 0; j < sliceArr(KHMC, size)[i].length; j++) {
-                // console.log(sliceArr(KHMC,size)[i][j].split(','))
-                if (sliceArr(KHMC, size)[i][j].split(','))
-                    KHMC2.push(sliceArr(KHMC, size)[i][j].split(','))
+                // console.log(sliceArr(KHMC,size)[i][j])
+                if (sliceArr(KHMC, size)[i][j] != "") {
+                    if ((typeof sliceArr(KHMC, size)[i][j]) == 'string') {
+                        KHMC2.push(sliceArr(KHMC, size)[i][j].split(','))
+                    }
+                    // KHMC2.push(sliceArr(KHMC, size)[i][j].split(','))
+                    // KHMC2.push(sliceArr(KHMC, size)[i][j].split(','))
+                }
+                //    else{
+                //         // console.log(sliceArr(KHMC, size)[i][j])
+                //         KHMC2.push(sliceArr(KHMC, size)[i][j])
+                //     }
             }
         }
-        // console.log(KHMC2)
+        // console.log(KHMC)
         // console.log(sliceArr(KHMC2,size))
     }
-    return sliceArr(KHMC2, size)
+    // console.log(KHMC)
+    // console.log(sliceArr(KHMC2, size))
+    return sliceArr(KHMC, size)
 })
-
 // 总金额筛选
 const ZJE = computed(() => {
     let LXDH = []
@@ -368,7 +381,7 @@ const KHBM = computed(() => {
         for (let i = 0; i < props.userInfoDataList.data.length; i++) {
             for (let j = 0; j < fieldName.value.length; j++) {
                 if (fieldName.value[j].type == '客户详情按钮') {
-                    KHMC.push({ text: fieldName.value[j].text, title: '客户详情' })
+                    KHMC.push({ text: fieldName.value[j].text, title: '客户详情',systemId: props.userInfoDataList.data[i][fieldName.value[j].fieldname]})
                 }
             }
         }
@@ -402,7 +415,6 @@ const sliceArr = (array, size) => {
     }
     return result;
 }
-
 // 调起手机拨打电话操作
 const callPhone = () => {
     window.location.href = 'tel://' + callPhoneNum.value
@@ -412,31 +424,6 @@ const callOut = (phoneNum) => {
     // console.log(phoneNum)
     show.value = true
     callPhoneNum.value = phoneNum
-}
-
-// 转单，转操作，转订单详细操作
-const goDetails = () => {
-    console.log(props.userInfoDataList.AJAX_Url)
-    // console.log(dd.env.platform);
-    if (dd.env.platform !== "notInDingTalk") {
-        //     dd.biz.util.openLink({
-        //     url:"https://open.dingtalk.com/",//要打开链接的地址
-        //     onSuccess : function(result) {
-        //         /**/
-        //     },
-        //     onFail : function(err) {}
-        // })
-    }
-    else {
-        console.log(props.userInfoDataList.AJAX_Url)
-    }
-    //     dd.biz.util.openLink({
-    //     url:"https://open.dingtalk.com/",//要打开链接的地址
-    //     onSuccess : function(result) {
-    //         /**/
-    //     },
-    //     onFail : function(err) {}
-    // })
 }
 
 // 将组件方法暴露给父组件,
@@ -492,10 +479,11 @@ const AJAX_UrlButton = (actions2) => {
     // console.log(userInfoDataList.value.AJAX_Url,actions2.value)
 }
 const transferOrderIndex = ref('')
+
 // 点击获取转单操作
 const onSelect = async (item) => {
     // console.log(transferOrderIndex.value,props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID)
-    // console.log(item)
+    console.log(item)
     const data = await loadTransferOrderData(item.tformname, item.tformname, props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID, item.tmaintablename)
     // console.log(JSON.stringify(data))
     const data2 = await changeTransferOrderData(item.tformname, item.dt, JSON.stringify(data),
@@ -521,19 +509,70 @@ const onSelect = async (item) => {
     }
 
 }
+// 转单，转操作，转订单详细操作
+const goDetails = async (item, index) => {
+    console.log(item, index)
+    const data = await loadTransferOrderData(item.name, item.name, props.userInfoDataList.data[index].SYSTEM_ID, item.tablename)
+    console.log(data);
+    const data2 = await changeTransferOrderData(item.name, item.dt, JSON.stringify(data),
+        item.name,
+        item.tablename,
+        props.userInfoDataList.data[index].SYSTEM_ID,
+        props.userInfoDataList.data[index].SYSTEM_LCMC,
+        props.userInfoDataList.data[index].SYSTEM_LCMXMC_ORG,
+    )
+    try {
+        // window.location.href = ('http://www.baidu.com')
+        if (data2.PAPA3) {
+            if (dd.env.platform !== "notInDingTalk") {
+                dd.biz.util.openLink({
+                    url: `${baseUrl.value}${data2.PAPA3}`,//要打开链接的地址
+                    onSuccess: function (result) {
+                        /**/
+                    },
+                    onFail: function (err) { }
+                })
+            }
+            else {
+                window.location.href = (baseUrl.value + 'WAP' + data2.PAPA3)
+            }
+        }
+        // window.location.href = ('http://www.baidu.com')
+        else {
+            // console.log(data2.MSG.split(data2.RESULT)[1])
+            showToast(data2.MSG.split(data2.RESULT)[1].replace(/\[|]/g, ''))
+        }
+
+    }
+    catch (err) {
+        console.log(err)
+    }
+    // if (dd.env.platform !== "notInDingTalk") {
+    //     //     dd.biz.util.openLink({
+    //     //     url:"https://open.dingtalk.com/",//要打开链接的地址
+    //     //     onSuccess : function(result) {
+    //     //         /**/
+    //     //     },
+    //     //     onFail : function(err) {}
+    //     // })
+    // }
+    // else {
+    //     console.log(props.userInfoDataList.data[index].SYSTEM_ID)
+    // }
+}
 
 
 const loadMore = () => {
     emit('loadMore')
 }
 const chooseSYSTEM_ID = ref([])
-const checked = (name, SYSTEM_ID,SYSTEM_LCMC,SYSTEM_LCMXMC_ORG) => {
+const checked = (name, SYSTEM_ID, SYSTEM_LCMC, SYSTEM_LCMXMC_ORG) => {
     // console.log(name)
     // let chooseSYSTEM_ID = []
     if (!chooseList.value.includes(name)) {
         totalMoney.value.push(name) // 判断已选列表中是否存在该id，不是则追加进去
         chooseList.value.push(name) // 判断已选列表中是否存在该id，不是则追加进去
-        chooseSYSTEM_ID.value.push({SYSTEM_ID:SYSTEM_ID,SYSTEM_LCMC:SYSTEM_LCMC,SYSTEM_LCMXMC_ORG:SYSTEM_LCMXMC_ORG})
+        chooseSYSTEM_ID.value.push({ SYSTEM_ID: SYSTEM_ID, SYSTEM_LCMC: SYSTEM_LCMC, SYSTEM_LCMXMC_ORG: SYSTEM_LCMXMC_ORG })
     } else {
         let index = chooseList.value.indexOf(name) // 求出当前id的所在位置
         // console.log()
@@ -653,7 +692,7 @@ defineExpose({
             justify-content: flex-end;
             position: absolute;
             right: 0;
-            top: 0;
+            // top: 0;
             align-items: center;
 
             img {
@@ -699,7 +738,7 @@ defineExpose({
     }
 
     .border {
-        height: 0.5px;
+        // height: 1px;
         background-color: rgba(233, 233, 233, 1);
     }
 
@@ -747,6 +786,7 @@ defineExpose({
         align-items: flex-end;
         justify-content: flex-end;
         align-items: baseline;
+        margin-bottom: 8px;
 
         // height: 24px;
         // line-height: 24px;

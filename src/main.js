@@ -9,6 +9,9 @@ import 'amfe-flexible' // 计算设置rem的基准值，即html的font-size
 import 'vant/es/notify/style'
 import 'vant/es/dialog/style'
 import 'vant/es/toast/style'
+// import '@/assets/fonts/iconfont.css'
+import './assets/fonts/iconfont.css'
+
 
 import 'uno.css'
 import './css/common.less'

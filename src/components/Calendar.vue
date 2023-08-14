@@ -20,6 +20,16 @@ const value1 = ref(false)
 const value2 = ref(false)
 const minDate = ref(new Date(2020, 0, 1))
 const maxDate = ref(new Date(2025, 0, 31))
+const props =defineProps({
+  calendarDate1List:Object,
+})
+// 日期自定义的初始化
+const initDate = () =>{
+  // console.log(props.calendarDate1List)
+  date1.value = props.calendarDate1List.dateFrom
+  date2.value = props.calendarDate1List.dateTo
+}
+initDate()
 // 将组件方法暴露给父组件,
 const emit = defineEmits(['onConfirmDate', 'onConfirmDate2'])
 const onConfirm = (date) => {
