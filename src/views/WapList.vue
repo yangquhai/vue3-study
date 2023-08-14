@@ -53,14 +53,10 @@
           <div class="sortItem">
             <div>{{ item.text }}</div>
             <div class="imgList">
-              <img class="img1" src="../assets/down.png" alt="" @click="down(index, item.order, 0)"
-                v-if="item.order != 'desc'">
-              <img class="img1" src="../assets/chooseDown.png" alt="" @click="down(index, item.order, 1)"
-                v-if="item.order == 'desc'">
-              <img class="img2" src="../assets/up.png" alt="" @click="up(index, item.order, 0)"
-                v-if="item.order != 'descd'">
-              <img class="img1" src="../assets/chooseDown.png" alt="" @click="up(index, item.order, 1)"
-                v-if="item.order == 'descd'">
+              <img class="img1" src="../assets/down.png" alt="" v-if="item.order != 'desc'">
+              <img class="img1" src="../assets/chooseDown.png" alt="" v-if="item.order == 'desc'">
+              <img class="img2" src="../assets/up.png" alt="" v-if="item.order != 'descd'">
+              <img class="img1" src="../assets/chooseDown.png" alt="" v-if="item.order == 'descd'">
             </div>
           </div>
         </div>
@@ -177,7 +173,7 @@
 <script setup>
 import request from '_api'
 import { ref, computed } from 'vue'
-import { showToast, showDialog, Toast } from 'vant';
+import { showToast, showDialog } from 'vant';
 const tabList = ref(['', '排序', '筛选'])
 const sortList = ref([])
 const isLoading = ref(true)
@@ -248,7 +244,7 @@ const toFormData = ref({
     orderType_sql: "",
     orderType:
     {
-      filedname: "",
+      fieldname: "",
       order: "",
       text: ""
     }
@@ -340,16 +336,56 @@ const initData = (tabListData, toFormData) => {
   // 搜索数据的初始化
   toFormData.value.search.value_sql = tabListData.value.search.value_sql
   toFormData.value.search.keyword = tabListData.value.search.keyword
+  // 排序数据的初始化
+  tabListData.value.orderType.orderType.forEach(function (value, index) {
+    if (value.select) {
+      toFormData.value.orderType.orderType.fieldname = value.fieldname
+      toFormData.value.orderType.orderType.order = value.order
+      toFormData.value.orderType.orderType.text = value.text
+    }
+  })
   // console.log(toFormData.value, tabListData.value)
 }
 
 // 获取页面数据,第一次进入页面
+
+const Tformnamecn = ref('1665')
+const Turl = ref('YXKHGZB.ASPX')
+const Ttablename = ref('YXKHGZB')
+const Tsystem_lcmc = ref('意向客户跟踪表')
+
+const props = defineProps({
+  Tformnamecn: {
+    type: String,
+    required: true
+  },
+  Turl: {
+    type: String,
+    required: true
+  },
+  Ttablename: {
+    type: String,
+    required: true
+  },
+  Tsystem_lcmc: {
+    type: String,
+    required: true
+  },
+})
+const getPageUrl = () =>{
+  Tformnamecn.value = props.Tformnamecn
+  Turl.value = props.Turl
+  Ttablename.value = props.Ttablename
+  Tsystem_lcmc.value = props.Tsystem_lcmc
+}
+getPageUrl()
+// console.log(props.Ttablename)
 const getData = async () => {
   let formData = new FormData()
-  formData.append('Tformnamecn', '1665')
-  formData.append('Turl', 'YXKHGZB.ASPX')
-  formData.append('Ttablename', 'YXKHGZB')
-  formData.append('Tsystem_lcmc', '意向客户跟踪表')
+  formData.append('Tformnamecn', Tformnamecn.value)
+  formData.append('Turl', Turl.value)
+  formData.append('Ttablename', Ttablename.value)
+  formData.append('Tsystem_lcmc', Tsystem_lcmc.value)
   formData.append('pageIndex', 1)
   formData.append('pagesize', 10)
   try {
@@ -363,13 +399,30 @@ const getData = async () => {
       chooseMonthIndex.value = tabListData.value.dateType.defaultValue
       tabList.value[0] = tabListData.value.dateType.defaultValue
     }
-    else
+    else {
       tabList.value = tabList.value.filter(item => item !== "当月")
+    }
     // 排序数组。当数组长度为空时，不显示排序字段
-    if (tabListData.value.orderType.orderType.length)
+    if (tabListData.value.orderType.orderType.length) {
       sortList.value = tabListData.value.orderType.orderType
-    else
+      if (tabList.value.length == 3) {
+        sortList.value.forEach(function (value) {
+          if (value.select) {
+            tabList.value[1] = value.text
+          }
+        })
+      }
+      else {
+        sortList.value.forEach(function (value) {
+          if (value.select) {
+            tabList.value[0] = value.text
+          }
+        })
+      }
+    }
+    else {
       tabList.value = tabList.value.filter(item => item !== "排序")
+    }
     // console.log(sortList.value)
     placeholder.value = tabListData.value.search.text
     keyword.value = tabListData.value.search.keyword
@@ -395,17 +448,18 @@ getData()
 
 // 点击获取转单操作
 const tsystem_idlist = ref('')
+// 批量操作数据
 const onSelect = async (item) => {
   let Tsystem_ids = "";
   for (let i = 0; i < chooseSYSTEM_ID.value.length; i++) {
-    Tsystem_ids += chooseSYSTEM_ID.value[i] + ",";
+    Tsystem_ids += chooseSYSTEM_ID.value[i].SYSTEM_ID + ",";
   }
   Tsystem_ids = Tsystem_ids.substring(0, Tsystem_ids.length - 1);
   let formData = new FormData()
-  formData.append('Tformnamecn', '1665')
-  formData.append('Turl', 'YXKHGZB.ASPX')
-  formData.append('Ttablename', 'YXKHGZB')
-  formData.append('Tsystem_lcmc', '意向客户跟踪表')
+  formData.append('Tformnamecn', Tformnamecn.value)
+  formData.append('Turl', Turl.value)
+  formData.append('Ttablename', Ttablename.value)
+  formData.append('Tsystem_lcmc', Tsystem_lcmc.value)
   formData.append('Tsystem_ids', Tsystem_ids)
   try {
     const res = await request.batchOperation(formData)
@@ -416,20 +470,84 @@ const onSelect = async (item) => {
   }
   // console.log(item)
   // console.log(chooseSYSTEM_ID.value)
-  let Turl = 'YXKHGZB.ASPX'
+  // let Turl = 'YXKHGZB.ASPX'
   if (item.name == '批量审批') {
     // console.log(baseUrl.value + `${Turl}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
-    window.location.href = (baseUrl.value + `${Turl}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
+    window.location.href = (baseUrl.value + `${Turl.value}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
   }
   else {
-    // console.log(baseUrl.value + `${Turl}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
-    window.location.href = (baseUrl.value + `${Turl}?Tflag=8&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
+    // console.log(baseUrl.value + `${Turl.value}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
+    window.location.href = (baseUrl.value + `${Turl.value}?Tflag=8&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
   }
 }
-
 const edit = () => {
   if (chooseList.value.length) {
     editFlag.value = true
+  }
+  else
+    showDialog({
+      message: '请选择数据',
+    }).then(() => {
+      // on close
+    });
+}
+// 批量删除数据
+// 删除词条
+const deleteWords = (wordIds) => {
+  userInfoDataList.value.data = userInfoDataList.value.data.filter(item => !wordIds.includes(item.SYSTEM_ID))
+}
+// deleteWords(wordIds){
+//      this.dictOrigin = this.dictOrigin.filter(item => !wordIds.includes(item.id))
+//  }
+const del = async () => {
+  if (chooseList.value.length) {
+    console.log('delete')
+    let userChoose = []
+    let Tsystem_ids = "";
+    let PWorkflowString = ""
+    let Pwork = ""
+    let delTurl = '[' + Turl.value + ']'
+    let delSYSTEM_LCMC = []
+    let SYSTEM_LCMXMC_ORG = []
+    for (let i = 0; i < chooseSYSTEM_ID.value.length; i++) {
+      userChoose.push(chooseSYSTEM_ID.value[i].SYSTEM_ID)
+      Tsystem_ids += chooseSYSTEM_ID.value[i].SYSTEM_ID + ",";
+      delSYSTEM_LCMC.push('[' + chooseSYSTEM_ID.value[i].SYSTEM_LCMC + ']')
+      SYSTEM_LCMXMC_ORG.push('[' + chooseSYSTEM_ID.value[i].SYSTEM_LCMXMC_ORG + ']')
+      // let delTurl = '[' + Turl.value +']'
+      // Pwork = chooseSYSTEM_ID.value[i].SYSTEM_LCMC + chooseSYSTEM_ID.value[i].SYSTEM_LCMXMC_ORG +delTurl
+      // PWorkflowString += Pwork + ","
+      // console.log(PWorkflowString)
+    }
+    Tsystem_ids = Tsystem_ids.substring(0, Tsystem_ids.length - 1)
+    Pwork = delSYSTEM_LCMC[0] + SYSTEM_LCMXMC_ORG[0] + delTurl
+    // PWorkflowString = PWorkflowString.substring(0, PWorkflowString.length - 1)
+    // console.log(Tsystem_ids,Pwork)
+    // console.log(Tsystem_ids)
+    let formData = new FormData()
+    formData.append('id', Tsystem_ids)
+    formData.append('PWorkflowString', Pwork)
+    // console.log(userChoose)
+    // console.log(chooseSYSTEM_ID.value, userInfoDataList.value.data)
+    try {
+      const res = await request.deleteUserInfo(formData)
+      deleteWords(userChoose)
+      console.log(userChoose.length)
+      userInfoDataList.value.sum.count = userInfoDataList.value.sum.count - userChoose.length
+      count.value = count.value - userChoose.length
+      chooseList.value.length = 0
+      Tsystem_ids = ""
+      Pwork = ""
+      userChoose.length = 0
+      console.log(res)
+    }
+    catch (err) {
+      chooseList.value.length = 0
+      Tsystem_ids = ""
+      Pwork = ""
+      userChoose.length = 0
+      console.log(err)
+    }
   }
   else
     showDialog({
@@ -448,10 +566,10 @@ const loadMore = async () => {
   siftDataTo.value.sum = { fieldname: sumFieldName.value, text: totalMoneyTitle.value }
   console.log(siftDataTo.value)
   let formData = new FormData()
-  formData.append('Tformnamecn', '1665')
-  formData.append('Turl', 'YXKHGZB.ASPX')
-  formData.append('Ttablename', 'YXKHGZB')
-  formData.append('Tsystem_lcmc', '意向客户跟踪表')
+  formData.append('Tformnamecn', Tformnamecn.value)
+  formData.append('Turl', Turl.value)
+  formData.append('Ttablename', Ttablename.value)
+  formData.append('Tsystem_lcmc', Tsystem_lcmc.value)
   formData.append('Tfilter', JSON.stringify(siftDataTo.value))
   formData.append('pageIndex', pageIndex.value)
   formData.append('pagesize', 10)
@@ -669,40 +787,26 @@ const getSimpleDate = (date) => {
 
 // 选择排序字段
 const choosesort = (index, value) => {
+  console.log(initDataTo.value, value)
+  initDataTo.value.orderType.orderType.fieldname = value.fieldname
+  initDataTo.value.orderType.orderType.text = value.text
+  initDataTo.value.orderType.orderType.order = 'desc'
   chooseDateIndex.value = value.text
-  console.log('+++++')
   // 再次点击相同索引，关闭下拉框
   if (sortIncludes.value.includes(chooseDateIndex.value)) {
     chooseIndex.value = null
     firstIndex.value = null
+    // 如果没有月份排序，则tabList字段第一个值为排序
     if (tabList.value.length == 3)
       tabList.value[1] = value.text
     else
       tabList.value[0] = value.text
-    console.log(index)
+    // console.log(index,value)
+    copyData(siftDataTo, initDataTo)
+    siftUserInfo(JSON.stringify(siftDataTo.value))
     flag.value = false
     monthFlag.value = false
     sortFlag.value = false
-  }
-}
-
-// 点击排序字段选择升序还是降序
-const up = (index, value, type) => {
-  console.log(index, value, type)
-  if (type == 0) {
-    sortList.value[index].order = 'descd'
-  }
-  else {
-    console.log('spec')
-  }
-}
-const down = (index, value, type) => {
-  console.log(index, value, type)
-  if (type == 0) {
-    sortList.value[index].order = 'desc'
-  }
-  else {
-    console.log('spec')
   }
 }
 
@@ -820,17 +924,6 @@ const checkedAll = () => {
   // console.log(chooseList.value,info.value.chooseList)
 }
 
-const del = () => {
-  if (chooseList.value.length) {
-    console.log('delete', chooseList.value)
-  }
-  else
-    showDialog({
-      message: '请选择数据',
-    }).then(() => {
-      // on close
-    });
-}
 // 重置选项为后端开始返回的值,只重置高级筛选内容
 const filter = ref(null)
 const reset = () => {
@@ -895,10 +988,10 @@ const reset = () => {
 // 保存筛选框的值
 const saveData = async (Tformat) => {
   let formData = new FormData()
-  formData.append('Tformnamecn', '1665')
-  formData.append('Turl', 'YXKHGZB.ASPX')
-  formData.append('Ttablename', 'YXKHGZB')
-  formData.append('Tsystem_lcmc', '意向客户跟踪表')
+  formData.append('Tformnamecn', Tformnamecn.value)
+  formData.append('Turl', Turl.value)
+  formData.append('Ttablename', Ttablename.value)
+  formData.append('Tsystem_lcmc', Tsystem_lcmc.value)
   formData.append('Tformat', Tformat)
   try {
     const res = await request.saveUserInfo(formData)
@@ -928,7 +1021,7 @@ const initDataTo = ref({
     orderType_sql: "",
     orderType:
     {
-      filedname: "",
+      fieldname: "",
       order: "",
       text: ""
     }
@@ -1062,10 +1155,10 @@ const siftUserInfo = async (Tformat) => {
   isLoading.value = true
   pageIndex.value = 1
   let formData = new FormData()
-  formData.append('Tformnamecn', '1665')
-  formData.append('Turl', 'YXKHGZB.ASPX')
-  formData.append('Ttablename', 'YXKHGZB')
-  formData.append('Tsystem_lcmc', '意向客户跟踪表')
+  formData.append('Tformnamecn', Tformnamecn.value)
+  formData.append('Turl', Turl.value)
+  formData.append('Ttablename', Ttablename.value)
+  formData.append('Tsystem_lcmc', Tsystem_lcmc.value)
   formData.append('Tfilter', Tformat)
   formData.append('pageIndex', 1)
   formData.append('pagesize', 10)

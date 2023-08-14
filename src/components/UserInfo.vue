@@ -8,7 +8,7 @@
                         <div class="checked flex">
                             <div class="checkBorder"
                                 :style="{ 'border': (chooseList.includes(item.rn) ? 'solid 1px #ffffff' : 'solid 1px rgba(226, 226, 226, 1)') }"
-                                @click.stop="checked(item.rn, item.SYSTEM_ID)">
+                                @click.stop="checked(item.rn, item.SYSTEM_ID,item.SYSTEM_LCMC,item.SYSTEM_LCMXMC_ORG)">
                                 <van-icon v-show="chooseList.includes(item.rn)" name="success" />
                             </div>
                             <div class="name m-l-8">
@@ -527,13 +527,13 @@ const loadMore = () => {
     emit('loadMore')
 }
 const chooseSYSTEM_ID = ref([])
-const checked = (name, SYSTEM_ID) => {
+const checked = (name, SYSTEM_ID,SYSTEM_LCMC,SYSTEM_LCMXMC_ORG) => {
     // console.log(name)
     // let chooseSYSTEM_ID = []
     if (!chooseList.value.includes(name)) {
         totalMoney.value.push(name) // 判断已选列表中是否存在该id，不是则追加进去
         chooseList.value.push(name) // 判断已选列表中是否存在该id，不是则追加进去
-        chooseSYSTEM_ID.value.push(SYSTEM_ID)
+        chooseSYSTEM_ID.value.push({SYSTEM_ID:SYSTEM_ID,SYSTEM_LCMC:SYSTEM_LCMC,SYSTEM_LCMXMC_ORG:SYSTEM_LCMXMC_ORG})
     } else {
         let index = chooseList.value.indexOf(name) // 求出当前id的所在位置
         // console.log()

@@ -87,13 +87,19 @@ const routes = [
         }),
     },
     {
-        path: '/wap-list/',
+        path: '/wap-list/Tformnamecn/:Tformnamecn/Turl/:Turl/Ttablename/:Ttablename/Tsystem_lcmc/:Tsystem_lcmc/',
         // ?Ttablename=bxd_main&Turl=bxd.aspx&Tformnamecn=Tformnamecn&Tsystem_lcmc=4366&Tsystem_lcmc=/
         name: 'WapList',
         component: WapList,
         meta: {
-            title:'意向客户跟踪列表'
+            title: '意向客户跟踪列表'
         },
+        props: route => ({
+            Tformnamecn: route.params.Tformnamecn,
+            Turl: route.params.Turl,
+            Ttablename: route.params.Ttablename,
+            Tsystem_lcmc: route.params.Tsystem_lcmc,
+        }),
         // beforeEnter: (to, from, next) => {
         //     document.title = to.params.Ttablename  // 根据页面状态设置标题
         //     next()

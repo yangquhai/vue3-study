@@ -99,6 +99,15 @@ export function siftUserInfo(params) {
     return request.post(APIFiles.colloborationList, '/data/list_bill_wap.aspx?Tmethod=getlist.gz.data', params, contentType.FormData)
 }
 
+/***-批量删除数据-***/
+
+export function deleteUserInfo(params) {
+    // 打包上传
+    // return request.post(APIFiles.colloborationList, 'deleteList',params, contentType.FormData)
+    return request.post(APIFiles.colloborationList, 'data/Aiot_list_bill.aspx?Tmethod=deleteList', params, contentType.FormData)
+}
+
+// 该接口返回值没有code所以需要单独写接口
 /***-批量操作审批数据-***/
 
 export function batchOperation(params) {
@@ -134,5 +143,6 @@ export default {
     siftUserInfo,
     getTransferOrderData,
     changeTransferOrderData,
-    batchOperation
+    batchOperation,
+    deleteUserInfo
 }
