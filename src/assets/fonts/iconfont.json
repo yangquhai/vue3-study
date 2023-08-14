@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "6151377",
+      "name": "sort-down",
+      "font_class": "sort-down",
+      "unicode": "e843",
+      "unicode_decimal": 59459
+    },
+    {
+      "icon_id": "6151384",
+      "name": "sort-up",
+      "font_class": "sort-up",
+      "unicode": "e844",
+      "unicode_decimal": 59460
+    },
+    {
       "icon_id": "36902251",
       "name": "排序-降序-copy",
       "font_class": "paixu-jiangxu",

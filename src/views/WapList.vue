@@ -9,10 +9,14 @@
         <div v-for="(item, index) in tabList" :key="index" class="dropdownList" @click="dropdown(item)"
           :style="{ 'color': (item != chooseIndex ? 'rgba(50, 50, 51, 1)' : '#1890ff') }" v-if="!isLoading">
           <div>{{ item }}</div>
-          <img src="https://api.iconify.design/ic:baseline-arrow-drop-down.svg?color=%23888888" alt="" style=""
-            v-if="item != chooseIndex">
-          <img src="https://api.iconify.design/ic:baseline-arrow-drop-up.svg?color=%231989fa" alt="" style=""
-            v-if="item == chooseIndex">
+          <span v-if="index!=1">
+            <span class="iconfont icon-sort-down" v-if="item != chooseIndex" style="color: #dcdee0;"></span>
+            <span class="iconfont icon-sort-up" v-if="item == chooseIndex"></span>
+          </span>
+          <div v-if="index==1">
+            <span class="iconfont icon-sort-up" :style="{'color': sortDescFlag ? '#dcdee0':'#1890ff'}"></span>
+            <span class="iconfont icon-sort-down" :style="{'color': !sortDescFlag ? '#dcdee0':'#1890ff'}" style="display: block;"></span>
+          </div>
         </div>
         <div v-else class="skeleton">
           <van-skeleton-paragraph class="paragraphTitle" row-width="30%" style="background-color: #f2f3f5" />
@@ -58,7 +62,7 @@
                 <span class="iconfont icon-paixu-jiangxu" style="color:black" v-if="item.order != 'DESC'"></span>
                 <span class="iconfont icon-paixu-shengxu" v-if="item.order == ''"></span>
                 <span class="iconfont icon-paixu-jiangxu" v-if="item.order == 'DESC'"></span>
-                <span class="iconfont icon-paixu-shengxu" style="color:black" v-if="item.order != ''"></span> 
+                <span class="iconfont icon-paixu-shengxu" style="color:black" v-if="item.order != ''"></span>
               </div>
               <div v-else>
                 <span class="iconfont icon-paixu-jiangxu" style="color:black"></span>
@@ -264,6 +268,7 @@ const toFormData = ref({
 // 用于初始化后端传来的数组 
 // 传入到高级筛选模块的日期框
 const calendarDate1List = ref({ dateFrom: '请选择日期', dateTo: '请选择日期' })
+const sortDescFlag = ref(false)
 const initData = (tabListData, toFormData) => {
   toFormData.value.dateType = tabListData.value.dateType
   // 选中的流程值
@@ -355,6 +360,13 @@ const initData = (tabListData, toFormData) => {
   // 排序数据的初始化
   tabListData.value.orderType.orderType.forEach(function (value) {
     if (value.select) {
+      console.log(sortDescFlag.value,value.order)
+      if(!value.order){
+        sortDescFlag.value = false
+      }
+      else {
+        sortDescFlag.value = true
+      }
       toFormData.value.orderType.orderType.fieldname = value.fieldname
       toFormData.value.orderType.orderType.order = value.order
       toFormData.value.orderType.orderType.text = value.text
@@ -810,7 +822,7 @@ const getSimpleDate = (date) => {
 }
 
 // 选择排序字段
-const orderType = ref(1)
+const orderType = ref(0)
 const choosesort = (index, value) => {
   let initOrderFlag = 0
   initDataTo.value.orderType.orderType.fieldname = value.fieldname
@@ -819,13 +831,15 @@ const choosesort = (index, value) => {
   // console.log(initDataTo.value.orderType.orderType, sortList.value)
   // console.log(chooseDateIndex.value)
   // console.log(value.order)
-  sortList.value.forEach(function(item){
+  sortList.value.forEach(function (item) {
+    // console.log(item)
     item.select = false
   })
   // 无初始值
   if (!orderType.value) {
     initDataTo.value.orderType.orderType.order = 'DESC'
     sortList.value[index].order = 'DESC'
+    sortDescFlag.value = false
     sortList.value[index].select = true
     orderType.value++
   }
@@ -833,6 +847,7 @@ const choosesort = (index, value) => {
     initDataTo.value.orderType.orderType.order = ''
     sortList.value[index].order = ''
     sortList.value[index].select = true
+    sortDescFlag.value = true
     orderType.value = 0
   }
   // 再次点击相同索引，关闭下拉框
@@ -1290,10 +1305,9 @@ const search = (value) => {
     margin-top: -1px;
     background-color: rgba(255, 255, 255, 1);
 
-    img {
-      width: 21px;
-      height: 21px;
-      // margin-left: 40px;
+    span {
+      font-size: 12px;
+      margin-left: 3px;
     }
 
     .dropdownList {
@@ -1345,6 +1359,7 @@ const search = (value) => {
         // margin-left: 316px;
         display: flex;
         margin-left: auto;
+
         span {
           font-size: 12px;
         }
