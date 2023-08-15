@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import * as dd from 'dingtalk-jsapi';
 import Index from '../views/Index.vue'
 import NotFound from '../views/NotFound.vue'
 import ImplementationList from '../views/ImplementationList.vue'
@@ -98,7 +99,7 @@ const routes = [
             Tsystem_lcmc: route.params.Tsystem_lcmc,
         }),
         meta: {
-            title: '意向客户跟踪列表'
+            title: ''
         },
         beforeEnter: (to, from, next) => {
             document.title = to.params.Tsystem_lcmc + '列表' // 根据页面状态设置标题

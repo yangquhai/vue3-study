@@ -191,6 +191,7 @@
 import request from '_api'
 import { ref, computed } from 'vue'
 import { showToast, showDialog } from 'vant';
+import * as dd from 'dingtalk-jsapi';
 const tabList = ref(['', '排序', '筛选'])
 const sortList = ref([])
 const isLoading = ref(true)
@@ -267,7 +268,7 @@ const toFormData = ref({
     }
   },
 })
-
+// console.log(document.location,/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent))
 // 用于初始化后端传来的数组 
 // 传入到高级筛选模块的日期框
 const calendarDate1List = ref({ dateFrom: '请选择日期', dateTo: '请选择日期' })

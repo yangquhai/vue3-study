@@ -20,6 +20,7 @@ export default defineConfig(({ mode }) => {
     const FOLDER_PATH = `/projects/mobile/${PROJECT_NAME}/`
     const BASE_PATH = mode === 'development' ? '' : FOLDER_PATH
     return {
+        chunkSizeWarningLimit: 1500,
         // 根据mode返回不同的配置选项
         base: BASE_PATH, // 修改 publicPath
         build: {
@@ -27,19 +28,24 @@ export default defineConfig(({ mode }) => {
                 output: {
                     // 修改输出目录为 dist/projects/mobile/anywell-collaboration
                     dir: resolve(__dirname, 'dist' + FOLDER_PATH),
+                    manualChunks(id) {
+                        if (id.includes('node_modules')) {
+                            return id.toString().split('node_modules/')[1].split('/')[0].toString();
+                        }
+                    }
                 },
             }
         },
         server: {
             port: 8080,
-            cors:true,//开发模式
-            host:"0.0.0.0",
-            proxy:{
-              '^/api/*':{
-                target: 'http://dx.anywellchat.com:8888/ANYWELL_hylingls',
-                changeOrigin: true,//允许跨域
-                rewrite: (path) => path.replace(/^\/api/, "")
-              }
+            cors: true,//开发模式
+            host: "0.0.0.0",
+            proxy: {
+                '^/api/*': {
+                    target: 'http://dx.anywellchat.com:8888/ANYWELL_hylingls',
+                    changeOrigin: true,//允许跨域
+                    rewrite: (path) => path.replace(/^\/api/, "")
+                }
             },
         },
         plugins: [

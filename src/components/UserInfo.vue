@@ -163,9 +163,12 @@ const goSystem = (index) => {
             onFail: function (err) { }
         })
     }
+    if(navigator.userAgent.indexOf("wxwork")<=0 && navigator.userAgent.indexOf("DingTalk")<=0){
+        window.location.href = (baseUrl.value  + SYSTEM_URL.value[index])
+        // window.location.href = (baseUrl.value + 'WAPYXKHGZB.ASPX?tnw=oknew2&Tsystem_id=62DSSJTB')
+    }
     else {
-        window.location.href = (baseUrl.value + SYSTEM_URL.value[index])
-        // window.location.href = 'http://oa.gzwebway.com:8888/OA/'
+        window.location.href = (baseUrl.value  + SYSTEM_URL.value[index])
     }
 }
 const goKhDetails = (index) => {
@@ -181,6 +184,8 @@ const goKhDetails = (index) => {
         })
     }
     else {
+        // console.log(document.location)
+        // document.location = `wapCustomerBill.aspx?khbm=${KHBM.value[index].systemId}`
         window.location.href = (baseUrl.value + 'wapCustomerBill.aspx?khbm=' + KHBM.value[index].systemId)
     }
 }
@@ -580,18 +585,6 @@ const goDetails = async (item, index) => {
     catch (err) {
         console.log(err)
     }
-    // if (dd.env.platform !== "notInDingTalk") {
-    //     //     dd.biz.util.openLink({
-    //     //     url:"https://open.dingtalk.com/",//要打开链接的地址
-    //     //     onSuccess : function(result) {
-    //     //         /**/
-    //     //     },
-    //     //     onFail : function(err) {}
-    //     // })
-    // }
-    // else {
-    //     console.log(props.userInfoDataList.data[index].SYSTEM_ID)
-    // }
 }
 
 
@@ -625,12 +618,13 @@ onMounted(() => {
     scrollRef.value.addEventListener('scroll', () => {
         const { scrollTop, offsetHeight, scrollHeight } = scrollRef.value
         // console.log(scrollTop, offsetHeight, scrollHeight,)
-        if (scrollTop + offsetHeight >= scrollHeight - 1) {
+        if (scrollTop + offsetHeight == scrollHeight ) {
             //滚动条到达底部
             if (props.userInfoDataList.data.length < props.userInfoDataList.sum.count) {
                 loadMore()
             }
             console.log(props.userInfoDataList.data.length, props.userInfoDataList.sum.count)
+            console.log(scrollTop, offsetHeight, scrollHeight)
         }
     })
 })
