@@ -9,13 +9,15 @@
         <div v-for="(item, index) in tabList" :key="index" class="dropdownList" @click="dropdown(item)"
           :style="{ 'color': (item != chooseIndex ? 'rgba(50, 50, 51, 1)' : '#1890ff') }" v-if="!isLoading">
           <div>{{ item }}</div>
-          <span v-if="index!=1">
+          <span v-if="index != 1">
             <span class="iconfont icon-sort-down" v-if="item != chooseIndex" style="color: #dcdee0;"></span>
             <span class="iconfont icon-sort-up" v-if="item == chooseIndex"></span>
           </span>
-          <div v-if="index==1">
-            <span class="iconfont icon-sort-up" :style="{'color': sortDescFlag ? '#dcdee0':'#1890ff'}"></span>
-            <span class="iconfont icon-sort-down" :style="{'color': !sortDescFlag ? '#dcdee0':'#1890ff'}" style="display: block;"></span>
+          <div v-if="index == 1" class="sorticon">
+            <span class="iconfont icon-sort-up icon-sort1"
+              :style="{ 'color': sortDescFlag ? '#dcdee0' : '#1890ff' }"></span>
+            <span class="iconfont icon-sort-down icon-sort2" :style="{ 'color': !sortDescFlag ? '#dcdee0' : '#1890ff' }"
+              style="display: block;"></span>
           </div>
         </div>
         <div v-else class="skeleton">
@@ -234,7 +236,7 @@ const minDate = ref(new Date(2020, 0, 1))
 const maxDate = ref(new Date(2025, 0, 31))
 const baseUrl = ref('http://dx.anywellchat.com:8888/ANYWELL_hylingls/')
 // 总金额
-const totalMoney = ref('')
+const totalMoney = ref(0)
 const totalMoneyTitle = ref('')
 const count = ref('')
 const isIos = /(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)
@@ -360,8 +362,8 @@ const initData = (tabListData, toFormData) => {
   // 排序数据的初始化
   tabListData.value.orderType.orderType.forEach(function (value) {
     if (value.select) {
-      console.log(sortDescFlag.value,value.order)
-      if(!value.order){
+      // console.log(sortDescFlag.value,value.order)
+      if (!value.order) {
         sortDescFlag.value = false
       }
       else {
@@ -466,7 +468,10 @@ const getData = async () => {
     keyword.value = tabListData.value.search.keyword
     // JSON.parse(JSON.stringify(b.value))将浅拷贝转换为深拷贝,此时改变procedureList的值不会影响tabListData的值
     procedureList.value = JSON.parse(JSON.stringify(tabListData.value.lcmxmc))
-    totalMoney.value = userInfoDataList.value.sum.value
+    if (userInfoDataList.value.sum.value==null)
+      totalMoney.value = 0
+    else
+      totalMoney.value = userInfoDataList.value.sum.value
     totalMoneyTitle.value = userInfoDataList.value.sum.text
     sumFieldName.value = userInfoDataList.value.sum.fieldname
     count.value = userInfoDataList.value.sum.count
@@ -822,34 +827,53 @@ const getSimpleDate = (date) => {
 }
 
 // 选择排序字段
-const orderType = ref(0)
+const orderType = ref(1)
 const choosesort = (index, value) => {
-  let initOrderFlag = 0
+  // let initOrderFlag = 0
+  // console.log(chooseDateIndex.value, value.text, initDataTo.value.orderType.orderType)
+  sortList.value.forEach(function (item) {
+    item.select = false
+  })
+  if (initDataTo.value.orderType.orderType.fieldname)
+    orderType.value = 1
+  else
+    orderType.value = 0
   initDataTo.value.orderType.orderType.fieldname = value.fieldname
   initDataTo.value.orderType.orderType.text = value.text
+  // 点击相同索引
+  if (chooseDateIndex.value == value.text) {
+    console.log(initDataTo.value.orderType.orderType.order)
+    if (initDataTo.value.orderType.orderType.order == 'DESC') {
+      initDataTo.value.orderType.orderType.order = ''
+      sortList.value[index].order = ''
+      sortList.value[index].select = true
+      sortDescFlag.value = false
+      orderType.value = 0
+      console.log(sortList.value)
+    }
+    else {
+      initDataTo.value.orderType.orderType.order = 'DESC'
+      sortList.value[index].order = 'DESC'
+      sortList.value[index].select = true
+      sortDescFlag.value = true
+      orderType.value = 0
+      console.log(222)
+    }
+  }
+  // 点击不同索引
+  else {
+    console.log(value)
+    initDataTo.value.orderType.orderType.order = 'DESC'
+    sortList.value[index].order = 'DESC'
+    sortList.value[index].select = true
+    sortDescFlag.value = true
+    orderType.value = 0
+    console.log(222)
+  }
   chooseDateIndex.value = value.text
   // console.log(initDataTo.value.orderType.orderType, sortList.value)
   // console.log(chooseDateIndex.value)
   // console.log(value.order)
-  sortList.value.forEach(function (item) {
-    // console.log(item)
-    item.select = false
-  })
-  // 无初始值
-  if (!orderType.value) {
-    initDataTo.value.orderType.orderType.order = 'DESC'
-    sortList.value[index].order = 'DESC'
-    sortDescFlag.value = false
-    sortList.value[index].select = true
-    orderType.value++
-  }
-  else {
-    initDataTo.value.orderType.orderType.order = ''
-    sortList.value[index].order = ''
-    sortList.value[index].select = true
-    sortDescFlag.value = true
-    orderType.value = 0
-  }
   // 再次点击相同索引，关闭下拉框
   if (sortIncludes.value.includes(chooseDateIndex.value)) {
     chooseIndex.value = null
@@ -1321,6 +1345,24 @@ const search = (value) => {
       color: rgba(80, 80, 80, 1);
       font-size: 12px;
       position: relative;
+
+      .sorticon {
+        position: relative;
+        // height: 20px;
+        // border: solid 1px red;
+      }
+
+      .icon-sort1 {
+        // border: solid 1px red;
+        position: absolute;
+        margin-top: -10px;
+      }
+
+      .icon-sort2 {
+        // border: solid 1px red;
+        margin-top: -2px;
+        position: absolute;
+      }
     }
 
     .skeleton {
@@ -1639,5 +1681,4 @@ const search = (value) => {
       }
     }
   }
-}
-</style>
+}</style>

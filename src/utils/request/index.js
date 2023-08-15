@@ -47,31 +47,61 @@ const request = (options) => {
         method: method || 'GET',
         headers: header || { 'Content-Type': 'application/json' },
     }).catch((error) => {
-        if (error.code >= 400) {
-            if (error.message.length > 20) {
-                showDialog({
-                    title: '系统提示',
-                    allowHtml: true,
-                    message: error.message,
-                    theme: 'round-button',
-                    confirmButtonText: '确 认'
-                }).then(() => {
+        if (error.message) {
+            if (error.code >= 400 || error.code == 0) {
+                if (error.message.length > 20) {
+                    showDialog({
+                        title: '系统提示',
+                        allowHtml: true,
+                        message: error.message,
+                        theme: 'round-button',
+                        confirmButtonText: '确 认'
+                    }).then(() => {
 
-                })
+                    })
 
+                } else {
+                    showNotify({
+                        type: 'danger',
+                        message: `${error.message}`
+                    })
+                }
+                throw new Error(`${error.message}`)
             } else {
                 showNotify({
                     type: 'danger',
-                    message: `${error.message}`
+                    message: `网络错误，请重试`
                 })
+                throw new Error(`${error.message}，详情：${error}`)
             }
-            throw new Error(`${error.message}`)
-        } else {
-            showNotify({
-                type: 'danger',
-                message: `网络错误，请重试`
-            })
-            throw new Error(`${error.message}，详情：${error}`)
+        }
+        else {
+            if (error.code >= 400 || error.code == 0) {
+                if (error.msg.length > 20) {
+                    showDialog({
+                        title: '系统提示',
+                        allowHtml: true,
+                        message: error.msg,
+                        theme: 'round-button',
+                        confirmButtonText: '确 认'
+                    }).then(() => {
+
+                    })
+
+                } else {
+                    showNotify({
+                        type: 'danger',
+                        message: `${error.msg}`
+                    })
+                }
+                throw new Error(`${error.msg}`)
+            } else {
+                showNotify({
+                    type: 'danger',
+                    message: `网络错误，请重试`
+                })
+                throw new Error(`${error.msg}，详情：${error}`)
+            }
         }
     })
 }
