@@ -102,12 +102,12 @@ const routes = [
         },
         beforeEnter: (to, from, next) => {
             document.title = to.params.Tsystem_lcmc + '列表' // 根据页面状态设置标题
+            if (dd.env.platform !== "notInDingTalk")
+                dd.biz.navigation.setTitle({
+                    title: to.params.Tsystem_lcmc + '列表',
+                });
             next()
         }
-        // beforeEnter: (to, from, next) => {
-        //     document.title = to.params.Ttablename  // 根据页面状态设置标题
-        //     next()
-        // }
     },
 ]
 

@@ -34,7 +34,7 @@
                                 <div class="taglist flex flex-l">
                                     <div class="buyOptions m-r-4 m-b-4" v-for="(item) in BQ[index]">
                                         <van-tag color="#fff2e9" text-color="#fd9148" size="large" v-if="item">
-                                                {{ item }}
+                                            {{ item }}
                                         </van-tag>
                                     </div>
                                 </div>
@@ -89,8 +89,8 @@
                                     </div>
                                     <!-- 为了只渲染一次，限制只有index2为零才渲染 -->
                                     <div v-if="AJAX_Url.length > 2 && index2 == 0">
-                                        <button class="userDetails borders m-l-8"
-                                            @click.stop="transferOrder(index)">转 单</button>
+                                        <button class="userDetails borders m-l-8" @click.stop="transferOrder(index)">转
+                                            单</button>
                                     </div>
                                     <div v-if="index2 == 0 && KHBM.length">
                                         <button class="userDetails order m-l-8" @click.stop="goKhDetails(index)">
@@ -105,7 +105,8 @@
             </div>
             <div class="nomore" v-if="props.userInfoDataList.sum.count">
                 <!-- {{ KHBM }} -->
-                <span v-if="props.userInfoDataList.sum.count == props.userInfoDataList.data.length">没有更多了</span>
+                <span
+                    v-if="props.userInfoDataList.sum.count == props.userInfoDataList.data.length || props.userInfoDataList.sum.count < props.userInfoDataList.data.length">没有更多了</span>
                 <van-loading v-else size="24px">加载中...</van-loading>
             </div>
 
@@ -167,21 +168,33 @@ const goSystem = (index) => {
         // window.location.href = 'http://oa.gzwebway.com:8888/OA/'
     }
 }
-const goKhDetails = (index) =>{
-   console.log(index,KHBM.value[index])
-   window.location.href = (baseUrl.value + 'wapCustomerBill.aspx?khbm=' + KHBM.value[index].systemId)
+const goKhDetails = (index) => {
+    // console.log(index,KHBM.value[index])
+    if (dd.env.platform !== "notInDingTalk") {
+        dd.biz.util.openLink({
+            url: `${baseUrl.value} + 'wapCustomerBill.aspx?khbm=' + ${KHBM.value[index].systemId}`,
+            // url:'http://oa.gzwebway.com:8888/oa/WAPGZRZ.ASPX?Tsystem_id=RZ756096&IsShowLiePi=1',
+            onSuccess: function (result) {
+                /**/
+            },
+            onFail: function (err) { }
+        })
+    }
+    else {
+        window.location.href = (baseUrl.value + 'wapCustomerBill.aspx?khbm=' + KHBM.value[index].systemId)
+    }
 }
 
 // 获取AJAX_Url按钮
 const buttonNumber = ref(0)
 const AJAX_Url = computed(() => {
     let AJAX_Url = props.userInfoDataList.AJAX_Url
-    console.log(AJAX_Url.length,KHBM.value.length)
-    if(!KHBM.value.length){
-        buttonNumber.value =  AJAX_Url.length
+    console.log(AJAX_Url.length, KHBM.value.length)
+    if (!KHBM.value.length) {
+        buttonNumber.value = AJAX_Url.length
     }
     else {
-        buttonNumber.value =  AJAX_Url.length + 1
+        buttonNumber.value = AJAX_Url.length + 1
     }
     console.log(buttonNumber.value)
     return AJAX_Url
@@ -391,7 +404,7 @@ const KHBM = computed(() => {
         for (let i = 0; i < props.userInfoDataList.data.length; i++) {
             for (let j = 0; j < fieldName.value.length; j++) {
                 if (fieldName.value[j].type == '客户详情按钮') {
-                    KHMC.push({ text: fieldName.value[j].text, title: '客户详情',systemId: props.userInfoDataList.data[i][fieldName.value[j].fieldname]})
+                    KHMC.push({ text: fieldName.value[j].text, title: '客户详情', systemId: props.userInfoDataList.data[i][fieldName.value[j].fieldname] })
                 }
             }
         }
@@ -504,10 +517,20 @@ const onSelect = async (item) => {
         props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_LCMXMC_ORG,
     )
     try {
-        // window.location.href = ('http://www.baidu.com')
-        if (data2.PAPA3)
-            // window.location.href = ('http://www.baidu.com')
-            window.location.href = (baseUrl.value + 'WAP' + data2.PAPA3)
+        if (data2.PAPA3) {
+            if (dd.env.platform !== "notInDingTalk") {
+                dd.biz.util.openLink({
+                    url: `${baseUrl.value} + 'WAP' + ${data2.PAPA3}`,
+                    onSuccess: function (result) {
+                        /**/
+                    },
+                    onFail: function (err) { }
+                })
+            }
+            else {
+                window.location.href = (baseUrl.value + 'WAP' + data2.PAPA3)
+            }
+        }
         else {
             // console.log(data2.MSG.split(data2.RESULT)[1])
             showToast(data2.MSG.split(data2.RESULT)[1].replace(/\[|]/g, ''))
@@ -797,6 +820,7 @@ defineExpose({
         justify-content: flex-end;
         align-items: baseline;
         margin-bottom: 8px;
+
         // border: solid 1px red;
         // height: 24px;
         // line-height: 24px;

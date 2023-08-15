@@ -14,10 +14,14 @@
             <span class="iconfont icon-sort-up" v-if="item == chooseIndex"></span>
           </span>
           <div v-if="index == 1" class="sorticon">
-            <span class="iconfont icon-sort-up icon-sort1"
+            <span class="iconfont icon-sort-down" v-if="!orderType" style="color: #dcdee0;"></span>
+
+            <span class="iconfont icon-sort-up icon-sort1" v-if="orderType"
               :style="{ 'color': sortDescFlag ? '#dcdee0' : '#1890ff' }"></span>
-            <span class="iconfont icon-sort-down icon-sort2" :style="{ 'color': !sortDescFlag ? '#dcdee0' : '#1890ff' }"
-              style="display: block;"></span>
+            <span class="iconfont icon-sort-down icon-sort2" :style="{ 'color': sortDescFlag ? '#1890ff ' : '#dcdee0' }"
+            v-if="orderType" style="display: block;"></span>
+
+
           </div>
         </div>
         <div v-else class="skeleton">
@@ -139,9 +143,6 @@
           <superFilter :tabListData="tabListData" ref="filter"></superFilter>
         </div>
         <div class="userOptions2">
-          <!-- <van-button class="button" round type="success" size="small">重置</van-button>
-          <van-button class="button1" round type="success" size="small" @click="keep">保存</van-button>
-          <van-button class="button3" round type="success" size="small" @click="sift">筛选</van-button> -->
           <van-button class="button" type="primary" size="small" @click="reset">重 置</van-button>
           <van-button type="primary" class="button1" size="small" @click="keep">保 存</van-button>
           <van-button class="button3" type="primary" size="small" @click="sift">筛 选</van-button>
@@ -271,6 +272,7 @@ const toFormData = ref({
 // 传入到高级筛选模块的日期框
 const calendarDate1List = ref({ dateFrom: '请选择日期', dateTo: '请选择日期' })
 const sortDescFlag = ref(false)
+const orderType = ref(true)
 const initData = (tabListData, toFormData) => {
   toFormData.value.dateType = tabListData.value.dateType
   // 选中的流程值
@@ -365,9 +367,11 @@ const initData = (tabListData, toFormData) => {
       // console.log(sortDescFlag.value,value.order)
       if (!value.order) {
         sortDescFlag.value = false
+        orderType.value = false
       }
       else {
         sortDescFlag.value = true
+        orderType.value = true
       }
       toFormData.value.orderType.orderType.fieldname = value.fieldname
       toFormData.value.orderType.orderType.order = value.order
@@ -468,7 +472,7 @@ const getData = async () => {
     keyword.value = tabListData.value.search.keyword
     // JSON.parse(JSON.stringify(b.value))将浅拷贝转换为深拷贝,此时改变procedureList的值不会影响tabListData的值
     procedureList.value = JSON.parse(JSON.stringify(tabListData.value.lcmxmc))
-    if (userInfoDataList.value.sum.value==null)
+    if (userInfoDataList.value.sum.value == null)
       totalMoney.value = 0
     else
       totalMoney.value = userInfoDataList.value.sum.value
@@ -515,12 +519,33 @@ const onSelect = async (item) => {
   // console.log(chooseSYSTEM_ID.value)
   // let Turl = 'YXKHGZB.ASPX'
   if (item.name == '批量审批') {
-    // console.log(baseUrl.value + `${Turl}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
-    window.location.href = (baseUrl.value + `${Turl.value}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
+    if (dd.env.platform !== "notInDingTalk") {
+      dd.biz.util.openLink({
+        url: `${baseUrl.value}${Turl.value} + '?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=' +${tsystem_idlist.value}`,
+        onSuccess: function (result) {
+          /**/
+        },
+        onFail: function (err) { }
+      })
+    }
+    else {
+      window.location.href = (baseUrl.value + `${Turl.value}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
+    }
   }
   else {
-    // console.log(baseUrl.value + `${Turl.value}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
-    window.location.href = (baseUrl.value + `${Turl.value}?Tflag=8&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
+    if (dd.env.platform !== "notInDingTalk") {
+      dd.biz.util.openLink({
+        url: `${baseUrl.value}${Turl.value} + '?Tflag=8&TAUTOCLOSE=2&tsystem_idlist=' + ${tsystem_idlist.value}`,
+        onSuccess: function (result) {
+          /**/
+        },
+        onFail: function (err) { }
+      })
+    }
+    else {
+      window.location.href = (baseUrl.value + `${Turl.value}?Tflag=8&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
+    }
+    // window.location.href = (baseUrl.value + `${Turl.value}?Tflag=8&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
   }
 }
 const edit = () => {
@@ -665,17 +690,21 @@ const close = () => {
 const goAddData = () => {
   let url = baseUrl.value + tabListData.value.newUrl
   console.log(url)
+  if (dd.env.platform !== "notInDingTalk") {
+    dd.biz.util.openLink({
+      url: `${baseUrl.value}${tabListData.value.newUrl}`,
+      onSuccess: function (result) {
+        /**/
+      },
+      onFail: function (err) { }
+    })
+  }
+  else {
+    window.location.href = (baseUrl.value + tabListData.value.newUrl)
+  }
   // window.open = (this.baseUrl + this.tabListData.newUrl,"blank")
   // window.location.href = ('http://www.baidu.com')
-  window.location.href = (baseUrl.value + tabListData.value.newUrl)
-
-  // window.open("https://www.cnblogs.com/guorongtao/");
-  //   dd.openLink({
-  //   url: 'http://www.dingtalk.com',
-  //   success: () => {},
-  //   fail: () => {},
-  //   complete: () => {},
-  // });
+  // window.location.href = (baseUrl.value + tabListData.value.newUrl)
 }
 
 // 用于判断sortList中是否存在item索引
@@ -827,17 +856,16 @@ const getSimpleDate = (date) => {
 }
 
 // 选择排序字段
-const orderType = ref(1)
 const choosesort = (index, value) => {
   // let initOrderFlag = 0
   // console.log(chooseDateIndex.value, value.text, initDataTo.value.orderType.orderType)
   sortList.value.forEach(function (item) {
     item.select = false
   })
-  if (initDataTo.value.orderType.orderType.fieldname)
-    orderType.value = 1
-  else
-    orderType.value = 0
+  // if (initDataTo.value.orderType.orderType.fieldname)
+  //   orderType.value = true
+  // else
+  //   orderType.value = false
   initDataTo.value.orderType.orderType.fieldname = value.fieldname
   initDataTo.value.orderType.orderType.text = value.text
   // 点击相同索引
@@ -890,6 +918,7 @@ const choosesort = (index, value) => {
     monthFlag.value = false
     sortFlag.value = false
   }
+  orderType.value = true
 }
 
 // 判断多选列表
@@ -1078,7 +1107,7 @@ const saveData = async (Tformat) => {
   try {
     const res = await request.saveUserInfo(formData)
     console.log(res)
-    showToast(res.msg);
+    showToast(res.message);
   }
   catch (err) {
     console.log(err)
@@ -1249,7 +1278,11 @@ const siftUserInfo = async (Tformat) => {
     // console.log(res.data.sum)
     userInfoDataList.value.data = res.data.data
     // userInfoCard.value = res.data.data
-    totalMoney.value = res.data.sum.value
+    if (res.data.sum.value == null)
+      totalMoney.value = 0
+    else
+      totalMoney.value = res.data.sum.value
+    // totalMoney.value = res.data.sum.value
     totalMoneyTitle.value = res.data.sum.text
     sumFieldName.value = res.data.sum.fieldname
     count.value = res.data.sum.count
@@ -1348,6 +1381,7 @@ const search = (value) => {
 
       .sorticon {
         position: relative;
+        margin-left: 3px;
         // height: 20px;
         // border: solid 1px red;
       }
@@ -1469,6 +1503,7 @@ const search = (value) => {
     }
 
     .userOptions2 {
+      // position: absolute;
       // width: 100%;
       // padding-top: 12px;
       margin-left: 12px;
@@ -1509,6 +1544,7 @@ const search = (value) => {
       // height: 497px;
       max-height: 60vh;
       background-color: rgba(255, 255, 255, 1);
+      // margin-bottom: 12px;
 
       .title {
         padding-top: 8px;
@@ -1681,4 +1717,5 @@ const search = (value) => {
       }
     }
   }
-}</style>
+}
+</style>
