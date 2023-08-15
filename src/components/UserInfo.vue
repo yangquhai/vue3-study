@@ -619,25 +619,32 @@ const checked = (name, SYSTEM_ID, SYSTEM_LCMC, SYSTEM_LCMXMC_ORG) => {
 }
 
 const scrollRef = ref() //名字需要跟上面模板中定义的一样
+const loadingMore = ref(false) 
 onMounted(() => {
     // console.log(scrollRef.value)
     // 触底加载事件
     scrollRef.value.addEventListener('scroll', () => {
         const { scrollTop, offsetHeight, scrollHeight } = scrollRef.value
-        // console.log(scrollTop, offsetHeight, scrollHeight,)
-        if (scrollTop + offsetHeight == scrollHeight) {
+        console.log(scrollTop, offsetHeight, scrollHeight,)
+
+        if (loadingMore.value) 
+        return
+
+        if (scrollTop + offsetHeight >= scrollHeight-40) {
             //滚动条到达底部
             if (props.userInfoDataList.data.length < props.userInfoDataList.sum.count) {
                 loadMore()
+                console.log('loadmore')
             }
             console.log(props.userInfoDataList.data.length, props.userInfoDataList.sum.count)
-            console.log(scrollTop, offsetHeight, scrollHeight)
+            // console.log(scrollTop, offsetHeight, scrollHeight,props.userInfoDataList.data.length , props.userInfoDataList.sum.count)
         }
     })
 })
 // 暴露值给父组件
 defineExpose({
-    chooseList
+    chooseList,
+    loadingMore,
 }); 
 </script>
 

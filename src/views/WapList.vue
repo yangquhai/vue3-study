@@ -639,10 +639,12 @@ const del = async () => {
 const conactArray = ref([])
 const pageIndex = ref(1)
 const loadMore = async () => {
+  info.value.loadingMore = true
   pageIndex.value++
   siftDataTo.value = JSON.parse(JSON.stringify(initDataTo.value))
   siftDataTo.value.sum = { fieldname: sumFieldName.value, text: totalMoneyTitle.value }
   // console.log(siftDataTo.value)
+  console.log(info.value.loadingMore)
   let formData = new FormData()
   formData.append('Tformnamecn', Tformnamecn.value)
   formData.append('Turl', Turl.value)
@@ -655,6 +657,7 @@ const loadMore = async () => {
     const res = await request.siftUserInfo(formData)
     conactArray.value = res.data.data
     userInfoDataList.value.data = userInfoDataList.value.data.concat(conactArray.value)
+    info.value.loadingMore = false
     // console.log(conactArray.value,userInfoDataList.value.data)
   }
   catch (err) {

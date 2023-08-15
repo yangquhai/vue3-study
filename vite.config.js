@@ -28,14 +28,8 @@ export default defineConfig(({ mode }) => {
                 output: {
                     // 修改输出目录为 dist/projects/mobile/anywell-collaboration
                     dir: resolve(__dirname, 'dist' + FOLDER_PATH),
-                    manualChunks(id) {
-                        if (id.includes('node_modules')) {
-                            return id.toString().split('node_modules/')[1].split('/')[0].toString();
-                        }
-                    }
                 },
             },
-
             targets: 'es2015'
             
         },
