@@ -19,7 +19,7 @@
             <span class="iconfont icon-sort-up icon-sort1" v-if="orderType"
               :style="{ 'color': sortDescFlag ? '#dcdee0' : '#1890ff' }"></span>
             <span class="iconfont icon-sort-down icon-sort2" :style="{ 'color': sortDescFlag ? '#1890ff ' : '#dcdee0' }"
-            v-if="orderType" style="display: block;"></span>
+              v-if="orderType" style="display: block;"></span>
 
 
           </div>
@@ -273,7 +273,7 @@ const toFormData = ref({
 // 传入到高级筛选模块的日期框
 const calendarDate1List = ref({ dateFrom: '请选择日期', dateTo: '请选择日期' })
 const sortDescFlag = ref(false)
-const orderType = ref(true)
+const orderType = ref(false)
 const initData = (tabListData, toFormData) => {
   toFormData.value.dateType = tabListData.value.dateType
   // 选中的流程值
@@ -366,14 +366,18 @@ const initData = (tabListData, toFormData) => {
   tabListData.value.orderType.orderType.forEach(function (value) {
     if (value.select) {
       // console.log(sortDescFlag.value,value.order)
+      if(value.fieldname){
+        orderType.value = true
+        console.log(value.fieldname)
+      }
+      
       if (!value.order) {
         sortDescFlag.value = false
-        orderType.value = false
       }
       else {
         sortDescFlag.value = true
-        orderType.value = true
       }
+      // console.log(orderType.value,value.fieldname)
       toFormData.value.orderType.orderType.fieldname = value.fieldname
       toFormData.value.orderType.orderType.order = value.order
       toFormData.value.orderType.orderType.text = value.text
@@ -416,6 +420,7 @@ const getPageUrl = () => {
 }
 getPageUrl()
 
+// document.title = Tsystem_lcmc.value
 // 第一次请求页面获取参数
 const getData = async () => {
   let formData = new FormData()
@@ -529,6 +534,9 @@ const onSelect = async (item) => {
         onFail: function (err) { }
       })
     }
+    if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
+      window.location.href = (baseUrl.value + `${Turl.value}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
+    }
     else {
       window.location.href = (baseUrl.value + `${Turl.value}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
     }
@@ -542,6 +550,9 @@ const onSelect = async (item) => {
         },
         onFail: function (err) { }
       })
+    }
+    if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
+      window.location.href = (baseUrl.value + `${Turl.value}?Tflag=8&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
     }
     else {
       window.location.href = (baseUrl.value + `${Turl.value}?Tflag=8&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
@@ -699,6 +710,9 @@ const goAddData = () => {
       },
       onFail: function (err) { }
     })
+  }
+  if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
+    window.location.href = (baseUrl.value + tabListData.value.newUrl)
   }
   else {
     window.location.href = (baseUrl.value + tabListData.value.newUrl)

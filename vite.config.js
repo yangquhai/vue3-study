@@ -7,7 +7,7 @@ import autoprefixer from 'autoprefixer'
 import copy from 'rollup-plugin-copy'
 import { resolve } from 'path'
 // import browserslist from 'browserslist'
-// import legacy from '@vitejs/plugin-legacy'
+import legacy from '@vitejs/plugin-legacy'
 
 // const browserslistConfig = browserslist.loadConfig({ path: '.' })
 
@@ -34,7 +34,10 @@ export default defineConfig(({ mode }) => {
                         }
                     }
                 },
-            }
+            },
+
+            targets: 'es2015'
+            
         },
         server: {
             port: 8080,
@@ -50,9 +53,35 @@ export default defineConfig(({ mode }) => {
         },
         plugins: [
             vue(),
-            // legacy({
-            //     targets: browserslistConfig,
-            //   }),
+
+
+            legacy({
+                targets: ['chrome 52'],
+                additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
+                renderLegacyChunks: true,
+                polyfills: [
+                    'es.symbol',
+                    'es.promise',
+                    'es.promise.finally',
+                    'es/map',
+                    'es/set',
+                    'es.array.filter',
+                    'es.array.for-each',
+                    'es.array.flat-map',
+                    'es.object.define-properties',
+                    'es.object.define-property',
+                    'es.object.get-own-property-descriptor',
+                    'es.object.get-own-property-descriptors',
+                    'es.object.keys',
+                    'es.object.to-string',
+                    'web.dom-collections.for-each',
+                    'esnext.global-this',
+                    'esnext.string.match-all'
+                ]
+            }),
+
+
+
             Components({
                 resolvers: [VantResolver()],
             }),
@@ -78,6 +107,7 @@ export default defineConfig(({ mode }) => {
                 hook: 'writeBundle', // 在构建完成后执行复制操作
             }),
         ],
+        
         resolve: {
             // 设置路径别名
             alias: {
