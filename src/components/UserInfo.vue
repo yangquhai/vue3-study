@@ -148,28 +148,28 @@ watch(() => props.userInfoDataList, (value) => {
 // 跳转值system界面
 const baseUrl = ref('http://dx.anywellchat.com:8888/ANYWELL_hylingls/')
 const goSystem = (index) => {
-    console.log(SYSTEM_URL.value[index], index)
-    // http://dx.anywellchat.com:8888/anywell_hylingls/WAPYXKHGZB.ASPX?Tsystem_id=2023080414170266873090102c6ca   WAPYXKHGZB.ASPX?Tsystem_id=54DSSJTB
-
-    // window.open = (baseUrl.value,SYSTEM_URL.value[index])
-    // window.open("https://www.cnblogs.com/guorongtao/")
+    // console.log(SYSTEM_URL.value[index], index)
     if (dd.env.platform !== "notInDingTalk") {
         dd.biz.util.openLink({
             // url:"http://oa.gzwebway.com:8888/oa/WAPGZRZ.ASPX?Tsystem_id=RZ756089&IsShowLiePi=1",//要打开链接的地址
             url: `${baseUrl.value}${SYSTEM_URL.value[index]}`,
             onSuccess: function (result) {
                 /**/
+                console.log(url)
             },
-            onFail: function (err) { }
+            onFail: function (err) {
+                console.log(err)
+             }
         })
     }
     if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
-        window.location.href = (baseUrl.value + SYSTEM_URL.value[index])
+        window.location.href = './' + SYSTEM_URL.value[index]
         // window.location.href = (baseUrl.value + 'WAPYXKHGZB.ASPX?tnw=oknew2&Tsystem_id=62DSSJTB')
+        // console.log(SYSTEM_URL.value[index])
     }
-    else {
-        window.location.href = (baseUrl.value + SYSTEM_URL.value[index])
-    }
+    // else {
+    //     window.location.href = (baseUrl.value + 'WAPYXKHGZB.ASPX?tnw=oknew2&Tsystem_id=62DSSJTB')
+    // }
 }
 const goKhDetails = (index) => {
     // console.log(index,KHBM.value[index])
@@ -184,11 +184,11 @@ const goKhDetails = (index) => {
         })
     }
     if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
-        window.location.href = (baseUrl.value + 'wapCustomerBill.aspx?khbm=' + KHBM.value[index].systemId)
+        window.location.href =  './wapCustomerBill.aspx?khbm=' + KHBM.value[index].systemId
     }
-    else {
-        window.location.href = (baseUrl.value + 'wapCustomerBill.aspx?khbm=' + KHBM.value[index].systemId)
-    }
+    // else {
+    //     window.location.href =  'wapCustomerBill.aspx?khbm=' + KHBM.value[index].systemId
+    // }
 }
 
 // 获取AJAX_Url按钮
@@ -418,7 +418,7 @@ const KHBM = computed(() => {
 const userDataList2 = reactive([])
 const chooseList = ref([])
 const totalMoney = ref([])
-const valueStr = ref([])
+// const valueStr = ref([])
 const isLoading = ref(false)
 const show = ref(false)
 const callPhoneNum = ref('')
@@ -496,7 +496,6 @@ const changeTransferOrderData = async (FC, DT, formdata, tformname, ttablename, 
     // formData.append('tselecteddatagridsstr', [])
 }
 
-
 const actions2 = ref([])
 const orderFlag = ref(false)
 const transferOrder = (index) => {
@@ -521,6 +520,7 @@ const onSelect = async (item) => {
     showLoadingToast({
         duration: 0,
         forbidClick: true,
+        message: '加载中...',
     });
     // console.log(transferOrderIndex.value,props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID)
     console.log(item)
@@ -535,6 +535,7 @@ const onSelect = async (item) => {
     )
     try {
         closeToast();
+        orderFlag.value = false
         if (data2.PAPA3) {
             if (dd.env.platform !== "notInDingTalk") {
                 dd.biz.util.openLink({
@@ -546,11 +547,11 @@ const onSelect = async (item) => {
                 })
             }
             if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
-                window.location.href = (baseUrl.value + 'WAP' + data2.PAPA3)
+                window.location.href =  './WAP' + data2.PAPA3
             }
-            else {
-                window.location.href = (baseUrl.value + 'WAP' + data2.PAPA3)
-            }
+            // else {
+            //     window.location.href =  'WAP' + data2.PAPA3
+            // }
         }
         else {
             // console.log(data2.MSG.split(data2.RESULT)[1])
@@ -569,6 +570,7 @@ const goDetails = async (item, index) => {
     showLoadingToast({
         duration: 0,
         forbidClick: true,
+        message: '加载中...',
     });
     const data = await loadTransferOrderData(item.name, item.name, props.userInfoDataList.data[index].SYSTEM_ID, item.tablename)
     console.log(data);
@@ -593,11 +595,11 @@ const goDetails = async (item, index) => {
                 })
             }
             if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
-                window.location.href = (baseUrl.value + 'WAP' + data2.PAPA3)
+                window.location.href =  './WAP' + data2.PAPA3
             }
-            else {
-                window.location.href = (baseUrl.value + 'WAP' + data2.PAPA3)
-            }
+            // else {
+            //     window.location.href =  'WAP' + data2.PAPA3
+            // }
         }
         // window.location.href = ('http://www.baidu.com')
         else {

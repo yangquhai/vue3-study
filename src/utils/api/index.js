@@ -16,6 +16,7 @@ function getCommonParam() {
 const APIFiles = {
     colloboration: './data/FormService_xt.aspx?Tmethod=',
     colloborationList: './data/list_bill_wap.aspx?Tmethod=',
+    deletecolloborationList:  './data/Aiot_list_bill.aspx?Tmethod=',
     oneClientOneGroup: './data/FormService_ykyq.aspx?Tmethod=',
 }
 
@@ -49,9 +50,6 @@ export function confirmCheckInATakePhotosData(params) {
     return request.post(APIFiles.oneClientOneGroup, 'confirmCheckInATakePhotosData', params, contentType.FormData)
 }
 
-
-
-
 /***-实施单处理页面-***/
 // 获取实施单处理数据
 export function getImplementationProcess(params) {
@@ -65,6 +63,7 @@ export function uploadImplImg(params) {
     }
     return request.post('uploadImg', params)
 }
+
 
 
 
@@ -103,29 +102,31 @@ export function siftUserInfo(params) {
 
 export function deleteUserInfo(params) {
     // 打包上传
-    // return request.post(APIFiles.colloborationList, 'deleteList',params, contentType.FormData)
-    return request.post(APIFiles.colloborationList, 'data/Aiot_list_bill.aspx?Tmethod=deleteList', params, contentType.FormData)
+    // return request.post(APIFiles.deletecolloborationList, 'deleteList',params, contentType.FormData)
+    return request.post(APIFiles.colloborationList, '/data/Aiot_list_bill.aspx?Tmethod=deleteList', params, contentType.FormData)
 }
+
+
 
 // 该接口返回值没有code所以需要单独写接口
 /***-批量操作审批数据-***/
 
 export function batchOperation(params) {
-     // let data = axios({ url: `/anywell_hylingls/data/Aiot_list_bill.aspx?Tmethod=Batch_delivery`, method: 'post', data: params })
+     // let data = axios({ url: `./data/Aiot_list_bill.aspx?Tmethod=Batch_delivery`, method: 'post', data: params })
      let data =  axios({url: `/api/data/Aiot_list_bill.aspx?Tmethod=Batch_delivery`,method:'post', data:  params})
      return data
 }
 
 /***-转单接口一-***/
 export function getTransferOrderData(params, FC) {
-    // let data = axios({ url: `/anywell_hylingls/ForceCheckScript/FC_${FC}?Tmethod=FormLoad`, method: 'post', data: params })
+    // let data = axios({ url: `./ForceCheckScript/FC_${FC}?Tmethod=FormLoad`, method: 'post', data: params })
     let data =  axios({url: `/api/ForceCheckScript/FC_${FC}?Tmethod=FormLoad`,method:'post', data:  params})
     return data
 }
 
 /***-转单接口二-***/
 export function changeTransferOrderData(params, FC, DT) {
-    // let data = axios({ url: `/anywell_hylingls/ForceCheckScript/FC_${FC}?Tmethod=CFCLICK_${DT}`, method: 'post', data: params })
+    // let data = axios({ url: `./ForceCheckScript/FC_${FC}?Tmethod=CFCLICK_${DT}`, method: 'post', data: params })
     let data =  axios({ url: `/api/ForceCheckScript/FC_${FC}?Tmethod=CFCLICK_${DT}`,method:'post', data:  params})
     return data
 }

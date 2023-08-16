@@ -20,8 +20,6 @@
               :style="{ 'color': sortDescFlag ? '#dcdee0' : '#1890ff' }"></span>
             <span class="iconfont icon-sort-down icon-sort2" :style="{ 'color': sortDescFlag ? '#1890ff ' : '#dcdee0' }"
               v-if="orderType" style="display: block;"></span>
-
-
           </div>
         </div>
         <div v-else class="skeleton">
@@ -65,14 +63,14 @@
             <div class="imgList">
               <!-- 被选中 -->
               <div v-if="item.select">
-                <span class="iconfont icon-paixu-jiangxu" style="color:black" v-if="item.order != 'DESC'"></span>
+                <span class="iconfont icon-paixu-jiangxu" style="color:#999999" v-if="item.order != 'DESC'"></span>
                 <span class="iconfont icon-paixu-shengxu" v-if="item.order == ''"></span>
                 <span class="iconfont icon-paixu-jiangxu" v-if="item.order == 'DESC'"></span>
-                <span class="iconfont icon-paixu-shengxu" style="color:black" v-if="item.order != ''"></span>
+                <span class="iconfont icon-paixu-shengxu" style="color:#999999" v-if="item.order != ''"></span>
               </div>
               <div v-else>
-                <span class="iconfont icon-paixu-jiangxu" style="color:black"></span>
-                <span class="iconfont icon-paixu-shengxu" style="color:black"></span>
+                <span class="iconfont icon-paixu-jiangxu" style="color:#999999"></span>
+                <span class="iconfont icon-paixu-shengxu" style="color:#999999"></span>
               </div>
               <!-- 未被选中 -->
 
@@ -430,6 +428,8 @@ const getData = async () => {
   formData.append('Tsystem_lcmc', Tsystem_lcmc.value)
   formData.append('pageIndex', 1)
   formData.append('pagesize', 10)
+  // baseUrl.value = document.URL
+  // console.log(window.location)
   try {
     const res = await request.getUserInfo(formData)
     isLoading.value = false
@@ -500,6 +500,7 @@ const getData = async () => {
 getData()
 
 
+
 // 点击获取转单操作
 const tsystem_idlist = ref('')
 // 批量操作数据
@@ -507,6 +508,7 @@ const onSelect = async (item) => {
   showLoadingToast({
     duration: 0,
     forbidClick: true,
+    message: '加载中...',
   });
   let Tsystem_ids = "";
   for (let i = 0; i < chooseSYSTEM_ID.value.length; i++) {
@@ -522,6 +524,7 @@ const onSelect = async (item) => {
   try {
     const res = await request.batchOperation(formData)
     tsystem_idlist.value = res.data.data
+    editFlag.value = false
     closeToast();
   }
   catch (err) {
@@ -542,11 +545,12 @@ const onSelect = async (item) => {
       })
     }
     if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
-      window.location.href = (baseUrl.value + `${Turl.value}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
+      // console.log(`./${Turl.value}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
+      window.location.href = `./${Turl.value}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`
     }
-    else {
-      window.location.href = (baseUrl.value + `${Turl.value}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
-    }
+    // else {
+    //   window.location.href = `${Turl.value}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`
+    // }
   }
   else {
     if (dd.env.platform !== "notInDingTalk") {
@@ -559,12 +563,12 @@ const onSelect = async (item) => {
       })
     }
     if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
-      window.location.href = (baseUrl.value + `${Turl.value}?Tflag=8&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
+      window.location.href = `./${Turl.value}?Tflag=8&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`
     }
-    else {
-      window.location.href = (baseUrl.value + `${Turl.value}?Tflag=8&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
-    }
-    // window.location.href = (baseUrl.value + `${Turl.value}?Tflag=8&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
+    // else {
+    //   window.location.href = `${Turl.value}?Tflag=8&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`
+    // }
+    // window.location.href = `${Turl.value}?Tflag=8&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`
   }
 }
 const edit = () => {
@@ -588,6 +592,7 @@ const del = async () => {
     showLoadingToast({
       duration: 0,
       forbidClick: true,
+      message: '加载中...',
     });
     console.log('delete')
     let userChoose = []
@@ -719,26 +724,28 @@ const close = () => {
 }
 // 点击跳转新增页面
 const goAddData = () => {
-  let url = baseUrl.value + tabListData.value.newUrl
-  console.log(url)
+  // let url = baseUrl.value + tabListData.value.newUrl
+  // console.log(document.location)
+  // console.log(url)
   if (dd.env.platform !== "notInDingTalk") {
     dd.biz.util.openLink({
       url: `${baseUrl.value}${tabListData.value.newUrl}`,
       onSuccess: function (result) {
         /**/
+        console.log(url)
       },
-      onFail: function (err) { }
+      onFail: function (err) {
+        console.log(err)
+      }
     })
   }
   if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
-    window.location.href = (baseUrl.value + tabListData.value.newUrl)
+    // console.log(tabListData.value.newUrl)
+    window.location.href = './' + tabListData.value.newUrl
   }
-  else {
-    window.location.href = (baseUrl.value + tabListData.value.newUrl)
-  }
-  // window.open = (this.baseUrl + this.tabListData.newUrl,"blank")
-  // window.location.href = ('http://www.baidu.com')
-  // window.location.href = (baseUrl.value + tabListData.value.newUrl)
+  // else {
+  //   window.location.href = (baseUrl.value + tabListData.value.newUrl)
+  // }
 }
 
 // 用于判断sortList中是否存在item索引
@@ -1076,7 +1083,7 @@ const checkedAll = () => {
     })
     chooseList.value = info.value.chooseList
     // console.log(chooseSYSTEM_ID.value)
-    checked(chooseList.value,chooseSYSTEM_ID.value)
+    checked(chooseList.value, chooseSYSTEM_ID.value)
   }
   else {
     info.value.chooseList.length = 0
