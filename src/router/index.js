@@ -9,7 +9,7 @@ import PerformanceReportingList from '../views/PerformanceReportingList.vue'
 import CheckInAndTakePhotos from '../views/CheckInAndTakePhotos.vue'
 import WapList from '../views/WapList.vue'
 
-const title = '亿建通协同'
+const title = '意向客户跟踪列表'
 const routes = [
     {
         path: '/:tszid/',

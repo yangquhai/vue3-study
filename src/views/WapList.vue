@@ -190,8 +190,8 @@
 <script setup>
 import request from '_api'
 import { ref, computed } from 'vue'
-import { showToast, showDialog } from 'vant';
 import * as dd from 'dingtalk-jsapi';
+import { showLoadingToast, closeToast, showToast, showDialog } from 'vant';
 const tabList = ref(['', '排序', '筛选'])
 const sortList = ref([])
 const isLoading = ref(true)
@@ -366,11 +366,11 @@ const initData = (tabListData, toFormData) => {
   tabListData.value.orderType.orderType.forEach(function (value) {
     if (value.select) {
       // console.log(sortDescFlag.value,value.order)
-      if(value.fieldname){
+      if (value.fieldname) {
         orderType.value = true
-        console.log(value.fieldname)
+        // console.log(value.fieldname)
       }
-      
+
       if (!value.order) {
         sortDescFlag.value = false
       }
@@ -499,10 +499,15 @@ const getData = async () => {
 
 getData()
 
+
 // 点击获取转单操作
 const tsystem_idlist = ref('')
 // 批量操作数据
 const onSelect = async (item) => {
+  showLoadingToast({
+    duration: 0,
+    forbidClick: true,
+  });
   let Tsystem_ids = "";
   for (let i = 0; i < chooseSYSTEM_ID.value.length; i++) {
     Tsystem_ids += chooseSYSTEM_ID.value[i].SYSTEM_ID + ",";
@@ -517,9 +522,11 @@ const onSelect = async (item) => {
   try {
     const res = await request.batchOperation(formData)
     tsystem_idlist.value = res.data.data
+    closeToast();
   }
   catch (err) {
     console.log(err)
+    closeToast();
   }
   // console.log(item)
   // console.log(chooseSYSTEM_ID.value)
@@ -578,6 +585,10 @@ const deleteWords = (wordIds) => {
 }
 const del = async () => {
   if (chooseList.value.length) {
+    showLoadingToast({
+      duration: 0,
+      forbidClick: true,
+    });
     console.log('delete')
     let userChoose = []
     let Tsystem_ids = "";
@@ -609,22 +620,27 @@ const del = async () => {
     try {
       const res = await request.deleteUserInfo(formData)
       deleteWords(userChoose)
-      console.log(userChoose.length)
+      // console.log(userChoose)
       userInfoDataList.value.sum.count = userInfoDataList.value.sum.count - userChoose.length
       count.value = count.value - userChoose.length
       chooseList.value.length = 0
+      // totalMoney.value = 
       Tsystem_ids = ""
       Pwork = ""
       userChoose.length = 0
+      checkAllFlag.value = false
+      closeToast();
       showToast(res.msg)
-      console.log(res)
+      // console.log(res)
     }
     catch (err) {
       chooseList.value.length = 0
       Tsystem_ids = ""
       Pwork = ""
       userChoose.length = 0
-      console.log(err)
+      checkAllFlag.value = false
+      closeToast();
+      // console.log(err)
     }
   }
   else
@@ -1016,7 +1032,7 @@ const checked = (val, SYSTEM_ID) => {
   let chooseTotalMoneyList = []
   chooseList.value = val
   chooseSYSTEM_ID.value = SYSTEM_ID
-  // console.log(chooseList.value,chooseSYSTEM_ID.value)
+  // console.log(chooseSYSTEM_ID.value)
   for (let i = 0; i < userInfoDataList.value.data.length; i++) {
     // console.log(userInfoDataList.value.data[i].rn)
     for (let j = 0; j < chooseList.value.length; j++) {
@@ -1033,19 +1049,34 @@ const checked = (val, SYSTEM_ID) => {
     chooseTotalMoney.value = (chooseTotalMoney.value / 10000).toFixed(0).toString() + '万'
   // console.log(chooseTotalMoney.value,chooseTotalMoneyList)
 }
+
 // 全选与反选
 const checkAllFlag = ref(false)
 const checkedAll = () => {
   checkAllFlag.value = !checkAllFlag.value
-  // 说明数组为空,进行全选操作
 
+  // 说明数组为空,进行全选操作
   if (checkAllFlag.value) {
     for (let i = 0; i < userInfoDataList.value.data.length; i++) {
       info.value.chooseList.push(userInfoDataList.value.data[i].rn)
+      // console.log(userInfoDataList.value.data)
+      chooseSYSTEM_ID.value.push({
+        SYSTEM_ID: userInfoDataList.value.data[i].SYSTEM_ID,
+        SYSTEM_LCMC: userInfoDataList.value.data[i].SYSTEM_LCMC,
+        SYSTEM_LCMXMC_ORG: userInfoDataList.value.data[i].SYSTEM_LCMXMC_ORG,
+        rn: userInfoDataList.value.data[i].rn,
+      })
     }
     info.value.chooseList = [...new Set(info.value.chooseList)]
+    // setarr(chooseSYSTEM_ID.value)
+    chooseSYSTEM_ID.value = chooseSYSTEM_ID.value.filter((item, index, self) => {
+      // findIndex方法找到第一个与当前元素id相等的元素索引
+      const i = self.findIndex(t => t.rn === item.rn)
+      return i === index
+    })
     chooseList.value = info.value.chooseList
-    checked(chooseList.value)
+    // console.log(chooseSYSTEM_ID.value)
+    checked(chooseList.value,chooseSYSTEM_ID.value)
   }
   else {
     info.value.chooseList.length = 0

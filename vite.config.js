@@ -30,6 +30,7 @@ export default defineConfig(({ mode }) => {
                     dir: resolve(__dirname, 'dist' + FOLDER_PATH),
                 },
             },
+            
             targets: 'es2015'
             
         },

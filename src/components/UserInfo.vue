@@ -114,7 +114,7 @@
         </van-pull-refresh>
         <!-- 用于唤起弹窗，拨打电话 -->
         <van-dialog v-model:show="show" show-cancel-button confirmButtonText="拨打电话" confirmButtonColor='#1890ff'
-            :closeOnClickOverlay="true" cancelButtonText="复制" @confirm="callPhone()">
+            :closeOnClickOverlay="true" cancelButtonText="复制" @confirm="callPhone()" @cancel="copy(callPhoneNum)">
             <!-- <p class="callPhone">{{ callPhoneNum }}</p> -->
             <p class="callPhone">18173135078</p>
             <p class="phoneTips">为了保护数据的安全性，本次的操作被系统记录。</p>
@@ -128,7 +128,7 @@
 import { ref, reactive, computed, watch, onMounted } from 'vue'
 import * as dd from 'dingtalk-jsapi';
 import request from '_api'
-import { showToast } from 'vant';
+import { showToast, showLoadingToast, closeToast, } from 'vant';
 
 const props = defineProps({
     userInfoDataList: Object,
@@ -391,11 +391,8 @@ const ZJE = computed(() => {
                     ZJEText.value = fieldName.value[j].text
                     if (props.userInfoDataList.data[i][fieldName.value[j].fieldname] < 100000)
                         LXDH.push(Math.trunc(props.userInfoDataList.data[i][fieldName.value[j].fieldname]).toString().replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g, '$1,'))
-                    // this.valueStr.push(this.userDataList[i].money.toString().replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g,'$1,'))
                     else
-                        // this.userDataList[i].money
-                        valueStr.value.push((userDataList.value[i].money / 10000).toFixed(2).toString())
-                    // LXDH.push(Math.trunc(this.userDataList2[i][this.fieldName[j].fieldname]))
+                        LXDH.push(Number((props.userInfoDataList.value[i].money / 10000)).toFixed(2).toString())
                 }
             }
         }
@@ -454,6 +451,16 @@ const callOut = (phoneNum) => {
     show.value = true
     callPhoneNum.value = phoneNum
 }
+// 点击复制按钮
+const copy = (phoneNum) => {
+    console.log(phoneNum)
+    let copyInput = document.createElement("input"); // 创建标签
+    copyInput.value = phoneNum; // 标签赋值
+    document.body.appendChild(copyInput); // 添加标签
+    copyInput.select(); // 选取文本框内容
+    document.execCommand("copy"); // 调用浏览器复制
+    document.body.removeChild(copyInput); // 复制成功后再将构造的标签 移除
+}
 
 // 将组件方法暴露给父组件,
 const emit = defineEmits(['checked', 'loadMore', 'onRefresh'])
@@ -511,6 +518,10 @@ const transferOrderIndex = ref('')
 
 // 点击获取转单操作
 const onSelect = async (item) => {
+    showLoadingToast({
+        duration: 0,
+        forbidClick: true,
+    });
     // console.log(transferOrderIndex.value,props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID)
     console.log(item)
     const data = await loadTransferOrderData(item.tformname, item.tformname, props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID, item.tmaintablename)
@@ -523,6 +534,7 @@ const onSelect = async (item) => {
         props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_LCMXMC_ORG,
     )
     try {
+        closeToast();
         if (data2.PAPA3) {
             if (dd.env.platform !== "notInDingTalk") {
                 dd.biz.util.openLink({
@@ -544,9 +556,9 @@ const onSelect = async (item) => {
             // console.log(data2.MSG.split(data2.RESULT)[1])
             showToast(data2.MSG.split(data2.RESULT)[1].replace(/\[|]/g, ''))
         }
-
     }
     catch (err) {
+        closeToast();
         console.log(err)
     }
 
@@ -554,6 +566,10 @@ const onSelect = async (item) => {
 // 转单，转操作，转订单详细操作
 const goDetails = async (item, index) => {
     console.log(item, index)
+    showLoadingToast({
+        duration: 0,
+        forbidClick: true,
+    });
     const data = await loadTransferOrderData(item.name, item.name, props.userInfoDataList.data[index].SYSTEM_ID, item.tablename)
     console.log(data);
     const data2 = await changeTransferOrderData(item.name, item.dt, JSON.stringify(data),
@@ -565,6 +581,7 @@ const goDetails = async (item, index) => {
     )
     try {
         // window.location.href = ('http://www.baidu.com')
+        closeToast();
         if (data2.PAPA3) {
             if (dd.env.platform !== "notInDingTalk") {
                 dd.biz.util.openLink({
@@ -587,9 +604,9 @@ const goDetails = async (item, index) => {
             // console.log(data2.MSG.split(data2.RESULT)[1])
             showToast(data2.MSG.split(data2.RESULT)[1].replace(/\[|]/g, ''))
         }
-
     }
     catch (err) {
+        closeToast();
         console.log(err)
     }
 }
@@ -605,7 +622,7 @@ const checked = (name, SYSTEM_ID, SYSTEM_LCMC, SYSTEM_LCMXMC_ORG) => {
     if (!chooseList.value.includes(name)) {
         totalMoney.value.push(name) // 判断已选列表中是否存在该id，不是则追加进去
         chooseList.value.push(name) // 判断已选列表中是否存在该id，不是则追加进去
-        chooseSYSTEM_ID.value.push({ SYSTEM_ID: SYSTEM_ID, SYSTEM_LCMC: SYSTEM_LCMC, SYSTEM_LCMXMC_ORG: SYSTEM_LCMXMC_ORG })
+        chooseSYSTEM_ID.value.push({ SYSTEM_ID: SYSTEM_ID, SYSTEM_LCMC: SYSTEM_LCMC, SYSTEM_LCMXMC_ORG: SYSTEM_LCMXMC_ORG, rn: chooseSYSTEM_ID.rn })
     } else {
         let index = chooseList.value.indexOf(name) // 求出当前id的所在位置
         // console.log()
@@ -619,18 +636,18 @@ const checked = (name, SYSTEM_ID, SYSTEM_LCMC, SYSTEM_LCMXMC_ORG) => {
 }
 
 const scrollRef = ref() //名字需要跟上面模板中定义的一样
-const loadingMore = ref(false) 
+const loadingMore = ref(false)
 onMounted(() => {
     // console.log(scrollRef.value)
     // 触底加载事件
     scrollRef.value.addEventListener('scroll', () => {
         const { scrollTop, offsetHeight, scrollHeight } = scrollRef.value
-        console.log(scrollTop, offsetHeight, scrollHeight,)
+        // console.log(scrollTop, offsetHeight, scrollHeight,)
 
-        if (loadingMore.value) 
-        return
+        if (loadingMore.value)
+            return
 
-        if (scrollTop + offsetHeight >= scrollHeight-40) {
+        if (scrollTop + offsetHeight >= scrollHeight - 40) {
             //滚动条到达底部
             if (props.userInfoDataList.data.length < props.userInfoDataList.sum.count) {
                 loadMore()
