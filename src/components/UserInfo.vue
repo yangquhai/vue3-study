@@ -2,7 +2,7 @@
 <template>
     <div class="page-content" ref="scrollRef">
         <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
-            <div v-for="(item, index) in props.userInfoDataList.data" class="card" @click="goSystem(index)">
+            <div v-for="(item, index) in props.userInfoDataList.data" class="card">
                 <div>
                     <div class="card-header flex">
                         <div class="checked flex">
@@ -16,7 +16,7 @@
                             </div>
                         </div>
 
-                        <small class="options">
+                        <small class="options" @click="goSystem(index)">
                             <!-- <a href="WAPYXKHGZB.ASPX?Tsystem_id=64DSSJTB"></a>   -->
                             {{ SYSTEM_LCMXMC[index] }}
                             <van-icon name="arrow" />
@@ -38,7 +38,7 @@
                                         </van-tag>
                                     </div>
                                 </div>
-                                <div class="phone" @click.stop="callOut(LXDH[index])" v-if="LXDH[index]">
+                                <div class="phone" @click.stop="callOut(LXDH[index], index)" v-if="LXDH[index]">
                                     <!-- <img src="../assets/phone.svg" alt=""> -->
                                     <van-icon name="phone" class="txt-gray" />
                                     <small>{{ LXDH[index] }}</small>
@@ -116,8 +116,8 @@
         <!-- 用于唤起弹窗，拨打电话 -->
         <van-dialog v-model:show="show" show-cancel-button confirmButtonText="拨打电话" confirmButtonColor='#1890ff'
             :closeOnClickOverlay="true" cancelButtonText="复制" @confirm="callPhone()" @cancel="copy(callPhoneNum)">
-            <!-- <p class="callPhone">{{ callPhoneNum }}</p> -->
-            <p class="callPhone">18173135078</p>
+            <p class="callPhone">{{ callPhoneNum }}</p>
+            <!-- <p class="callPhone">18173135078</p> -->
             <p class="phoneTips">为了保护数据的安全性，本次的操作被系统记录。</p>
         </van-dialog>
         <!-- 用于转单链接 -->
@@ -129,11 +129,27 @@
 import { ref, reactive, computed, watch, onMounted } from 'vue'
 import * as dd from 'dingtalk-jsapi';
 import request from '_api'
-import { showToast, showLoadingToast, closeToast,showDialog } from 'vant';
+import { showLoadingToast, closeToast, showDialog } from 'vant';
 
 const props = defineProps({
     userInfoDataList: Object,
     isLoad: Boolean,
+    Tformnamecn: {
+        type: String,
+        required: true
+    },
+    Turl: {
+        type: String,
+        required: true
+    },
+    Ttablename: {
+        type: String,
+        required: true
+    },
+    Tsystem_lcmc: {
+        type: String,
+        required: true
+    },
 })
 
 // 解析后端传输的字段，筛选出符合要求的数据,并对数据进行处理
@@ -169,7 +185,7 @@ const goSystem = (index) => {
         // SYSTEM_URL.value[index].split('?')
         let url = SYSTEM_URL.value[index].split('?')[0] + '?TNW=OKNEW2&' + SYSTEM_URL.value[index].split('?')[1]
         window.location.href = './' + url
-        console.log(SYSTEM_URL.value[index],url)
+        console.log(SYSTEM_URL.value[index], url)
     }
 }
 const goKhDetails = (index) => {
@@ -455,17 +471,41 @@ const sliceArr = (array, size) => {
 const callPhone = () => {
     window.location.href = 'tel://' + callPhoneNum.value
 }
+// 解密电话号码
+const getPhoneNum = async (Tformnamecn, Turl, Ttablename, Tsystem_lcmc, Tsystem_id, phoneNum) => {
+    let formData = new FormData()
+    formData.append('Tformnamecn', Tformnamecn)
+    formData.append('Turl', Turl)
+    formData.append('Ttablename', Ttablename)
+    formData.append('Tsystem_lcmc', Tsystem_lcmc)
+    formData.append('Tsystem_id', Tsystem_id)
+    try {
+        const res = await request.getPhoneNum(formData)
+        // return res.data
+        if (res.data.tel) {
+            callPhoneNum.value = res.data.tel
+        }
+        else {
+            callPhoneNum.value = phoneNum
+        }
+    }
+    catch (err) {
+        console.log(err)
+    }
+}
 // 唤起确认拨打电话弹窗
-const callOut = (phoneNum) => {
-    // console.log(phoneNum)
+const callOut = (phoneNum, index) => {
+    // console.log(phoneNum, props.userInfoDataList.data[index].SYSTEM_ID, props.Tformnamecn, props.Turl, props.Ttablename, props.Tsystem_lcmc)
+    getPhoneNum(props.Tformnamecn, props.Turl, props.Ttablename, props.Tsystem_lcmc, props.userInfoDataList.data[index].SYSTEM_ID, phoneNum)
     show.value = true
-    callPhoneNum.value = phoneNum
+    // callPhoneNum.value = phoneNum
+    // console.log(callPhoneNum.value)
 }
 // 点击复制按钮
 const copy = (phoneNum) => {
-    console.log(phoneNum)
+    // console.log(callPhoneNum.value)
     let copyInput = document.createElement("input"); // 创建标签
-    copyInput.value = phoneNum; // 标签赋值
+    copyInput.value = callPhoneNum.value; // 标签赋值
     document.body.appendChild(copyInput); // 添加标签
     copyInput.select(); // 选取文本框内容
     document.execCommand("copy"); // 调用浏览器复制
@@ -525,7 +565,7 @@ const AJAX_UrlButton = (actions2) => {
 }
 const transferOrderIndex = ref('')
 
-// 点击获取转单操作
+// 点击获取转单操作,单个按钮
 const onSelect = async (item) => {
     showLoadingToast({
         duration: 0,
@@ -569,7 +609,13 @@ const onSelect = async (item) => {
         }
         else {
             // console.log(data2.MSG.split(data2.RESULT)[1])
-            showToast(data2.MSG.split(data2.RESULT)[1].replace(/\[|]/g, ''))
+            // showToast(data2.MSG.split(data2.RESULT)[1].replace(/\[|]/g, ''))
+            showDialog({
+                message: data2.MSG.split(data2.RESULT)[1].replace(/\[|]/g, ''),
+                theme: 'round-button',
+            }).then(() => {
+                // on close
+            });
         }
     }
     catch (err) {
@@ -620,7 +666,13 @@ const goDetails = async (item, index) => {
         // window.location.href = ('http://www.baidu.com')
         else {
             // console.log(data2.MSG.split(data2.RESULT)[1])
-            showToast(data2.MSG.split(data2.RESULT)[1].replace(/\[|]/g, ''))
+            // showToast(data2.MSG.split(data2.RESULT)[1].replace(/\[|]/g, ''))
+            showDialog({
+                message: data2.MSG.split(data2.RESULT)[1].replace(/\[|]/g, ''),
+                theme: 'round-button',
+            }).then(() => {
+                // on close
+            });
         }
     }
     catch (err) {
@@ -730,6 +782,9 @@ defineExpose({
     }
 
     .options {
+        // border: solid 1px red;
+        width: 120px;
+        text-align: right;
         font-size: 14px;
         color: rgba(24, 144, 255, 1);
     }

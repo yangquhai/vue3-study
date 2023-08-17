@@ -180,8 +180,9 @@
       </div>
       <van-action-sheet v-model:show="editFlag" :actions="actions" @select="onSelect" cancel-text="取消" />
     </div>
-    <skeleton v-if="isLoading"></skeleton>
+    <skeleton v-if="isLoading || delLoading"></skeleton>
     <userInfo class="userInfo" ref="info" @checked="checked" :isLoad="isLoading" v-else @loadMore="loadMore"
+      :Tformnamecn="Tformnamecn" :Turl="Turl" :Ttablename="Ttablename" :Tsystem_lcmc="Tsystem_lcmc"
       :userInfoDataList="userInfoDataList"></userInfo>
   </div>
 </template>
@@ -194,6 +195,7 @@ import { showLoadingToast, closeToast, showToast, showDialog } from 'vant';
 const tabList = ref(['', '排序', '筛选'])
 const sortList = ref([])
 const isLoading = ref(true)
+const delLoading = ref(true)
 // 用户选中的数组
 const chooseList = ref([])
 // 用户选择框
@@ -442,6 +444,7 @@ const getData = async () => {
   try {
     const res = await request.getUserInfo(formData)
     isLoading.value = false
+    delLoading.value = false
     tabListData.value = res.colums
     userInfoDataList.value = res.data
     // console.log(userInfoCard.value)
@@ -546,7 +549,7 @@ const onSelect = async (item) => {
   if (item.name == '批量审批') {
     if (dd.env.platform !== "notInDingTalk") {
       dd.biz.util.openLink({
-        url: `${baseUrl.value}${Turl.value} + '?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=' +${tsystem_idlist.value}`,
+        url: `${baseUrl.value} + 'WAP' + ${Turl.value} + '?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=' +${tsystem_idlist.value}`,
         onSuccess: function (result) {
           /**/
         },
@@ -554,8 +557,8 @@ const onSelect = async (item) => {
       })
     }
     if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
-      console.log(`./${Turl.value}?TNW=OKNEW2&Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
-      // window.location.href = `./${Turl.value}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`
+      // console.log(`./${Turl.value}?TNW=OKNEW2&Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
+      window.location.href = `./WAP${Turl.value}?TNW=OKNEW2&Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`
     }
     // else {
     //   window.location.href = `${Turl.value}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`
@@ -572,7 +575,7 @@ const onSelect = async (item) => {
       })
     }
     if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
-      window.location.href = `./${Turl.value}?TNW=OKNEW2&Tflag=8&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`
+      window.location.href = `./WAP${Turl.value}?TNW=OKNEW2&Tflag=8&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`
     }
     // else {
     //   window.location.href = `${Turl.value}?Tflag=8&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`
@@ -606,7 +609,7 @@ const del = async () => {
     console.log('delete')
     let userChoose = []
     let Tsystem_ids = "";
-    let PWorkflowString = ""
+    // let PWorkflowString = ""
     let Pwork = ""
     let delTurl = '[' + Turl.value + ']'
     let delSYSTEM_LCMC = []
@@ -634,17 +637,31 @@ const del = async () => {
     try {
       const res = await request.deleteUserInfo(formData)
       deleteWords(userChoose)
-      // console.log(userChoose)
-      userInfoDataList.value.sum.count = userInfoDataList.value.sum.count - userChoose.length
-      count.value = count.value - userChoose.length
-      chooseList.value.length = 0
-      // totalMoney.value = 
       Tsystem_ids = ""
       Pwork = ""
       userChoose.length = 0
       checkAllFlag.value = false
       closeToast();
       showToast(res.msg)
+
+      try {
+        // keepData()
+        copyData(siftDataTo, initDataTo)
+        // console.log(siftDataTo.value)
+        siftUserInfo(JSON.stringify(siftDataTo.value),1)
+      }
+      catch(err) {
+        console.log(err)
+      }
+
+      // 删除成功请求拉取数据接口
+      // sift()
+
+      // console.log(userChoose)
+      // userInfoDataList.value.sum.count = userInfoDataList.value.sum.count - userChoose.length
+      // count.value = count.value - userChoose.length
+      // chooseList.value.length = 0
+      // totalMoney.value = 
       // console.log(res)
     }
     catch (err) {
@@ -750,7 +767,7 @@ const goAddData = () => {
   }
   if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
     // console.log(tabListData.value.newUrl)
-    let url = tabListData.value.newUrl.split('?')[0] +'?TNW=OKNEW2&' + tabListData.value.newUrl.split('?')[1]
+    let url = tabListData.value.newUrl.split('?')[0] + '?TNW=OKNEW2&' + tabListData.value.newUrl.split('?')[1]
     // console.log(url)
     window.location.href = './' + url
   }
@@ -1334,8 +1351,14 @@ const keep = () => {
   saveData(JSON.stringify(initDataTo.value))
 }
 // 筛选数据接口
-const siftUserInfo = async (Tformat) => {
-  isLoading.value = true
+const siftUserInfo = async (Tformat,type) => {
+  if(type ==1) {
+    // isLoading.value = true
+    delLoading.value = true
+  }
+  else {
+    isLoading.value = true
+  }
   pageIndex.value = 1
   let formData = new FormData()
   formData.append('Tformnamecn', Tformnamecn.value)
@@ -1345,8 +1368,12 @@ const siftUserInfo = async (Tformat) => {
   formData.append('Tfilter', Tformat)
   formData.append('pageIndex', 1)
   formData.append('pagesize', 10)
+  console.log(type)
   try {
     const res = await request.siftUserInfo(formData)
+    if(type==1){
+      delLoading.value = false
+    }
     isLoading.value = false
     // console.log(res.data.sum)
     userInfoDataList.value.data = res.data.data
@@ -1434,7 +1461,6 @@ const search = (value) => {
     justify-content: center;
     margin-top: -1px;
     background-color: rgba(255, 255, 255, 1);
-
     span {
       font-size: 12px;
       margin-left: 3px;
@@ -1499,9 +1525,10 @@ const search = (value) => {
     // border: none;
     // margin-top: -1px;
     .sort {
-      height: 34px;
+      height: 44px;
       display: flex;
       align-items: center;
+      // border: solid 1px red;
 
       // justify-content: center;
       .imgList {
@@ -1517,7 +1544,7 @@ const search = (value) => {
       .sortItem {
         width: 90%;
         font-size: 12px;
-        padding-bottom: 8px;
+        padding-bottom: 12px;
         border-bottom: 1px solid rgba(242, 243, 245, 1);
         margin-left: 16px;
         // border: solid 1px red;

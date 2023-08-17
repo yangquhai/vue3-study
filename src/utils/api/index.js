@@ -79,31 +79,40 @@ export function recordPhoneCall(params) {
 
 export function getUserInfo(params) {
     // 打包上传
-    return request.post(APIFiles.colloborationList, 'getlistbill.gz.initial',params, contentType.FormData)
-    // return request.post(APIFiles.colloborationList, '/data/list_bill_wap.aspx?Tmethod=getlistbill.gz.initial', params, contentType.FormData)
+    // return request.post(APIFiles.colloborationList, 'getlistbill.gz.initial',params, contentType.FormData)
+    return request.post(APIFiles.colloborationList, '/data/list_bill_wap.aspx?Tmethod=getlistbill.gz.initial', params, contentType.FormData)
 }
 
 /***-保存数据-***/
 
 export function saveUserInfo(params) {
     // 打包上传
-    return request.post(APIFiles.colloborationList, 'saveformat',params, contentType.FormData)
-    // return request.post(APIFiles.colloborationList, '/data/list_bill_wap.aspx?Tmethod=saveformat', params, contentType.FormData)
+    // return request.post(APIFiles.colloborationList, 'saveformat',params, contentType.FormData)
+    return request.post(APIFiles.colloborationList, '/data/list_bill_wap.aspx?Tmethod=saveformat', params, contentType.FormData)
 }
 /***-拉取数据-***/
 
 export function siftUserInfo(params) {
     // 打包上传
-    return request.post(APIFiles.colloborationList, 'getlist.gz.data',params, contentType.FormData)
-    // return request.post(APIFiles.colloborationList, '/data/list_bill_wap.aspx?Tmethod=getlist.gz.data', params, contentType.FormData)
+    // return request.post(APIFiles.colloborationList, 'getlist.gz.data',params, contentType.FormData)
+    return request.post(APIFiles.colloborationList, '/data/list_bill_wap.aspx?Tmethod=getlist.gz.data', params, contentType.FormData)
 }
+
+/***-解密电话接口-***/
+
+export function getPhoneNum(params) {
+    // 打包上传
+    // return request.post(APIFiles.colloborationList, 'getTel',params, contentType.FormData)
+    return request.post(APIFiles.colloborationList, '/data/list_bill_wap.aspx?Tmethod=getTel', params, contentType.FormData)
+}
+
 
 /***-批量删除数据-***/
 
 export function deleteUserInfo(params) {
     // 打包上传
-    return request.post(APIFiles.deletecolloborationList, 'deleteList',params, contentType.FormData)
-    // return request.post(APIFiles.colloborationList, '/data/Aiot_list_bill.aspx?Tmethod=deleteList', params, contentType.FormData)
+    // return request.post(APIFiles.deletecolloborationList, 'deleteList',params, contentType.FormData)
+    return request.post(APIFiles.deletecolloborationList, '/data/Aiot_list_bill.aspx?Tmethod=deleteList', params, contentType.FormData)
 }
 
 
@@ -112,22 +121,22 @@ export function deleteUserInfo(params) {
 /***-批量操作审批数据-***/
 
 export function batchOperation(params) {
-     let data = axios({ url: `./data/Aiot_list_bill.aspx?Tmethod=Batch_delivery`, method: 'post', data: params })
-     // let data =  axios({url: `/api/data/Aiot_list_bill.aspx?Tmethod=Batch_delivery`,method:'post', data:  params})
+     // let data = axios({ url: `./data/Aiot_list_bill.aspx?Tmethod=Batch_delivery`, method: 'post', data: params })
+     let data =  axios({url: `/api/data/Aiot_list_bill.aspx?Tmethod=Batch_delivery`,method:'post', data:  params})
      return data
 }
 
 /***-转单接口一-***/
 export function getTransferOrderData(params, FC) {
-    let data = axios({ url: `./ForceCheckScript/FC_${FC}?Tmethod=FormLoad`, method: 'post', data: params })
-    // let data =  axios({url: `/api/ForceCheckScript/FC_${FC}?Tmethod=FormLoad`,method:'post', data:  params})
+    // let data = axios({ url: `./ForceCheckScript/FC_${FC}?Tmethod=FormLoad`, method: 'post', data: params })
+    let data =  axios({url: `/api/ForceCheckScript/FC_${FC}?Tmethod=FormLoad`,method:'post', data:  params})
     return data
 }
 
 /***-转单接口二-***/
 export function changeTransferOrderData(params, FC, DT) {
-    let data = axios({ url: `./ForceCheckScript/FC_${FC}?Tmethod=CFCLICK_${DT}`, method: 'post', data: params })
-    // let data =  axios({ url: `/api/ForceCheckScript/FC_${FC}?Tmethod=CFCLICK_${DT}`,method:'post', data:  params})
+    // let data = axios({ url: `./ForceCheckScript/FC_${FC}?Tmethod=CFCLICK_${DT}`, method: 'post', data: params })
+    let data =  axios({ url: `/api/ForceCheckScript/FC_${FC}?Tmethod=CFCLICK_${DT}`,method:'post', data:  params})
     return data
 }
 
@@ -145,5 +154,6 @@ export default {
     getTransferOrderData,
     changeTransferOrderData,
     batchOperation,
-    deleteUserInfo
+    deleteUserInfo,
+    getPhoneNum
 }
