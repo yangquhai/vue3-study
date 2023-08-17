@@ -1368,7 +1368,7 @@ const siftUserInfo = async (Tformat,type) => {
   formData.append('Tfilter', Tformat)
   formData.append('pageIndex', 1)
   formData.append('pagesize', 10)
-  console.log(type)
+  // console.log(type)
   try {
     const res = await request.siftUserInfo(formData)
     if(type==1){
