@@ -159,7 +159,7 @@ const goSystem = (index) => {
             },
             onFail: function (err) {
                 console.log(err)
-             }
+            }
         })
     }
     if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
@@ -184,7 +184,7 @@ const goKhDetails = (index) => {
         })
     }
     if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
-        window.location.href =  './wapCustomerBill.aspx?khbm=' + KHBM.value[index].systemId
+        window.location.href = './wapCustomerBill.aspx?khbm=' + KHBM.value[index].systemId
     }
     // else {
     //     window.location.href =  'wapCustomerBill.aspx?khbm=' + KHBM.value[index].systemId
@@ -547,7 +547,7 @@ const onSelect = async (item) => {
                 })
             }
             if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
-                window.location.href =  './WAP' + data2.PAPA3
+                window.location.href = './WAP' + data2.PAPA3
             }
             // else {
             //     window.location.href =  'WAP' + data2.PAPA3
@@ -595,7 +595,7 @@ const goDetails = async (item, index) => {
                 })
             }
             if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
-                window.location.href =  './WAP' + data2.PAPA3
+                window.location.href = './WAP' + data2.PAPA3
             }
             // else {
             //     window.location.href =  'WAP' + data2.PAPA3

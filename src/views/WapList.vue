@@ -115,7 +115,8 @@
                 }}</van-tag>
               </div>
             </div>
-            <calendar v-if="calendarFlag2[index]"  :calendarDate1List="calendarDate1List"  @onConfirmDate="onConfirmDate"
+            <calendar v-if="calendarFlag2[index]" @click="getDateIndex(index)"
+              :calendarDate1List="calendarDate1List[index]" @onConfirmDate="onConfirmDate"
               @onConfirmDate2="onConfirmDate2"></calendar>
           </div>
           <van-divider></van-divider>
@@ -220,7 +221,7 @@ const date1 = ref('请选择日期')
 const date2 = ref('请选择日期')
 // 控制日历框的出现
 const calendarFlag = ref(false)
-const calendarFlag2 = ref([false])
+const calendarFlag2 = ref([])
 // 控制日历框的出现
 const value1 = ref(false)
 const value2 = ref(false)
@@ -269,7 +270,7 @@ const toFormData = ref({
 // console.log(document.location,/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent))
 // 用于初始化后端传来的数组 
 // 传入到高级筛选模块的日期框
-const calendarDate1List = ref({ dateFrom: '请选择日期', dateTo: '请选择日期' })
+const calendarDate1List = ref([])
 const sortDescFlag = ref(false)
 const orderType = ref(false)
 const initData = (tabListData, toFormData) => {
@@ -323,18 +324,22 @@ const initData = (tabListData, toFormData) => {
     // 将值为dateTime入参
     if (tabListData.value.searchCondition[i].type == 'datetime') {
       // console.log(tabListData.value.searchCondition[i])
+      let index = -1
+      index++
+      calendarDate1List.value.push({ dateFrom: '', dateTo: '' })
       for (let j = 0; j < tabListData.value.searchCondition[i].values.length; j++) {
         if (tabListData.value.searchCondition[i].values[j].value == '自定义') {
           // console.log(tabListData.value.searchCondition[i].text_bg)
           // calendarDate2.value = tabListData.value.searchCondition[i].values[j]
           // toFormData.value.searchCondition[i].values.value = ''
           if (tabListData.value.searchCondition[i].values[j].select) {
-            calendarDate1List.value = tabListData.value.searchCondition[i].values[j]
-            calendarFlag2.value = true
+            calendarDate1List.value[index] = tabListData.value.searchCondition[i].values[j]
+            calendarFlag2.value[index] = true
           }
           else {
-            calendarDate1List.value.dateFrom = tabListData.value.searchCondition[i].text_bg
-            calendarDate1List.value.dateTo = tabListData.value.searchCondition[i].text_bg
+            // console.log(calendarDate1List.value[i],i)
+            calendarDate1List.value[index].dateFrom = tabListData.value.searchCondition[i].text_bg
+            calendarDate1List.value[index].dateTo = tabListData.value.searchCondition[i].text_bg
           }
           toFormData.value.searchCondition[i].values.dateFrom = tabListData.value.searchCondition[i].values[j].dateFrom
           toFormData.value.searchCondition[i].values.dateTo = tabListData.value.searchCondition[i].values[j].dateTo
@@ -708,7 +713,6 @@ const dateList = computed(() => {
   for (let i = 0; i < tabListData.value.searchCondition.length; i++) {
     if (tabListData.value.searchCondition[i].type == 'datetime') {
       dateList.push(tabListData.value.searchCondition[i])
-      calendarFlag2.value.push(false)
     }
   }
   // console.log(dateList)
@@ -989,15 +993,21 @@ const chooseProcedureTags = (index, value) => {
 }
 // 日期单选,日期框选择的日期
 const lastClick = ref(null)
+const dataClickIndex = ref()
+const getDateIndex = (index) => {
+  dataClickIndex.value = index
+  // return index
+}
 const onConfirmDate = (val) => {
-  console.log(val)
-  calendarDate1List.value.dateFrom = val
+  // console.log(val,dataClickIndex.value,calendarDate1List.value[dataClickIndex.value].dateFrom)
+  calendarDate1List.value[dataClickIndex.value].dateFrom = val
 }
 const onConfirmDate2 = (val) => {
-  console.log(val)
-  calendarDate1List.value.dateTo = val
+  // console.log(val,dataClickIndex.value)
+  calendarDate1List.value[dataClickIndex.value].dateTo = val
 }
 const chooseDataTag = (index, index2, value) => {
+  // dataClickIndex.value = index
   // console.log(index, index2,dateList.value[index].values)
   for (let i = 0; i < dateList.value[index].values.length; i++) {
     // dateList.value[index].values[i].select = false
@@ -1008,6 +1018,7 @@ const chooseDataTag = (index, index2, value) => {
   }
   if (value.value == '自定义') {
     // 判断之前是否有点击
+    console.log(calendarFlag2.value[index])
     if (!lastClick.value) {
       dateList.value[index].values[index2].select = !dateList.value[index].values[index2].select
       calendarFlag2.value[index] = !calendarFlag2.value[index]
@@ -1237,9 +1248,9 @@ const keepData = () => {
         initDataTo.value.searchCondition[i].values.value = dateList.value[i].values[j].value
         if (dateList.value[i].values[j].value == '自定义') {
           if (dateList.value[i].values[j].select) {
-            // calendarDate1List
-            initDataTo.value.searchCondition[i].values.dateFrom = calendarDate1List.value.dateFrom
-            initDataTo.value.searchCondition[i].values.dateTo = calendarDate1List.value.dateTo
+            // console.log(calendarDate1List.value[i].dateFrom)
+            initDataTo.value.searchCondition[i].values.dateFrom = calendarDate1List.value[i].dateFrom
+            initDataTo.value.searchCondition[i].values.dateTo = calendarDate1List.value[i].dateTo
           }
           else {
             initDataTo.value.searchCondition[i].values.dateFrom = dateList.value[i].values[j].dateFrom.split('T')[0]
