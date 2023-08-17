@@ -47,13 +47,14 @@
                         </div>
                         <small class="card-content2">
                             <div class="van-row m-t-12 m-r-12 m-l-12">
-                                <div class="title van-col van-col--8 flex flex-col" v-for="(item) in ZDY[index]">
-                                    <div class="titleDetails" v-if="item.value">{{ item.title }}</div>
-                                    <div class="datas m-t-4 m-b-12" v-if="item.value">{{ item.value }}</div>
-                                </div>
+                                <template v-for="(item) in ZDY[index]">
+                                    <div class="title van-col van-col--8 flex flex-col" v-if="item.value">
+                                        <div class="titleDetails" v-if="item.value">{{ item.title }}</div>
+                                        <div class="datas m-t-4 m-b-12" v-if="item.value">{{ item.value }}</div>
+                                    </div>
+                                </template>
                             </div>
                         </small>
-
                         <div class="card-content3 m-t-0 m-l-12 m-r-12" v-if="BZ[index]">
                             <div class="tips m-8">
                                 <span> <small style="font-weight:bold;">最后跟进内容:</small> <small>{{ BZ[index] }}</small>
@@ -128,7 +129,7 @@
 import { ref, reactive, computed, watch, onMounted } from 'vue'
 import * as dd from 'dingtalk-jsapi';
 import request from '_api'
-import { showToast, showLoadingToast, closeToast, } from 'vant';
+import { showToast, showLoadingToast, closeToast,showDialog } from 'vant';
 
 const props = defineProps({
     userInfoDataList: Object,
@@ -163,32 +164,39 @@ const goSystem = (index) => {
         })
     }
     if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
-        window.location.href = './' + SYSTEM_URL.value[index]
-        // window.location.href = (baseUrl.value + 'WAPYXKHGZB.ASPX?tnw=oknew2&Tsystem_id=62DSSJTB')
-        // console.log(SYSTEM_URL.value[index])
+        // window.location.href = './' + SYSTEM_URL.value[index]
+        // window.location.href = 'http://dx.anywellchat.com:8888/ANYWELL_hylingls/WAPYXKHGZB.ASPX?tnw=oknew2Tsystem_id=2023081614274276610zbhu'
+        // SYSTEM_URL.value[index].split('?')
+        let url = SYSTEM_URL.value[index].split('?')[0] + '?TNW=OKNEW2&' + SYSTEM_URL.value[index].split('?')[1]
+        window.location.href = './' + url
+        console.log(SYSTEM_URL.value[index],url)
     }
-    // else {
-    //     window.location.href = (baseUrl.value + 'WAPYXKHGZB.ASPX?tnw=oknew2&Tsystem_id=62DSSJTB')
-    // }
 }
 const goKhDetails = (index) => {
-    // console.log(index,KHBM.value[index])
-    if (dd.env.platform !== "notInDingTalk") {
-        dd.biz.util.openLink({
-            url: `${baseUrl.value} + 'wapCustomerBill.aspx?khbm=' + ${KHBM.value[index].systemId}`,
-            // url:'http://oa.gzwebway.com:8888/oa/WAPGZRZ.ASPX?Tsystem_id=RZ756096&IsShowLiePi=1',
-            onSuccess: function (result) {
-                /**/
-            },
-            onFail: function (err) { }
-        })
+    console.log(index, KHBM.value[index].systemId)
+    if (!KHBM.value[index].systemId) {
+        showDialog({
+            message: '当前客编不存在',
+        }).then(() => {
+            // on close
+        });
     }
-    if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
-        window.location.href = './wapCustomerBill.aspx?khbm=' + KHBM.value[index].systemId
+    else {
+        if (dd.env.platform !== "notInDingTalk") {
+            dd.biz.util.openLink({
+                url: `${baseUrl.value} + 'wapCustomerBill.aspx?khbm=' + ${KHBM.value[index].systemId}`,
+                // url:'http://oa.gzwebway.com:8888/oa/WAPGZRZ.ASPX?Tsystem_id=RZ756096&IsShowLiePi=1',
+                onSuccess: function (result) {
+                    /**/
+                },
+                onFail: function (err) { }
+            })
+        }
+        if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
+            // console.log(KHBM.value[index].systemId)
+            window.location.href = './wapCustomerBill.aspx?TNW=OKNEW2&khbm=' + KHBM.value[index].systemId
+        }
     }
-    // else {
-    //     window.location.href =  'wapCustomerBill.aspx?khbm=' + KHBM.value[index].systemId
-    // }
 }
 
 // 获取AJAX_Url按钮
@@ -314,8 +322,9 @@ const ZDY = computed(() => {
             for (let j = 0; j < fieldName.value.length; j++) {
                 if (fieldName.value[j].type == '字段1') {
                     sum++
+                    // if (props.userInfoDataList.data[i][fieldName.value[j].fieldname]) {
+                    // console.log(props.userInfoDataList.data[i][fieldName.value[j].fieldname])
                     if (fieldName.value[j].lb != '数据:时间框') {
-                        // console.log(fieldName.value[j].lb)
                         KHMC.push({ value: props.userInfoDataList.data[i][fieldName.value[j].fieldname], title: fieldName.value[j].text })
                     }
                     else {
@@ -324,6 +333,7 @@ const ZDY = computed(() => {
                         else
                             KHMC.push({ value: props.userInfoDataList.data[i][fieldName.value[j].fieldname], title: fieldName.value[j].text })
                     }
+                    // }
                 }
             }
             size = sum
@@ -523,7 +533,7 @@ const onSelect = async (item) => {
         message: '加载中...',
     });
     // console.log(transferOrderIndex.value,props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID)
-    console.log(item)
+    // console.log(item)
     const data = await loadTransferOrderData(item.tformname, item.tformname, props.userInfoDataList.data[transferOrderIndex.value].SYSTEM_ID, item.tmaintablename)
     // console.log(JSON.stringify(data))
     const data2 = await changeTransferOrderData(item.tformname, item.dt, JSON.stringify(data),
@@ -547,7 +557,11 @@ const onSelect = async (item) => {
                 })
             }
             if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
-                window.location.href = './WAP' + data2.PAPA3
+                // console.log(data2.PAPA3)
+                // console.log(data2.PAPA3.split('TNW=BLANK'))
+                let url = data2.PAPA3.split('TNW=BLANK')[0] + 'TNW=OKNEW2' + data2.PAPA3.split('TNW=BLANK')[1]
+                // console.log(url)
+                window.location.href = './WAP' + url
             }
             // else {
             //     window.location.href =  'WAP' + data2.PAPA3
@@ -595,7 +609,9 @@ const goDetails = async (item, index) => {
                 })
             }
             if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
-                window.location.href = './WAP' + data2.PAPA3
+                let url = data2.PAPA3.split('TNW=BLANK')[0] + 'TNW=OKNEW2' + data2.PAPA3.split('TNW=BLANK')[1]
+                // console.log(url)
+                window.location.href = './WAP' + url
             }
             // else {
             //     window.location.href =  'WAP' + data2.PAPA3

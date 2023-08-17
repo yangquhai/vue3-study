@@ -554,8 +554,8 @@ const onSelect = async (item) => {
       })
     }
     if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
-      // console.log(`./${Turl.value}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
-      window.location.href = `./${Turl.value}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`
+      console.log(`./${Turl.value}?TNW=OKNEW2&Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`)
+      // window.location.href = `./${Turl.value}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`
     }
     // else {
     //   window.location.href = `${Turl.value}?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`
@@ -572,7 +572,7 @@ const onSelect = async (item) => {
       })
     }
     if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
-      window.location.href = `./${Turl.value}?Tflag=8&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`
+      window.location.href = `./${Turl.value}?TNW=OKNEW2&Tflag=8&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`
     }
     // else {
     //   window.location.href = `${Turl.value}?Tflag=8&TAUTOCLOSE=2&tsystem_idlist=${tsystem_idlist.value}`
@@ -750,7 +750,9 @@ const goAddData = () => {
   }
   if (navigator.userAgent.indexOf("wxwork") <= 0 && navigator.userAgent.indexOf("DingTalk") <= 0) {
     // console.log(tabListData.value.newUrl)
-    window.location.href = './' + tabListData.value.newUrl
+    let url = tabListData.value.newUrl.split('?')[0] +'?TNW=OKNEW2&' + tabListData.value.newUrl.split('?')[1]
+    // console.log(url)
+    window.location.href = './' + url
   }
   // else {
   //   window.location.href = (baseUrl.value + tabListData.value.newUrl)
@@ -1017,7 +1019,7 @@ const chooseDataTag = (index, index2, value) => {
     }
   }
   if (value.value == '自定义') {
-    // 判断之前是否有点击
+    // 判断第一次点击
     console.log(calendarFlag2.value[index])
     if (!lastClick.value) {
       dateList.value[index].values[index2].select = !dateList.value[index].values[index2].select
@@ -1574,15 +1576,14 @@ const search = (value) => {
     }
 
     .userOptions2 {
-      // position: absolute;
-      // width: 100%;
-      // padding-top: 12px;
+      padding-top: 12px;
       margin-left: 12px;
-      margin-right: 2px;
+      // margin-right: 12px;
       display: flex;
       z-index: 2;
       justify-content: flex-end;
       padding-bottom: 12px;
+      // border: solid 1px red;
 
       .van-button {
         width: 66px;
@@ -1611,7 +1612,7 @@ const search = (value) => {
 
     .superSelect {
       // border: solid 1px red;
-      overflow: scroll;
+      overflow-y: scroll;
       // height: 497px;
       max-height: 60vh;
       background-color: rgba(255, 255, 255, 1);
