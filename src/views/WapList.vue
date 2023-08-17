@@ -115,7 +115,7 @@
                 }}</van-tag>
               </div>
             </div>
-            <calendar v-if="calendarFlag2" :calendarDate1List="calendarDate1List" @onConfirmDate="onConfirmDate"
+            <calendar v-if="calendarFlag2[index]"  :calendarDate1List="calendarDate1List"  @onConfirmDate="onConfirmDate"
               @onConfirmDate2="onConfirmDate2"></calendar>
           </div>
           <van-divider></van-divider>
@@ -220,7 +220,7 @@ const date1 = ref('请选择日期')
 const date2 = ref('请选择日期')
 // 控制日历框的出现
 const calendarFlag = ref(false)
-const calendarFlag2 = ref(false)
+const calendarFlag2 = ref([false])
 // 控制日历框的出现
 const value1 = ref(false)
 const value2 = ref(false)
@@ -325,12 +325,16 @@ const initData = (tabListData, toFormData) => {
       // console.log(tabListData.value.searchCondition[i])
       for (let j = 0; j < tabListData.value.searchCondition[i].values.length; j++) {
         if (tabListData.value.searchCondition[i].values[j].value == '自定义') {
-          // console.log(tabListData.value.searchCondition[i].values[j].dateFrom)
+          // console.log(tabListData.value.searchCondition[i].text_bg)
           // calendarDate2.value = tabListData.value.searchCondition[i].values[j]
           // toFormData.value.searchCondition[i].values.value = ''
           if (tabListData.value.searchCondition[i].values[j].select) {
             calendarDate1List.value = tabListData.value.searchCondition[i].values[j]
             calendarFlag2.value = true
+          }
+          else {
+            calendarDate1List.value.dateFrom = tabListData.value.searchCondition[i].text_bg
+            calendarDate1List.value.dateTo = tabListData.value.searchCondition[i].text_bg
           }
           toFormData.value.searchCondition[i].values.dateFrom = tabListData.value.searchCondition[i].values[j].dateFrom
           toFormData.value.searchCondition[i].values.dateTo = tabListData.value.searchCondition[i].values[j].dateTo
@@ -704,6 +708,7 @@ const dateList = computed(() => {
   for (let i = 0; i < tabListData.value.searchCondition.length; i++) {
     if (tabListData.value.searchCondition[i].type == 'datetime') {
       dateList.push(tabListData.value.searchCondition[i])
+      calendarFlag2.value.push(false)
     }
   }
   // console.log(dateList)
@@ -982,8 +987,16 @@ const chooseProcedureTags = (index, value) => {
     procedureList.value[index].select = true
   // console.log(value,initDataTo.value.lcmxmc)
 }
-// 日期单选,
+// 日期单选,日期框选择的日期
 const lastClick = ref(null)
+const onConfirmDate = (val) => {
+  console.log(val)
+  calendarDate1List.value.dateFrom = val
+}
+const onConfirmDate2 = (val) => {
+  console.log(val)
+  calendarDate1List.value.dateTo = val
+}
 const chooseDataTag = (index, index2, value) => {
   // console.log(index, index2,dateList.value[index].values)
   for (let i = 0; i < dateList.value[index].values.length; i++) {
@@ -997,13 +1010,13 @@ const chooseDataTag = (index, index2, value) => {
     // 判断之前是否有点击
     if (!lastClick.value) {
       dateList.value[index].values[index2].select = !dateList.value[index].values[index2].select
-      calendarFlag2.value = !calendarFlag2.value
+      calendarFlag2.value[index] = !calendarFlag2.value[index]
       lastClick.value = index2 + 1
     }
     else {
       // lastClick.value = null
       dateList.value[index].values[index2].select = !dateList.value[index].values[index2].select
-      calendarFlag2.value = !calendarFlag2.value
+      calendarFlag2.value[index] = !calendarFlag2.value[index]
       dateList.value[index].values[lastClick.value - 1].select = false
       lastClick.value = null
     }
@@ -1011,14 +1024,14 @@ const chooseDataTag = (index, index2, value) => {
   else {
     // 第一次点击
     if (!lastClick.value) {
-      calendarFlag2.value = false
+      calendarFlag2.value[index] = false
       dateList.value[index].values[index2].select = !dateList.value[index].values[index2].select
       lastClick.value = index2 + 1
     }
     else {
       // console.log(lastClick.value)
       // lastClick.value = null
-      calendarFlag2.value = false
+      calendarFlag2.value[index] = false
       dateList.value[index].values[index2].select = !dateList.value[index].values[index2].select
       dateList.value[index].values[lastClick.value - 1].select = false
       lastClick.value = null
@@ -1194,15 +1207,6 @@ const initDataTo = ref({
     }
   },
 })
-// 日期框选择的日期
-const onConfirmDate = (val) => {
-  console.log(val)
-  calendarDate1List.value.dateFrom = val
-}
-const onConfirmDate2 = (val) => {
-  console.log(val)
-  calendarDate1List.value.dateTo = val
-}
 // 将用户选择的数据收集起来,后续用于保存还是筛选分不同的点击
 const keepData = () => {
   // console.log(filter.value)

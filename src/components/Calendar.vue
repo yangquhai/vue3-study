@@ -25,7 +25,7 @@ const props =defineProps({
 })
 // 日期自定义的初始化
 const initDate = () =>{
-  // console.log(props.calendarDate1List)
+  console.log(props.calendarDate1List)
   date1.value = props.calendarDate1List.dateFrom
   date2.value = props.calendarDate1List.dateTo
 }
