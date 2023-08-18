@@ -48,7 +48,7 @@
                         <small class="card-content2">
                             <div class="van-row m-t-12 m-r-12 m-l-12">
                                 <template v-for="(item) in ZDY[index]">
-                                    <div class="title van-col van-col--8 flex flex-col" v-if="item.value">
+                                    <div class="title van-col van-col--8  flex-col" v-if="item.value">
                                         <div class="titleDetails" v-if="item.value">{{ item.title }}</div>
                                         <div class="datas m-t-4 m-b-12" v-if="item.value">{{ item.value }}</div>
                                     </div>
@@ -345,7 +345,7 @@ const ZDY = computed(() => {
                     }
                     else {
                         if (props.userInfoDataList.data[i][fieldName.value[j].fieldname])
-                            KHMC.push({ value: props.userInfoDataList.data[i][fieldName.value[j].fieldname].split('T')[0], title: fieldName.value[j].text })
+                            KHMC.push({ value: props.userInfoDataList.data[i][fieldName.value[j].fieldname].split('T')[0] + ' ' + props.userInfoDataList.data[i][fieldName.value[j].fieldname].split('T')[1], title: fieldName.value[j].text })
                         else
                             KHMC.push({ value: props.userInfoDataList.data[i][fieldName.value[j].fieldname], title: fieldName.value[j].text })
                     }
@@ -850,6 +850,8 @@ defineExpose({
 
     .card-content2 {
         .title {
+            align-items: center;
+            display: flex;
             .titleDetails {
                 color: #999999;
             }
