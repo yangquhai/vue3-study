@@ -164,7 +164,8 @@
                 chooseTotalMoney }}</span> </div>
         </div>
         <div class="userOptions">
-          <button class="button1" @click="del">删 除</button>
+          <!-- <button class="button1" @click="del">删 除</button> -->
+          <van-icon name="delete-o" @click="del" />
           <button class="button3" @click="edit">批量操作</button>
           <button class="button2" @click="goAddData" v-if="tabListData.newUrl">新 增</button>
         </div>
@@ -1814,7 +1815,10 @@ const search = (value) => {
     align-items: center;
     justify-content: flex-end;
     margin-right: 2px;
-
+    .van-icon {
+        font-size: 20px;
+        margin-right: 15px;
+      }
     button {
       background-color: white;
       border-radius: 2em;
