@@ -1,7 +1,7 @@
 <!-- 用于card信息的渲染 -->
 <template>
     <div class="page-content" ref="scrollRef">
-        <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
+        <van-pull-refresh v-model="isLoading" @refresh="onRefresh" success-text="刷新成功">
             <div v-for="(item, index) in props.userInfoDataList.data" class="card">
                 <div>
                     <div class="card-header flex">
@@ -219,14 +219,14 @@ const goKhDetails = (index) => {
 const buttonNumber = ref(0)
 const AJAX_Url = computed(() => {
     let AJAX_Url = props.userInfoDataList.AJAX_Url
-    console.log(AJAX_Url.length, KHBM.value.length)
+    // console.log(AJAX_Url.length, KHBM.value.length)
     if (!KHBM.value.length) {
         buttonNumber.value = AJAX_Url.length
     }
     else {
         buttonNumber.value = AJAX_Url.length + 1
     }
-    console.log(buttonNumber.value)
+    // console.log(buttonNumber.value)
     return AJAX_Url
 })
 
@@ -449,11 +449,12 @@ const isLoading = ref(false)
 const show = ref(false)
 const callPhoneNum = ref('')
 const onRefresh = () => {
-    setTimeout(() => {
-        // Toast('刷新成功');
-        isLoading.value = false;
-    }, 1000);
-    emit('onRefresh')
+    emit('onRefresh',isLoading.value)
+    // setTimeout(() => {
+    //     // Toast('刷新成功');
+    //     // console.log(isLoading.value)
+    //     isLoading.value = false
+    // }, 1000);
     // console.log(fieldName.value, userDataList2.value.length)
 }
 
@@ -732,6 +733,7 @@ onMounted(() => {
 defineExpose({
     chooseList,
     loadingMore,
+    isLoading
 }); 
 </script>
 

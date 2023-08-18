@@ -182,7 +182,7 @@
     </div>
     <skeleton v-if="isLoading || delLoading"></skeleton>
     <userInfo class="userInfo" ref="info" @checked="checked" :isLoad="isLoading" v-else @loadMore="loadMore"
-      :Tformnamecn="Tformnamecn" :Turl="Turl" :Ttablename="Ttablename" :Tsystem_lcmc="Tsystem_lcmc"
+      @onRefresh="onRefresh" :Tformnamecn="Tformnamecn" :Turl="Turl" :Ttablename="Ttablename" :Tsystem_lcmc="Tsystem_lcmc"
       :userInfoDataList="userInfoDataList"></userInfo>
   </div>
 </template>
@@ -191,7 +191,7 @@
 import request from '_api'
 import { ref, computed } from 'vue'
 import * as dd from 'dingtalk-jsapi';
-import { showLoadingToast, closeToast, showToast, showDialog } from 'vant';
+import { showLoadingToast, closeToast, showToast, showDialog, showConfirmDialog } from 'vant';
 const tabList = ref(['', '排序', '筛选'])
 const sortList = ref([])
 const isLoading = ref(true)
@@ -510,8 +510,55 @@ const getData = async () => {
 }
 
 getData()
-
-
+// 刷新列表
+const onRefresh = async () => {
+  showLoadingToast({
+    message: '加载中...',
+    forbidClick: true,
+  });
+  // delLoading.value = true
+  // console.log(info.value.isLoading)
+  // setTimeout(() => {
+  copyData(siftDataTo, initDataTo)
+  // siftUserInfo(JSON.stringify(siftDataTo.value), 1)
+  // }, 1000);
+  pageIndex.value = 1
+  let formData = new FormData()
+  formData.append('Tformnamecn', Tformnamecn.value)
+  formData.append('Turl', Turl.value)
+  formData.append('Ttablename', Ttablename.value)
+  formData.append('Tsystem_lcmc', Tsystem_lcmc.value)
+  formData.append('Tfilter', JSON.stringify(siftDataTo.value))
+  formData.append('pageIndex', 1)
+  formData.append('pagesize', 10)
+  // console.log(type)
+  try {
+    // console.log(info.value)
+    const res = await request.siftUserInfo(formData)
+    // console.log(info.value.isLoading)
+    info.value.isLoading = false
+    closeToast()
+    userInfoDataList.value.data = res.data.data
+    // userInfoCard.value = res.data.data
+    if (res.data.sum.value == null)
+      totalMoney.value = 0
+    else
+      totalMoney.value = res.data.sum.value
+    // totalMoney.value = res.data.sum.value
+    totalMoneyTitle.value = res.data.sum.text
+    sumFieldName.value = res.data.sum.fieldname
+    count.value = res.data.sum.count
+    userInfoDataList.value.sum.count = res.data.sum.count
+    if (totalMoney.value > 10000)
+      totalMoney.value = (totalMoney.value / 10000).toFixed(0).toString() + '万'
+    // chooseList.length = 0
+    // console.log(userInfoDataList.value.sum)
+    // console.log(info.value)
+  }
+  catch (err) {
+    console.log(err)
+  }
+}
 
 // 点击获取转单操作
 const tsystem_idlist = ref('')
@@ -549,7 +596,7 @@ const onSelect = async (item) => {
   if (item.name == '批量审批') {
     if (dd.env.platform !== "notInDingTalk") {
       dd.biz.util.openLink({
-        url: `${baseUrl.value} + 'WAP' + ${Turl.value} + '?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=' +${tsystem_idlist.value}`,
+        url: `${baseUrl.value} + 'WAP' + ${Turl.value} + '?Tflag=9&TAUTOCLOSE=2&tsystem_idlist=' + ${tsystem_idlist.value}`,
         onSuccess: function (result) {
           /**/
         },
@@ -567,7 +614,7 @@ const onSelect = async (item) => {
   else {
     if (dd.env.platform !== "notInDingTalk") {
       dd.biz.util.openLink({
-        url: `${baseUrl.value}${Turl.value} + '?Tflag=8&TAUTOCLOSE=2&tsystem_idlist=' + ${tsystem_idlist.value}`,
+        url: `${baseUrl.value} + 'WAP' + ${Turl.value} + '?Tflag=8&TAUTOCLOSE=2&tsystem_idlist=' + ${tsystem_idlist.value}`,
         onSuccess: function (result) {
           /**/
         },
@@ -599,80 +646,90 @@ const edit = () => {
 const deleteWords = (wordIds) => {
   userInfoDataList.value.data = userInfoDataList.value.data.filter(item => !wordIds.includes(item.SYSTEM_ID))
 }
-const del = async () => {
+const del = () => {
   if (chooseList.value.length) {
-    showLoadingToast({
-      duration: 0,
-      forbidClick: true,
-      message: '加载中...',
-    });
-    console.log('delete')
-    let userChoose = []
-    let Tsystem_ids = "";
-    // let PWorkflowString = ""
-    let Pwork = ""
-    let delTurl = '[' + Turl.value + ']'
-    let delSYSTEM_LCMC = []
-    let SYSTEM_LCMXMC_ORG = []
-    for (let i = 0; i < chooseSYSTEM_ID.value.length; i++) {
-      userChoose.push(chooseSYSTEM_ID.value[i].SYSTEM_ID)
-      Tsystem_ids += chooseSYSTEM_ID.value[i].SYSTEM_ID + ",";
-      delSYSTEM_LCMC.push('[' + chooseSYSTEM_ID.value[i].SYSTEM_LCMC + ']')
-      SYSTEM_LCMXMC_ORG.push('[' + chooseSYSTEM_ID.value[i].SYSTEM_LCMXMC_ORG + ']')
-      // let delTurl = '[' + Turl.value +']'
-      // Pwork = chooseSYSTEM_ID.value[i].SYSTEM_LCMC + chooseSYSTEM_ID.value[i].SYSTEM_LCMXMC_ORG +delTurl
-      // PWorkflowString += Pwork + ","
-      // console.log(PWorkflowString)
-    }
-    Tsystem_ids = Tsystem_ids.substring(0, Tsystem_ids.length - 1)
-    Pwork = delSYSTEM_LCMC[0] + SYSTEM_LCMXMC_ORG[0] + delTurl
-    // PWorkflowString = PWorkflowString.substring(0, PWorkflowString.length - 1)
-    // console.log(Tsystem_ids,Pwork)
-    // console.log(Tsystem_ids)
-    let formData = new FormData()
-    formData.append('id', Tsystem_ids)
-    formData.append('PWorkflowString', Pwork)
-    // console.log(userChoose)
-    // console.log(chooseSYSTEM_ID.value, userInfoDataList.value.data)
-    try {
-      const res = await request.deleteUserInfo(formData)
-      deleteWords(userChoose)
-      Tsystem_ids = ""
-      Pwork = ""
-      userChoose.length = 0
-      checkAllFlag.value = false
-      closeToast();
-      showToast(res.msg)
 
-      try {
-        // keepData()
-        copyData(siftDataTo, initDataTo)
-        // console.log(siftDataTo.value)
-        siftUserInfo(JSON.stringify(siftDataTo.value),1)
-      }
-      catch(err) {
-        console.log(err)
-      }
+    showConfirmDialog({
+      message: '请问确认是否删除',
+    })
+      .then(async () => {
+        // on confirm
+        showLoadingToast({
+          duration: 0,
+          forbidClick: true,
+          message: '加载中...',
+        });
+        console.log('delete')
+        let userChoose = []
+        let Tsystem_ids = "";
+        // let PWorkflowString = ""
+        let Pwork = ""
+        let delTurl = '[' + Turl.value + ']'
+        let delSYSTEM_LCMC = []
+        let SYSTEM_LCMXMC_ORG = []
+        for (let i = 0; i < chooseSYSTEM_ID.value.length; i++) {
+          userChoose.push(chooseSYSTEM_ID.value[i].SYSTEM_ID)
+          Tsystem_ids += chooseSYSTEM_ID.value[i].SYSTEM_ID + ",";
+          delSYSTEM_LCMC.push('[' + chooseSYSTEM_ID.value[i].SYSTEM_LCMC + ']')
+          SYSTEM_LCMXMC_ORG.push('[' + chooseSYSTEM_ID.value[i].SYSTEM_LCMXMC_ORG + ']')
+          // let delTurl = '[' + Turl.value +']'
+          // Pwork = chooseSYSTEM_ID.value[i].SYSTEM_LCMC + chooseSYSTEM_ID.value[i].SYSTEM_LCMXMC_ORG +delTurl
+          // PWorkflowString += Pwork + ","
+          // console.log(PWorkflowString)
+        }
+        Tsystem_ids = Tsystem_ids.substring(0, Tsystem_ids.length - 1)
+        Pwork = delSYSTEM_LCMC[0] + SYSTEM_LCMXMC_ORG[0] + delTurl
+        // PWorkflowString = PWorkflowString.substring(0, PWorkflowString.length - 1)
+        // console.log(Tsystem_ids,Pwork)
+        // console.log(Tsystem_ids)
+        let formData = new FormData()
+        formData.append('id', Tsystem_ids)
+        formData.append('PWorkflowString', Pwork)
+        // console.log(userChoose)
+        // console.log(chooseSYSTEM_ID.value, userInfoDataList.value.data)
+        try {
+          const res = await request.deleteUserInfo(formData)
+          deleteWords(userChoose)
+          Tsystem_ids = ""
+          Pwork = ""
+          userChoose.length = 0
+          checkAllFlag.value = false
+          closeToast();
+          showToast(res.msg)
 
-      // 删除成功请求拉取数据接口
-      // sift()
+          try {
+            // keepData()
+            copyData(siftDataTo, initDataTo)
+            // console.log(siftDataTo.value)
+            siftUserInfo(JSON.stringify(siftDataTo.value), 1)
+          }
+          catch (err) {
+            console.log(err)
+          }
 
-      // console.log(userChoose)
-      // userInfoDataList.value.sum.count = userInfoDataList.value.sum.count - userChoose.length
-      // count.value = count.value - userChoose.length
-      // chooseList.value.length = 0
-      // totalMoney.value = 
-      // console.log(res)
-    }
-    catch (err) {
-      chooseList.value.length = 0
-      Tsystem_ids = ""
-      Pwork = ""
-      userChoose.length = 0
-      checkAllFlag.value = false
-      closeToast();
-      // console.log(err)
-    }
+          // 删除成功请求拉取数据接口
+          // sift()
+
+          // console.log(userChoose)
+          // userInfoDataList.value.sum.count = userInfoDataList.value.sum.count - userChoose.length
+          // count.value = count.value - userChoose.length
+          // chooseList.value.length = 0
+          // totalMoney.value = 
+          // console.log(res)
+        }
+        catch (err) {
+          chooseList.value.length = 0
+          Tsystem_ids = ""
+          Pwork = ""
+          userChoose.length = 0
+          checkAllFlag.value = false
+          closeToast();
+          // console.log(err)
+        }
+      })
+      .catch(() => {
+        // on cancel
+      });
   }
   else
     showDialog({
@@ -1351,8 +1408,9 @@ const keep = () => {
   saveData(JSON.stringify(initDataTo.value))
 }
 // 筛选数据接口
-const siftUserInfo = async (Tformat,type) => {
-  if(type ==1) {
+const siftUserInfo = async (Tformat, type) => {
+  // console.log(info.value)
+  if (type == 1) {
     // isLoading.value = true
     delLoading.value = true
   }
@@ -1370,11 +1428,13 @@ const siftUserInfo = async (Tformat,type) => {
   formData.append('pagesize', 10)
   // console.log(type)
   try {
+    // console.log(info.value)
     const res = await request.siftUserInfo(formData)
-    if(type==1){
+    if (type == 1) {
       delLoading.value = false
     }
     isLoading.value = false
+    // console.log(info.value)
     // console.log(res.data.sum)
     userInfoDataList.value.data = res.data.data
     // userInfoCard.value = res.data.data
@@ -1391,10 +1451,12 @@ const siftUserInfo = async (Tformat,type) => {
       totalMoney.value = (totalMoney.value / 10000).toFixed(0).toString() + '万'
     // chooseList.length = 0
     // console.log(userInfoDataList.value.sum)
+    // console.log(info.value)
   }
   catch (err) {
     console.log(err)
   }
+  // console.log(info.value)
 }
 
 const siftDataTo = ref('')
@@ -1461,6 +1523,7 @@ const search = (value) => {
     justify-content: center;
     margin-top: -1px;
     background-color: rgba(255, 255, 255, 1);
+
     span {
       font-size: 12px;
       margin-left: 3px;
@@ -1544,11 +1607,12 @@ const search = (value) => {
       .sortItem {
         width: 90%;
         font-size: 12px;
-        padding-bottom: 12px;
+        padding-bottom: 13px;
         border-bottom: 1px solid rgba(242, 243, 245, 1);
         margin-left: 16px;
         // border: solid 1px red;
         display: flex;
+        align-items: center;
         justify-content: space-between;
       }
     }
