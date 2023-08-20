@@ -702,7 +702,6 @@ const checked = (name, SYSTEM_ID, SYSTEM_LCMC, SYSTEM_LCMXMC_ORG) => {
         chooseSYSTEM_ID.value.splice(index, 1)
     }
     // console.log(chooseList.value)
-    // console.log(this.chooseList,name)
     emit('checked', chooseList.value, chooseSYSTEM_ID.value)
 }
 

@@ -774,7 +774,6 @@ const loadMore = async () => {
 const usertTagList = computed(() => {
   let usertTagList = []
   for (let i = 0; i < tabListData.value.searchCondition.length; i++) {
-    // console.log(this.tabListData.searchCondition[i])
     if (tabListData.value.searchCondition[i].type == "muliselect")
       usertTagList.push(tabListData.value.searchCondition[i])
     // console.log(usertTagList)
@@ -796,8 +795,6 @@ const dateList = computed(() => {
 
 // 关闭下拉框
 const close = () => {
-  // console.log(this.value1.getFullYear())
-  // console.log(this.getSimpleDate(this.value1)) 
   chooseIndex.value = null
   firstIndex.value = null
   monthFlag.value = false
@@ -847,9 +844,7 @@ const sortIncludes = computed(() => {
 const dropdown = (item) => {
   // stop()
   // console.log(item,index,firstIndex.value)
-  // console.log(this.chooseIndex,index)
   chooseIndex.value = item
-  // console.log(this.firstIndex,index)
   // 判断是否第一次打开
   if (firstIndex.value != item) {
     // console.log(sortIncludes.value)
@@ -887,9 +882,7 @@ const dropdown = (item) => {
       return
     }
     else {
-      // console.log(index,this.flag)
       if (flag.value == false && monthList.value.includes(item)) {
-        // console.log(index,this.flag)
         monthFlag.value = true
         flag.value = true
         return
@@ -921,7 +914,6 @@ const chooseMonth = (index, value) => {
   // console.log(chooseIndex.value)
   // console.log(index, initDataTo.value.dateType.defaultValue)
   initDataTo.value.dateType.defaultValue = value
-  // this.chooseIndex为0选择第一个
   chooseMonthIndex.value = value
   if (monthList.value.includes(chooseIndex.value)) {
     if (index != 7) {
@@ -1052,7 +1044,6 @@ const choosesort = (index, value) => {
 const chooseUserTag = (index, index2, value) => {
   // console.log(usertTagList.value[index].values[index2].select)
   if (usertTagList.value[index].values[index2].select) {
-    // console.log(this.usertTagList[index].values[index2].select)
     usertTagList.value[index].values[index2].select = false
   }
   else {
