@@ -1,15 +1,15 @@
 <!-- 日历插件的制作 -->
 <template>
-    <div class="card">
-      <div class="tablist" style="display:flex">
-        <van-cell title="从" :value="date1" @click="value1 = true" />
-        <van-calendar v-model:show="value1" :show-confirm="false" @confirm="onConfirm" :min-date="minDate"
-          :max-date="maxDate" />
-        <van-cell title="至" class="van-cell2" :value="date2" @click="value2 = true" />
-        <van-calendar v-model:show="value2" :show-confirm="false" @confirm="onConfirm2" :min-date="minDate"
-          :max-date="maxDate" />
-      </div>
+  <div class="card">
+    <div class="tablist" style="display:flex">
+      <van-cell title="从" :value="date1" @click="value1 = true" />
+      <van-calendar v-model:show="value1" :show-confirm="false" @confirm="onConfirm" :min-date="minDate"
+        :max-date="maxDate" />
+      <van-cell title="至" class="van-cell2" :value="date2" @click="value2 = true" />
+      <van-calendar v-model:show="value2" :show-confirm="false" @confirm="onConfirm2" :min-date="minDate"
+        :max-date="maxDate" />
     </div>
+  </div>
 </template>
 
 <script setup>
@@ -20,12 +20,12 @@ const value1 = ref(false)
 const value2 = ref(false)
 const minDate = ref(new Date(2020, 0, 1))
 const maxDate = ref(new Date(2025, 0, 31))
-const props =defineProps({
-  calendarDate1List:Object,
+const props = defineProps({
+  calendarDate1List: Object,
 })
 // 日期自定义的初始化
-const initDate = () =>{
-  // console.log(props.calendarDate1List)
+const initDate = () => {
+  console.log(props.calendarDate1List)
   date1.value = props.calendarDate1List.dateFrom
   date2.value = props.calendarDate1List.dateTo
 }
