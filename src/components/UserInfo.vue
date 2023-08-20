@@ -587,7 +587,7 @@ const goDetails = async (item, index) => {
         if (data2.PAPA3) {
             if (dd.env.platform !== "notInDingTalk") {
                 dd.biz.util.openLink({
-                    url: `${baseUrl.value}${data2.PAPA3}`,//要打开链接的地址
+                    url: `${baseUrl.value} + 'WAP' + ${data2.PAPA3}`,//要打开链接的地址
                     onSuccess: function (result) {
                         /**/
                     },
