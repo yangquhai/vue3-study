@@ -8,8 +8,9 @@ import ImplementationProcess from '../views/ImplementationProcess.vue'
 import PerformanceReportingList from '../views/PerformanceReportingList.vue'
 import CheckInAndTakePhotos from '../views/CheckInAndTakePhotos.vue'
 import WapList from '../views/WapList.vue'
+import Test from '../views/test.vue'
 
-const title = '意向客户跟踪列表'
+const title = '测试'
 const routes = [
     {
         path: '/:tszid/',
@@ -110,6 +111,11 @@ const routes = [
             next()
         }
     },
+    {
+        path: '/test/',
+        name: 'Test',
+        component: Test,
+    }
 ]
 
 const router = createRouter({
